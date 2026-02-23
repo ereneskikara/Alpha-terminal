@@ -1,1426 +1,1440 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="AlphaTerminal"/>
 <title>AlphaTerminal</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --bg: #080c10; --bg2: #0d1117; --bg3: #111820;
-  --border: #1e2d3d; --accent: #00d4ff; --accent2: #00ff88;
-  --warn: #ffaa00; --danger: #ff3b5c;
-  --text: #e8f4f8; --text2: #7a9bb5; --text3: #3d5a70;
-  --green: #00e676; --red: #ff3b5c; --gold: #ffd700;
-  --card: rgba(13,17,23,0.95);
+/* DARK */
+[data-theme="dark"]{
+  --bg:#131722;--bg2:#1e222d;--bg3:#2a2e39;--bg4:#363c4e;
+  --border:#2a2e39;--border2:#363c4e;
+  --text:#d1d4dc;--text2:#787b86;--text3:#434651;
+  --card:#1e222d;--header:#1e222d;
+  --accent:#2962ff;--accent2:#00bcd4;
+  --up:#26a69a;--down:#ef5350;--gold:#f59e0b;--warn:#f59e0b;
+  --shadow:rgba(0,0,0,.4);--overlay:rgba(0,0,0,.85);
+  --modal-bg:#1e222d;--input-bg:#2a2e39;
 }
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html,body { height:100%; background:var(--bg); color:var(--text); font-family:'Syne',sans-serif; overflow:hidden; }
-body::before {
-  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  opacity:0.4;
+/* DIM */
+[data-theme="dim"]{
+  --bg:#1c2030;--bg2:#232738;--bg3:#2b2f45;--bg4:#353a52;
+  --border:#2b2f45;--border2:#353a52;
+  --text:#b2b5be;--text2:#6b7280;--text3:#414960;
+  --card:#232738;--header:#232738;
+  --accent:#4e74ff;--accent2:#26c6da;
+  --up:#4caf87;--down:#e57373;--gold:#fbbf24;--warn:#fbbf24;
+  --shadow:rgba(0,0,0,.5);--overlay:rgba(0,0,0,.8);
+  --modal-bg:#232738;--input-bg:#2b2f45;
 }
-body::after {
-  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,212,255,0.015) 40px,rgba(0,212,255,0.015) 41px);
+/* LIGHT */
+[data-theme="light"]{
+  --bg:#f0f3fa;--bg2:#ffffff;--bg3:#f0f3fa;--bg4:#e0e3eb;
+  --border:#e0e3eb;--border2:#c8cbcf;
+  --text:#131722;--text2:#787b86;--text3:#a3a6af;
+  --card:#ffffff;--header:#ffffff;
+  --accent:#2962ff;--accent2:#0097a7;
+  --up:#26a69a;--down:#ef5350;--gold:#d4a017;--warn:#d4a017;
+  --shadow:rgba(0,0,0,.1);--overlay:rgba(0,0,0,.6);
+  --modal-bg:#ffffff;--input-bg:#f0f3fa;
 }
-#app { position:relative; z-index:1; height:100dvh; display:flex; flex-direction:column; padding-top:env(safe-area-inset-top); }
-header {
-  padding:12px 16px 10px; display:flex; align-items:center; justify-content:space-between;
-  border-bottom:1px solid var(--border); background:rgba(8,12,16,0.98); backdrop-filter:blur(20px); flex-shrink:0;
-}
-.logo { font-family:'Space Mono',monospace; font-size:14px; color:var(--accent); letter-spacing:2px; }
-.logo span { color:var(--accent2); }
-.header-right { display:flex; gap:10px; align-items:center; }
-.live-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,230,118,0.4)} 50%{opacity:0.7;box-shadow:0 0 0 6px rgba(0,230,118,0)} }
-.time-display { font-family:'Space Mono',monospace; font-size:10px; color:var(--text2); }
-nav { display:flex; border-bottom:1px solid var(--border); background:var(--bg2); overflow-x:auto; scrollbar-width:none; flex-shrink:0; }
-nav::-webkit-scrollbar { display:none; }
-.tab { padding:10px 16px; font-size:11px; font-weight:700; letter-spacing:1px; color:var(--text3); white-space:nowrap; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; text-transform:uppercase; }
-.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
-main { flex:1; overflow-y:auto; overflow-x:hidden; padding:12px; padding-bottom:80px; }
-main::-webkit-scrollbar { width:3px; }
-main::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
-.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:12px; position:relative; overflow:hidden; }
-.card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--accent),transparent); opacity:0.3; }
-.card-title { font-size:10px; font-weight:700; letter-spacing:2px; color:var(--text3); text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-.watchlist-item { display:flex; align-items:center; justify-content:space-between; padding:10px 8px; border-bottom:1px solid rgba(30,45,61,0.5); cursor:pointer; transition:background 0.2s; border-radius:8px; }
-.watchlist-item:hover { background:rgba(0,212,255,0.05); }
-.watchlist-item:last-child { border-bottom:none; }
-.ticker-symbol { font-family:'Space Mono',monospace; font-size:14px; font-weight:700; }
-.ticker-name { font-size:10px; color:var(--text3); }
-.ticker-price { font-family:'Space Mono',monospace; font-size:14px; font-weight:700; }
-.ticker-change { font-family:'Space Mono',monospace; font-size:10px; padding:2px 6px; border-radius:4px; }
-.up { color:var(--green); } .down { color:var(--red); }
-.bg-up { background:rgba(0,230,118,0.1); color:var(--green); }
-.bg-down { background:rgba(255,59,92,0.1); color:var(--red); }
-.signal-badge { font-size:9px; font-weight:700; letter-spacing:1px; padding:3px 7px; border-radius:4px; text-transform:uppercase; }
-.signal-buy { background:rgba(0,230,118,0.15); color:var(--green); border:1px solid rgba(0,230,118,0.3); }
-.signal-sell { background:rgba(255,59,92,0.15); color:var(--red); border:1px solid rgba(255,59,92,0.3); }
-.signal-hold { background:rgba(255,170,0,0.15); color:var(--warn); border:1px solid rgba(255,170,0,0.3); }
-.add-stock-btn { display:flex; align-items:center; gap:8px; padding:10px 14px; background:rgba(0,212,255,0.05); border:1px dashed rgba(0,212,255,0.3); border-radius:10px; cursor:pointer; color:var(--accent); font-size:12px; font-weight:700; letter-spacing:1px; transition:all 0.2s; margin-top:8px; }
-canvas.minichart { width:100%; height:80px; display:block; border-radius:8px; }
-.indicators-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.indicator-item { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px; padding:10px; }
-.ind-label { font-size:9px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
-.ind-value { font-family:'Space Mono',monospace; font-size:16px; font-weight:700; }
-.ind-status { font-size:9px; margin-top:2px; }
-.signal-main { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-.signal-action { font-size:28px; font-weight:800; letter-spacing:-1px; }
-.confidence-wrap { text-align:right; }
-.confidence-score { font-family:'Space Mono',monospace; font-size:24px; font-weight:700; color:var(--accent); }
-.confidence-label { font-size:9px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
-.signal-reasons { display:flex; flex-direction:column; gap:6px; }
-.reason-item { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text2); padding:6px 10px; background:rgba(255,255,255,0.02); border-radius:6px; }
-.reason-bull { border-left:2px solid var(--green); }
-.reason-bear { border-left:2px solid var(--red); }
-.reason-neutral { border-left:2px solid var(--warn); }
-.progress-bar { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; margin-top:6px; }
-.progress-fill { height:100%; border-radius:2px; transition:width 0.5s ease; }
-.fib-table { width:100%; border-collapse:collapse; }
-.fib-table td { padding:6px 8px; font-family:'Space Mono',monospace; font-size:11px; border-bottom:1px solid rgba(30,45,61,0.4); }
-.fib-table td:first-child { color:var(--text3); }
-.fib-table td:last-child { text-align:right; font-weight:700; }
-.fib-key { color:var(--gold) !important; }
-.opp-card { background:linear-gradient(135deg,rgba(255,215,0,0.05),rgba(0,212,255,0.05)); border:1px solid rgba(255,215,0,0.2); border-radius:10px; padding:12px; margin-bottom:8px; cursor:pointer; transition:all 0.2s; }
-.opp-card:hover { border-color:rgba(255,215,0,0.4); transform:translateY(-1px); }
-.opp-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.opp-ticker { font-family:'Space Mono',monospace; font-size:16px; font-weight:700; color:var(--gold); }
-.opp-upside { font-family:'Space Mono',monospace; font-size:12px; color:var(--green); }
-.opp-reason { font-size:11px; color:var(--text2); line-height:1.5; }
-.opp-tags { display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
-.opp-tag { font-size:9px; padding:2px 7px; border-radius:3px; font-weight:700; letter-spacing:1px; background:rgba(0,212,255,0.1); color:var(--accent); border:1px solid rgba(0,212,255,0.2); }
-.unusual-item { display:flex; flex-direction:column; gap:4px; padding:10px 0; border-bottom:1px solid rgba(30,45,61,0.5); }
-.unusual-item:last-child { border-bottom:none; }
-.unusual-header { display:flex; justify-content:space-between; align-items:center; }
-.unusual-ticker { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; }
-.unusual-type { font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px; letter-spacing:1px; }
-.call-type { background:rgba(0,230,118,0.15); color:var(--green); }
-.put-type { background:rgba(255,59,92,0.15); color:var(--red); }
-.unusual-detail { font-family:'Space Mono',monospace; font-size:10px; color:var(--text2); }
-.unusual-size { font-size:11px; color:var(--warn); font-weight:700; }
-.news-item { padding:10px 0; border-bottom:1px solid rgba(30,45,61,0.5); cursor:pointer; }
-.news-item:last-child { border-bottom:none; }
-.news-header { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:4px; }
-.news-title { font-size:12px; color:var(--text); line-height:1.4; font-weight:600; }
-.news-impact { font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; white-space:nowrap; }
-.impact-high { background:rgba(255,59,92,0.15); color:var(--red); }
-.impact-med { background:rgba(255,170,0,0.15); color:var(--warn); }
-.impact-low { background:rgba(122,155,181,0.15); color:var(--text2); }
-.news-meta { font-size:10px; color:var(--text3); }
-.sent-bull { color:var(--green); } .sent-bear { color:var(--red); }
-/* BOARD CARD — FIX: was missing */
-.board-item { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid rgba(30,45,61,0.5); }
-.board-item:last-child { border-bottom:none; }
-.board-avatar { width:38px; height:38px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; color:var(--bg); }
-.board-info { flex:1; }
-.board-name { font-size:13px; font-weight:700; margin-bottom:2px; }
-.board-role { font-size:10px; color:var(--accent); margin-bottom:4px; }
-.board-bio { font-size:10px; color:var(--text2); line-height:1.4; }
-.board-score { font-family:'Space Mono',monospace; font-size:12px; color:var(--gold); font-weight:700; }
-.val-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.val-item { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px; padding:10px; }
-.val-label { font-size:9px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
-.val-value { font-family:'Space Mono',monospace; font-size:18px; font-weight:700; }
-.val-status { font-size:9px; margin-top:2px; }
-.ai-box { background:linear-gradient(135deg,rgba(0,212,255,0.05),rgba(0,255,136,0.03)); border:1px solid rgba(0,212,255,0.2); border-radius:10px; padding:14px; }
-.ai-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
-.ai-label { font-size:10px; font-weight:700; letter-spacing:2px; color:var(--accent); text-transform:uppercase; }
-.ai-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:blink 1.4s infinite; }
-.ai-dot:nth-child(2){animation-delay:0.2s} .ai-dot:nth-child(3){animation-delay:0.4s}
-@keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
-.ai-text { font-size:12px; color:var(--text2); line-height:1.7; }
-.bottom-nav { position:fixed; bottom:0; left:0; right:0; z-index:100; background:rgba(8,12,16,0.98); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; padding-bottom:env(safe-area-inset-bottom); }
-.bnav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:10px 0; cursor:pointer; transition:all 0.2s; color:var(--text3); font-size:9px; font-weight:700; letter-spacing:1px; }
-.bnav-item.active { color:var(--accent); }
-.bnav-icon { font-size:20px; line-height:1; }
-.modal-overlay { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); display:flex; align-items:flex-end; opacity:0; pointer-events:none; transition:opacity 0.3s; }
-.modal-overlay.open { opacity:1; pointer-events:all; }
-.modal { background:var(--bg2); border:1px solid var(--border); border-radius:20px 20px 0 0; padding:20px; width:100%; max-height:85vh; overflow-y:auto; transform:translateY(100%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
-.modal-overlay.open .modal { transform:translateY(0); }
-.modal-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 16px; }
-.modal-title { font-size:18px; font-weight:800; margin-bottom:16px; }
-input.stock-input { flex:1; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--text); font-family:'Space Mono',monospace; font-size:14px; outline:none; text-transform:uppercase; }
-input.stock-input:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(0,212,255,0.1); }
-input.stock-input::placeholder { color:var(--text3); text-transform:none; }
-.btn-primary { background:var(--accent); color:var(--bg); border:none; border-radius:10px; padding:12px 20px; font-family:'Syne',sans-serif; font-size:13px; font-weight:800; cursor:pointer; letter-spacing:1px; white-space:nowrap; width:100%; margin-top:10px; }
-.btn-primary:active { transform:scale(0.97); }
-.section-divider { font-size:10px; font-weight:700; letter-spacing:3px; color:var(--text3); text-transform:uppercase; margin:16px 0 8px; padding-left:4px; }
-.jackpot-banner { background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(255,100,0,0.05)); border:1px solid rgba(255,215,0,0.3); border-radius:12px; padding:16px; margin-bottom:12px; text-align:center; }
-.jackpot-emoji { font-size:32px; margin-bottom:8px; }
-.jackpot-title { font-size:16px; font-weight:800; color:var(--gold); margin-bottom:4px; }
-.jackpot-sub { font-size:11px; color:var(--text2); }
-.exch-btn { padding:5px 12px; border-radius:20px; font-size:10px; font-weight:700; white-space:nowrap; cursor:pointer; transition:all 0.2s; border:1px solid var(--border); color:var(--text3); background:var(--bg3); letter-spacing:0.5px; }
-.exch-btn.active { background:rgba(0,212,255,0.15); color:var(--accent); border-color:rgba(0,212,255,0.4); }
-.search-result-item { display:flex; align-items:center; justify-content:space-between; padding:10px; border-radius:10px; cursor:pointer; transition:background 0.15s; margin-bottom:4px; border:1px solid transparent; }
-.search-result-item:hover { background:rgba(0,212,255,0.07); border-color:rgba(0,212,255,0.15); }
-.sri-left { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
-.sri-flag { font-size:18px; line-height:1; flex-shrink:0; }
-.sri-info { flex:1; min-width:0; }
-.sri-ticker { font-family:'Space Mono',monospace; font-size:13px; font-weight:700; color:var(--text); }
-.sri-name { font-size:11px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px; }
-.sri-exchange { font-size:9px; color:var(--text3); margin-top:1px; }
-.sri-add-btn { font-size:9px; font-weight:700; padding:3px 9px; border-radius:5px; letter-spacing:1px; background:rgba(0,212,255,0.1); color:var(--accent); border:1px solid rgba(0,212,255,0.3); cursor:pointer; }
-.sri-add-btn.added { background:rgba(0,230,118,0.1); color:var(--green); border-color:rgba(0,230,118,0.3); }
-.wl-chip { display:flex; align-items:center; gap:5px; padding:5px 10px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:20px; font-size:11px; font-family:'Space Mono',monospace; color:var(--text2); cursor:pointer; }
-.wl-chip .remove { color:var(--red); font-size:13px; line-height:1; }
-.skeleton { background:linear-gradient(90deg,var(--bg3) 25%,rgba(255,255,255,0.03) 50%,var(--bg3) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:6px; height:24px; }
-@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-.view { display:none; }
-.view.active { display:block; }
-/* ICHIMOKU */
-.ichi-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px; }
-.ichi-item { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center; }
-.ichi-label { font-size:8px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
-.ichi-val { font-family:'Space Mono',monospace; font-size:11px; font-weight:700; }
-/* MICRO CAP */
-.micro-badge { display:inline-block; font-size:8px; font-weight:700; padding:2px 6px; border-radius:3px; letter-spacing:1px; background:rgba(255,215,0,0.15); color:var(--gold); border:1px solid rgba(255,215,0,0.3); margin-left:6px; }
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Roboto',sans-serif;overflow:hidden;font-size:13px;}
+body,header,nav,.bottom-nav,.card,.modal,.setting-group,.ind-item,.mkt-item,.val-item,.fib-table,.ai-box,.opp-card,.wl-item,.board-item,.news-item,.unusual-item,.tab,.bnav,.sri,.exch-btn,.btn-icon,.btn-sec,.wl-chip{transition:background .25s,color .25s,border-color .25s;}
+
+#app{position:relative;z-index:1;height:100dvh;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
+
+/* HEADER */
+header{height:46px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--header);flex-shrink:0;}
+.logo{font-family:'Roboto Mono',monospace;font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.logo-mark{width:24px;height:24px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;}
+.logo-name{font-weight:700;} .logo-name span{color:var(--text2);font-weight:400;}
+.h-right{display:flex;gap:6px;align-items:center;}
+.live-pill{display:flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(38,166,154,.1);border:1px solid rgba(38,166,154,.25);border-radius:3px;}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--up);animation:liveblink 2s infinite;}
+@keyframes liveblink{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(38,166,154,.5)}50%{opacity:.5;box-shadow:0 0 0 4px rgba(38,166,154,0)}}
+.live-lbl{font-family:'Roboto Mono',monospace;font-size:9px;color:var(--up);letter-spacing:1.5px;font-weight:600;}
+.h-clock{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--text2);}
+.h-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;font-size:16px;background:transparent;border:none;color:var(--text2);}
+.h-btn:hover{background:var(--bg3);}
+
+/* TICKER BAR */
+.ticker-bar{height:36px;display:flex;border-bottom:1px solid var(--border);background:var(--header);overflow-x:auto;scrollbar-width:none;flex-shrink:0;align-items:stretch;}
+.ticker-bar::-webkit-scrollbar{display:none;}
+.tb-item{display:flex;flex-direction:column;justify-content:center;padding:0 12px;border-right:1px solid var(--border);min-width:fit-content;cursor:pointer;flex-shrink:0;position:relative;gap:1px;}
+.tb-item:hover{background:var(--bg3);}
+.tb-item.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent);}
+.tb-sym{font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;color:var(--text);}
+.tb-price{font-family:'Roboto Mono',monospace;font-size:10px;}
+.tb-chg{font-family:'Roboto Mono',monospace;font-size:9px;}
+.up{color:var(--up);}.down{color:var(--down);}
+
+/* NAV */
+nav{display:flex;border-bottom:1px solid var(--border);background:var(--header);overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+nav::-webkit-scrollbar{display:none;}
+.tab{padding:0 14px;height:36px;font-size:12px;font-weight:500;color:var(--text2);white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;transition:color .15s,border-color .15s,background .15s;}
+.tab.active{color:var(--text);border-bottom-color:var(--accent);}
+.tab:hover:not(.active){color:var(--text);background:var(--bg3);}
+
+/* MAIN */
+main{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px;padding-bottom:76px;}
+main::-webkit-scrollbar{width:3px;}
+main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:8px;}
+.card-hdr{font-size:11px;font-weight:500;letter-spacing:.5px;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;}
+
+/* WATCHLIST */
+.wl-item{display:flex;align-items:center;justify-content:space-between;padding:8px 6px;border-radius:3px;cursor:pointer;margin-bottom:1px;}
+.wl-item:hover{background:var(--bg3);}
+.wl-item.selected{background:rgba(41,98,255,.1);}
+.wl-item.selected .wl-sym{color:var(--accent);}
+.wl-sym{font-family:'Roboto Mono',monospace;font-size:13px;font-weight:600;}
+.wl-name{font-size:10px;color:var(--text3);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;}
+.wl-price{font-family:'Roboto Mono',monospace;font-size:13px;font-weight:600;}
+.wl-chg{font-family:'Roboto Mono',monospace;font-size:10px;padding:1px 5px;border-radius:2px;margin-top:2px;}
+.wl-chg.up{background:rgba(38,166,154,.15);color:var(--up);}
+.wl-chg.down{background:rgba(239,83,80,.15);color:var(--down);}
+.sig-badge{font-size:9px;font-weight:700;padding:2px 5px;border-radius:2px;text-transform:uppercase;margin-left:3px;letter-spacing:.5px;}
+.sig-buy{background:rgba(38,166,154,.2);color:var(--up);}
+.sig-sell{background:rgba(239,83,80,.2);color:var(--down);}
+.sig-hold{background:rgba(245,158,11,.15);color:var(--warn);}
+.add-wl-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;margin-top:6px;background:transparent;border:1px dashed var(--border2);border-radius:3px;cursor:pointer;color:var(--text2);font-size:12px;font-weight:500;}
+.add-wl-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(41,98,255,.05);}
+
+/* CHART */
+canvas.minichart{width:100%;height:90px;display:block;border-radius:3px;}
+.chart-meta{display:flex;justify-content:space-between;margin-top:4px;font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3);}
+
+/* MARKET GRID */
+.mkt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.mkt-item{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:8px 10px;}
+.mkt-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+.mkt-val{font-family:'Roboto Mono',monospace;font-size:14px;font-weight:600;}
+.mkt-chg{font-family:'Roboto Mono',monospace;font-size:9px;margin-top:1px;}
+
+/* SIGNAL */
+.signal-hero{display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;}
+.sig-lbl{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:1px;}
+.sig-action{font-family:'Roboto Mono',monospace;font-size:28px;font-weight:700;}
+.sig-score-val{font-family:'Roboto Mono',monospace;font-size:26px;font-weight:700;color:var(--accent2);text-align:right;}
+.sig-score-lbl{font-size:10px;color:var(--text3);text-align:right;text-transform:uppercase;letter-spacing:.5px;}
+.sig-bar-wrap{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:12px;}
+.sig-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.reason{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--text2);padding:5px 8px;border-radius:3px;margin-bottom:4px;background:var(--bg3);line-height:1.5;}
+.reason.bull{border-left:2px solid var(--up);}
+.reason.bear{border-left:2px solid var(--down);}
+.reason.neutral{border-left:2px solid var(--warn);}
+
+/* INDICATORS */
+.ind-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.ind-item{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:8px 10px;}
+.ind-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+.ind-val{font-family:'Roboto Mono',monospace;font-size:15px;font-weight:600;}
+.ind-status{font-size:9px;margin-top:1px;}
+
+/* FIBONACCI */
+.fib-table{width:100%;border-collapse:collapse;}
+.fib-table tr{border-bottom:1px solid var(--border);}
+.fib-table tr:last-child{border-bottom:none;}
+.fib-table td{padding:5px 8px;font-family:'Roboto Mono',monospace;font-size:10px;}
+.fib-table td:first-child{color:var(--text3);}
+.fib-table td:last-child{text-align:right;font-weight:600;}
+.fib-key td{color:var(--gold)!important;}
+
+/* AI BOX */
+.ai-box{background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:10px;margin-bottom:8px;}
+.ai-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.ai-badge{font-family:'Roboto Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1.5px;color:var(--accent2);text-transform:uppercase;}
+.ai-dots{display:flex;gap:3px;align-items:center;}
+.ai-dot{width:4px;height:4px;border-radius:50%;background:var(--accent2);animation:blink 1.4s infinite;}
+.ai-dot:nth-child(2){animation-delay:.2s;}.ai-dot:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+.ai-text{font-size:12px;color:var(--text2);line-height:1.7;}
+.timestamp{font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3);margin-top:6px;}
+
+/* BUTTONS */
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:3px;padding:9px 14px;font-family:'Roboto',sans-serif;font-size:12px;font-weight:500;cursor:pointer;width:100%;letter-spacing:.3px;}
+.btn-primary:hover{opacity:.85;}
+.btn-sec{background:var(--bg3);color:var(--text2);border:1px solid var(--border2);border-radius:3px;padding:7px 12px;font-family:'Roboto',sans-serif;font-size:11px;font-weight:500;cursor:pointer;}
+.btn-sec:hover{border-color:var(--accent);color:var(--accent);}
+.btn-icon{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:4px 8px;cursor:pointer;font-size:11px;color:var(--text2);}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent);}
+
+/* NEWS */
+.news-item{padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.news-item:last-child{border-bottom:none;}
+.news-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:3px;}
+.news-title{font-size:12px;color:var(--text);line-height:1.4;font-weight:500;}
+.imp{font-size:9px;font-weight:600;padding:2px 5px;border-radius:2px;white-space:nowrap;flex-shrink:0;text-transform:uppercase;}
+.imp-high{background:rgba(239,83,80,.15);color:var(--down);}
+.imp-med{background:rgba(245,158,11,.12);color:var(--warn);}
+.imp-low{background:rgba(120,123,134,.15);color:var(--text2);}
+.news-meta{font-size:10px;color:var(--text3);}
+.sent-bull{color:var(--up);}.sent-bear{color:var(--down);}
+
+/* BOARD */
+.board-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.board-item:last-child{border-bottom:none;}
+.board-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Roboto Mono',monospace;font-size:11px;font-weight:700;color:#fff;}
+.board-name{font-size:12px;font-weight:600;margin-bottom:1px;}
+.board-role{font-size:10px;color:var(--accent2);margin-bottom:3px;}
+.board-bio{font-size:10px;color:var(--text2);line-height:1.5;}
+.board-score{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--gold);font-weight:600;}
+
+/* VALUATION */
+.val-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.val-item{background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:8px 10px;}
+.val-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+.val-val{font-family:'Roboto Mono',monospace;font-size:16px;font-weight:600;}
+.val-badge{font-size:9px;margin-top:1px;font-weight:600;}
+
+/* UNUSUAL */
+.unusual-item{padding:8px 0;border-bottom:1px solid var(--border);}
+.unusual-item:last-child{border-bottom:none;}
+.u-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.u-sym{font-family:'Roboto Mono',monospace;font-size:12px;font-weight:600;}
+.u-type{font-size:9px;font-weight:700;padding:2px 5px;border-radius:2px;text-transform:uppercase;}
+.call{background:rgba(38,166,154,.15);color:var(--up);}
+.put{background:rgba(239,83,80,.15);color:var(--down);}
+.u-prem{font-family:'Roboto Mono',monospace;font-size:11px;color:var(--warn);font-weight:600;}
+.u-detail{font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text2);}
+
+/* OPPORTUNITIES */
+.opp-card{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:11px;margin-bottom:7px;cursor:pointer;}
+.opp-card:hover{border-color:var(--accent);}
+.opp-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.opp-sym{font-family:'Roboto Mono',monospace;font-size:14px;font-weight:700;color:var(--gold);}
+.opp-name{font-size:10px;color:var(--text3);margin-top:1px;}
+.opp-up{font-family:'Roboto Mono',monospace;font-size:13px;font-weight:700;color:var(--up);}
+.opp-reason{font-size:11px;color:var(--text2);line-height:1.5;}
+.opp-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+.opp-tag{font-size:9px;padding:2px 6px;border-radius:2px;font-weight:500;background:rgba(41,98,255,.12);color:var(--accent);border:1px solid rgba(41,98,255,.2);}
+.jk-banner{background:var(--bg3);border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:12px;margin-bottom:8px;text-align:center;}
+.jk-title{font-family:'Roboto Mono',monospace;font-size:13px;font-weight:700;color:var(--gold);margin-bottom:3px;}
+.sec-div{font-size:10px;font-weight:500;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin:12px 0 7px;}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--header);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);}
+.bnav{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;cursor:pointer;color:var(--text3);font-size:9px;font-weight:500;text-transform:uppercase;}
+.bnav.active{color:var(--accent);}
+.bnav-icon{font-size:18px;line-height:1;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:var(--overlay);backdrop-filter:blur(8px);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--modal-bg);border:1px solid var(--border2);border-radius:8px 8px 0 0;padding:16px;width:100%;max-height:88vh;overflow-y:auto;transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-handle{width:32px;height:3px;background:var(--border2);border-radius:2px;margin:0 auto 14px;}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:14px;}
+input.s-input{width:100%;background:var(--input-bg);border:1px solid var(--border2);border-radius:3px;padding:10px 12px;color:var(--text);font-family:'Roboto Mono',monospace;font-size:13px;outline:none;text-transform:uppercase;}
+input.s-input::placeholder{text-transform:none;font-family:'Roboto',sans-serif;color:var(--text3);font-size:12px;}
+input.s-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(41,98,255,.1);}
+.exch-chips{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;margin:8px 0;padding-bottom:2px;}
+.exch-chips::-webkit-scrollbar{display:none;}
+.exch-btn{padding:4px 10px;border-radius:14px;font-size:9px;font-weight:600;white-space:nowrap;cursor:pointer;border:1px solid var(--border);color:var(--text3);background:transparent;}
+.exch-btn.active{background:rgba(41,98,255,.15);color:var(--accent);border-color:var(--accent);}
+.sri{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:3px;cursor:pointer;margin-bottom:2px;}
+.sri:hover{background:var(--bg3);}
+.sri-l{display:flex;align-items:center;gap:9px;flex:1;min-width:0;}
+.sri-flag{font-size:17px;flex-shrink:0;}
+.sri-sym{font-family:'Roboto Mono',monospace;font-size:12px;font-weight:600;color:var(--text);}
+.sri-name{font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;}
+.sri-exch{font-size:9px;color:var(--text3);}
+.sri-add{font-size:9px;font-weight:600;padding:3px 8px;border-radius:2px;background:rgba(41,98,255,.1);color:var(--accent);border:1px solid rgba(41,98,255,.3);cursor:pointer;}
+.sri-add.added{background:rgba(38,166,154,.1);color:var(--up);border-color:rgba(38,166,154,.3);}
+.search-empty{text-align:center;padding:24px;color:var(--text3);font-size:12px;}
+.wl-chip{display:flex;align-items:center;gap:3px;padding:3px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;font-size:10px;font-family:'Roboto Mono',monospace;color:var(--text2);cursor:pointer;}
+.wl-chip .rm{color:var(--down);font-size:12px;}
+
+/* SETTINGS */
+.settings-panel{display:flex;flex-direction:column;gap:10px;}
+.setting-group{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:12px;}
+.sgt{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
+.s-row:last-child{border-bottom:none;}
+.s-lbl{font-size:12px;color:var(--text);}
+.s-desc{font-size:10px;color:var(--text3);margin-top:1px;}
+.theme-btns{display:flex;gap:5px;}
+.t-btn{padding:5px 10px;border-radius:3px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:var(--bg3);}
+.t-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.tslider{position:absolute;inset:0;background:var(--bg4);border-radius:10px;cursor:pointer;transition:.3s;}
+.tslider::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:var(--text3);border-radius:50%;transition:.3s;}
+.toggle input:checked+.tslider{background:var(--accent);}
+.toggle input:checked+.tslider::before{transform:translateX(16px);background:#fff;}
+.wl-group-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);}
+.wl-group-row:last-child{border-bottom:none;}
+.wg-name{font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;color:var(--text);}
+.wg-cnt{font-size:10px;color:var(--text3);}
+.wg-actions{display:flex;gap:5px;}
+.badge-dot{width:7px;height:7px;border-radius:50%;}
+
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:3px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.view{display:none;}.view.active{display:block;}
+.t-up{color:var(--up);}.t-down{color:var(--down);}.t-warn{color:var(--warn);}.t-acc{color:var(--accent);}
 </style>
 </head>
 <body>
 <div id="app">
-  <header>
-    <div class="logo">ALPHA<span>TERMINAL</span></div>
-    <div class="header-right">
-      <div class="live-dot"></div>
-      <div class="time-display" id="clock">--:--:--</div>
-    </div>
-  </header>
 
-  <nav>
-    <div class="tab active" data-view="watchlist">📊 İzleme</div>
-    <div class="tab" data-view="signal">⚡ Sinyal</div>
-    <div class="tab" data-view="opportunities">🎯 Fırsatlar</div>
-    <div class="tab" data-view="unusual">🔥 Unusual</div>
-    <div class="tab" data-view="news">🌍 Jeopolitik</div>
-    <div class="tab" data-view="board">👔 Yönetim</div>
-    <div class="tab" data-view="valuation">💰 Değerleme</div>
-    <div class="tab" data-view="microcap">💎 MicroCap</div>
-  </nav>
+<header>
+  <div class="logo">
+    <div class="logo-mark">α</div>
+    <div class="logo-name">ALPHA<span>TERMINAL</span></div>
+  </div>
+  <div class="h-right">
+    <div class="live-pill"><div class="live-dot"></div><div class="live-lbl">CANLI</div></div>
+    <div class="h-clock" id="clock">--:--:--</div>
+    <button class="h-btn" onclick="switchView('settings')" title="Ayarlar">⚙️</button>
+  </div>
+</header>
 
-  <main>
+<div class="ticker-bar" id="tickerBar"></div>
 
-    <!-- WATCHLIST -->
-    <div class="view active" id="view-watchlist">
-      <div class="card">
-        <div class="card-title"><span>📈</span>Portföy İzleme Listesi</div>
-        <div id="watchlistItems"></div>
-        <div class="add-stock-btn" id="addStockBtn">+ Hisse Ekle</div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>📉</span>Mini Grafik — Seçili Hisse</div>
-        <canvas class="minichart" id="miniChart"></canvas>
-        <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text3)" id="chartLabel">Bir hisse seçin</div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>🌡️</span>Piyasa Özeti</div>
-        <div class="indicators-grid">
-          <div class="indicator-item"><div class="ind-label">S&P 500</div><div class="ind-value up" id="sp500val">—</div><div class="ind-status up" id="sp500chg">Yükleniyor...</div></div>
-          <div class="indicator-item"><div class="ind-label">VIX</div><div class="ind-value" style="color:var(--warn)" id="vixval">—</div><div class="ind-status" style="color:var(--warn)" id="vixlbl">—</div></div>
-          <div class="indicator-item"><div class="ind-label">DXY (Dolar)</div><div class="ind-value down" id="dxyval">—</div><div class="ind-status down" id="dxychg">—</div></div>
-          <div class="indicator-item"><div class="ind-label">10Y Faiz</div><div class="ind-value" style="color:var(--warn)" id="t10yval">—</div><div class="ind-status up">Devlet Tahvili</div></div>
-        </div>
+<nav>
+  <div class="tab active" data-view="watchlist">📊 İzleme</div>
+  <div class="tab" data-view="signal">⚡ Sinyal</div>
+  <div class="tab" data-view="opportunities">🎯 Fırsatlar</div>
+  <div class="tab" data-view="unusual">🔥 Unusual</div>
+  <div class="tab" data-view="news">🌍 Haber</div>
+  <div class="tab" data-view="board">👔 Yönetim</div>
+  <div class="tab" data-view="valuation">💰 Değerleme</div>
+  <div class="tab" data-view="settings">⚙️ Ayarlar</div>
+</nav>
+
+<main>
+
+<!-- WATCHLIST -->
+<div class="view active" id="view-watchlist">
+  <div class="card">
+    <div class="card-hdr">
+      <span>📊 İzleme Listesi</span>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span id="wlCount" style="font-family:'Roboto Mono',monospace;font-size:10px;color:var(--text3)">0 hisse</span>
+        <button class="btn-icon" id="refreshWLBtn">↻</button>
       </div>
     </div>
-
-    <!-- SIGNAL -->
-    <div class="view" id="view-signal">
-      <div class="card">
-        <div class="card-title"><span>⚡</span>Al / Sat / Bekle Sinyali</div>
-        <div class="signal-main">
-          <div>
-            <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px" id="signalTicker">Hisse Seçin</div>
-            <div class="signal-action" id="signalAction" style="color:var(--warn)">BEKLE</div>
-          </div>
-          <div class="confidence-wrap">
-            <div class="confidence-score" id="confidenceScore">--</div>
-            <div class="confidence-label">Güven Skoru</div>
-          </div>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="confidenceBar" style="width:0%;background:var(--warn)"></div>
-        </div>
-        <div style="margin-top:14px">
-          <div class="card-title" style="margin-bottom:8px">📋 Sinyal Gerekçeleri</div>
-          <div class="signal-reasons" id="signalReasons">
-            <div class="reason-item reason-neutral">İzleme listesinden bir hisse seçin</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>📐</span>Teknik Göstergeler</div>
-        <div class="indicators-grid" id="technicalGrid">
-          <div class="indicator-item"><div class="ind-label">RSI (14)</div><div class="skeleton"></div></div>
-          <div class="indicator-item"><div class="ind-label">MACD</div><div class="skeleton"></div></div>
-          <div class="indicator-item"><div class="ind-label">Stochastic</div><div class="skeleton"></div></div>
-          <div class="indicator-item"><div class="ind-label">CCI (20)</div><div class="skeleton"></div></div>
-          <div class="indicator-item"><div class="ind-label">BB Width</div><div class="skeleton"></div></div>
-          <div class="indicator-item"><div class="ind-label">Momentum</div><div class="skeleton"></div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>☁️</span>Ichimoku Analizi</div>
-        <div id="ichimokuDisplay">
-          <div style="font-size:11px;color:var(--text3);text-align:center;padding:12px">Hisse seçilince hesaplanacak</div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>🌊</span>Elliott Wave & Fibonacci</div>
-        <div id="elliottDisplay" style="margin-bottom:12px">
-          <div style="font-size:11px;color:var(--text3);text-align:center;padding:8px">Hisse seçilince hesaplanacak</div>
-        </div>
-        <table class="fib-table" id="fibTable">
-          <tr><td>%23.6</td><td>—</td></tr>
-          <tr><td>%38.2</td><td>—</td></tr>
-          <tr><td class="fib-key">%61.8 (Altın)</td><td class="fib-key">—</td></tr>
-          <tr><td>%78.6</td><td>—</td></tr>
-          <tr><td>Extension %161.8</td><td>—</td></tr>
-        </table>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>🤖</span>AI Analiz</div>
-        <div class="ai-box">
-          <div class="ai-header">
-            <div class="ai-label">Alpha AI</div>
-            <div style="display:flex;gap:4px" id="aiThinking"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
-          </div>
-          <div class="ai-text" id="aiAnalysisText">Analiz için bir hisse seçin ve "AI Analiz Et" butonuna basın.</div>
-        </div>
-        <button class="btn-primary" id="analyzeBtn">🤖 AI ile Analiz Et</button>
-      </div>
+    <div id="watchlistItems"></div>
+    <div class="add-wl-btn" id="addStockBtn"><span style="font-size:16px">+</span> Hisse Ekle</div>
+  </div>
+  <div class="card">
+    <div class="card-hdr">
+      <span>📉 <span id="chartLbl">—</span> · 30 Günlük</span>
+      <span id="chartPrLbl" style="font-family:'Roboto Mono',monospace;font-size:11px;color:var(--text2)"></span>
     </div>
-
-    <!-- OPPORTUNITIES -->
-    <div class="view" id="view-opportunities">
-      <div class="jackpot-banner">
-        <div class="jackpot-emoji">🎯</div>
-        <div class="jackpot-title">Günün Fırsatları</div>
-        <div class="jackpot-sub">AI tarafından tespit edilen yüksek potansiyelli hisseler</div>
-      </div>
-      <div id="opportunitiesList"></div>
-      <div class="section-divider">💎 Jackpot Radarı</div>
-      <div class="card">
-        <div class="card-title"><span>🚀</span>Yüksek Momentum Tarayıcı</div>
-        <div id="jackpotList"></div>
-        <button class="btn-primary" id="scanBtn">🔍 Yeni Tara</button>
-      </div>
+    <canvas class="minichart" id="miniChart"></canvas>
+    <div class="chart-meta"><span id="cLow">—</span><span style="color:var(--text3)">30G</span><span id="cHigh">—</span></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>🌡️ Piyasa Özeti</span><span id="mktTs" style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3)"></span></div>
+    <div class="mkt-grid" id="mktGrid">
+      <div class="mkt-item"><div class="mkt-label">S&amp;P 500 (SPY)</div><div class="mkt-val skeleton" style="height:18px;width:60px;margin:2px 0"></div></div>
+      <div class="mkt-item"><div class="mkt-label">VIX (VXX)</div><div class="mkt-val skeleton" style="height:18px;width:60px;margin:2px 0"></div></div>
+      <div class="mkt-item"><div class="mkt-label">DXY (UUP)</div><div class="mkt-val skeleton" style="height:18px;width:60px;margin:2px 0"></div></div>
+      <div class="mkt-item"><div class="mkt-label">10Y (TLT)</div><div class="mkt-val skeleton" style="height:18px;width:60px;margin:2px 0"></div></div>
     </div>
-
-    <!-- UNUSUAL OPTIONS -->
-    <div class="view" id="view-unusual">
-      <div class="card">
-        <div class="card-title"><span>🔥</span>Unusual Opsiyon Akışı</div>
-        <div id="unusualList"></div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>📊</span>Opsiyon Özeti</div>
-        <div class="indicators-grid">
-          <div class="indicator-item"><div class="ind-label">Put/Call Oranı</div><div class="ind-value up">0.72</div><div class="ind-status up">● Bullish</div></div>
-          <div class="indicator-item"><div class="ind-label">Implied Vol</div><div class="ind-value" style="color:var(--warn)">24.3%</div><div class="ind-status" style="color:var(--warn)">● Orta</div></div>
-          <div class="indicator-item"><div class="ind-label">Toplam Prim</div><div class="ind-value" style="color:var(--gold)">$2.4M</div><div class="ind-status up">▲ Yüksek</div></div>
-          <div class="indicator-item"><div class="ind-label">Büyük İşlem</div><div class="ind-value" style="color:var(--accent)">47</div><div class="ind-status">Bugün</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- NEWS / GEOPOLITICS -->
-    <div class="view" id="view-news">
-      <div class="card">
-        <div class="card-title"><span>🌍</span>Jeopolitik & Makro Analiz</div>
-        <div class="ai-box" style="margin-bottom:12px">
-          <div class="ai-text" id="geopoliticalSummary">Küresel piyasalar üzerindeki jeopolitik risk faktörleri yükleniyor...</div>
-        </div>
-        <button class="btn-primary" id="geoAnalyzeBtn">🌍 Jeopolitik AI Analizi</button>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>📰</span>Son Gelişmeler</div>
-        <div id="newsList"></div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>⚖️</span>Hukuki & Düzenleyici</div>
-        <div id="legalList"></div>
-      </div>
-    </div>
-
-    <!-- BOARD -->
-    <div class="view" id="view-board">
-      <div class="card">
-        <div class="card-title"><span>👔</span>Yönetim Kurulu Analizi</div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:12px">Seçili hisse: <span id="boardTickerLabel" style="color:var(--accent)">—</span></div>
-        <div id="boardList"></div>
-        <button class="btn-primary" id="boardAnalyzeBtn">🤖 AI ile Yönetim Analizi</button>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>📋</span>Insider Trading</div>
-        <div id="insiderList"></div>
-      </div>
-    </div>
-
-    <!-- VALUATION -->
-    <div class="view" id="view-valuation">
-      <div class="card">
-        <div class="card-title"><span>💰</span>Temel Değerleme — <span id="valTickerLabel" style="color:var(--accent);font-size:10px">—</span></div>
-        <div class="val-grid" id="valuationGrid">
-          <div class="val-item"><div class="val-label">P/E</div><div class="skeleton"></div></div>
-          <div class="val-item"><div class="val-label">P/B</div><div class="skeleton"></div></div>
-          <div class="val-item"><div class="val-label">EV/EBITDA</div><div class="skeleton"></div></div>
-          <div class="val-item"><div class="val-label">PEG</div><div class="skeleton"></div></div>
-          <div class="val-item"><div class="val-label">P/FCF</div><div class="skeleton"></div></div>
-          <div class="val-item"><div class="val-label">EV/EBIT</div><div class="skeleton"></div></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><span>🤖</span>Değerleme AI Yorumu</div>
-        <div class="ai-box">
-          <div class="ai-text" id="valuationAI">Değerleme analizi için sol menüden hisse seçin.</div>
-        </div>
-        <button class="btn-primary" id="valuationBtn">💰 Değerleme Analizi</button>
-      </div>
-    </div>
-
-    <!-- MICRO CAP -->
-    <div class="view" id="view-microcap">
-      <div class="jackpot-banner" style="background:linear-gradient(135deg,rgba(255,100,50,0.1),rgba(255,215,0,0.05))">
-        <div class="jackpot-emoji">💎</div>
-        <div class="jackpot-title" style="color:#ff6032">MicroCap Jackpot Tarayıcı</div>
-        <div class="jackpot-sub">Piyasa değeri $50M–$300M arası yüksek potansiyelli hisseler</div>
-      </div>
-      <div id="microcapList"></div>
-      <div class="card">
-        <div class="card-title"><span>🤖</span>AI MicroCap Analizi</div>
-        <div class="ai-box">
-          <div class="ai-text" id="microcapAI">MicroCap fırsatları için "AI Tara" butonuna basın.</div>
-        </div>
-        <button class="btn-primary" id="microcapBtn">🔍 AI ile MicroCap Tara</button>
-      </div>
-    </div>
-
-  </main>
-
-  <div class="bottom-nav">
-    <div class="bnav-item active" data-view="watchlist"><div class="bnav-icon">📊</div>İzleme</div>
-    <div class="bnav-item" data-view="signal"><div class="bnav-icon">⚡</div>Sinyal</div>
-    <div class="bnav-item" data-view="opportunities"><div class="bnav-icon">🎯</div>Fırsat</div>
-    <div class="bnav-item" data-view="unusual"><div class="bnav-icon">🔥</div>Unusual</div>
-    <div class="bnav-item" data-view="news"><div class="bnav-icon">🌍</div>Haber</div>
-    <div class="bnav-item" data-view="microcap"><div class="bnav-icon">💎</div>Micro</div>
   </div>
 </div>
 
-<!-- MODAL -->
+<!-- SIGNAL -->
+<div class="view" id="view-signal">
+  <div class="card">
+    <div class="card-hdr"><span>⚡ Al / Sat / Bekle Sinyali</span></div>
+    <div class="signal-hero">
+      <div><div class="sig-lbl" id="sigTicker">Hisse seçin</div><div class="sig-action" id="sigAction" style="color:var(--warn)">BEKLE</div></div>
+      <div><div class="sig-score-val" id="sigScore">—</div><div class="sig-score-lbl">Güven</div></div>
+    </div>
+    <div class="sig-bar-wrap"><div class="sig-bar-fill" id="sigBar" style="width:0%;background:var(--warn)"></div></div>
+    <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:8px 0 6px;">Sinyal Gerekçeleri</div>
+    <div id="sigReasons"><div class="reason neutral">İzleme listesinden bir hisse seçin</div></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>📐 Teknik Göstergeler</span><span id="techTs" style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3)"></span></div>
+    <div class="ind-grid" id="techGrid">
+      <div class="ind-item"><div class="ind-label">RSI (14)</div><div class="ind-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="ind-item"><div class="ind-label">MACD</div><div class="ind-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="ind-item"><div class="ind-label">Stochastic</div><div class="ind-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="ind-item"><div class="ind-label">CCI (20)</div><div class="ind-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="ind-item"><div class="ind-label">BB Width</div><div class="ind-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="ind-item"><div class="ind-label">Momentum</div><div class="ind-val skeleton" style="height:20px;width:48px"></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>🌊 Fibonacci Seviyeleri</span></div>
+    <table class="fib-table" id="fibTable">
+      <tr><td>%23.6</td><td>—</td></tr><tr><td>%38.2</td><td>—</td></tr>
+      <tr class="fib-key"><td>%61.8 Altın Oran</td><td>—</td></tr>
+      <tr><td>%78.6</td><td>—</td></tr><tr><td>Ext. %161.8</td><td style="color:var(--up)">—</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>🤖 AI Teknik Analiz</span><span id="aiSigTs" style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3)"></span></div>
+    <div class="ai-box">
+      <div class="ai-hdr"><div class="ai-badge">Claude AI · Anlık</div><div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div>
+      <div class="ai-text" id="aiSigText">Analiz için hisse seçin.</div>
+      <div class="timestamp" id="aiSigStamp"></div>
+    </div>
+    <button class="btn-primary" id="analyzeBtn">🤖 Anlık AI Analizi Yap</button>
+  </div>
+</div>
+
+<!-- OPPORTUNITIES -->
+<div class="view" id="view-opportunities">
+  <div class="jk-banner"><div style="font-size:26px;margin-bottom:5px">🎯</div><div class="jk-title">Günün Fırsatları</div><div style="font-size:11px;color:var(--text2)">AI destekli yüksek potansiyel tespiti</div></div>
+  <div id="oppsList"></div>
+  <div class="sec-div">💎 Jackpot Radar</div>
+  <div class="card">
+    <div class="card-hdr"><span>🚀 Momentum Tarayıcı</span></div>
+    <div id="jackpotList"></div>
+    <button class="btn-sec" style="width:100%;margin-top:8px" id="scanBtn">🔍 Yenile</button>
+  </div>
+</div>
+
+<!-- UNUSUAL -->
+<div class="view" id="view-unusual">
+  <div class="card">
+    <div class="card-hdr"><span>🔥 Unusual Opsiyon Akışı</span><span id="unusualTs" style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3)"></span></div>
+    <div id="unusualList"></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>📊 Opsiyon Özeti</span></div>
+    <div class="ind-grid">
+      <div class="ind-item"><div class="ind-label">Put/Call Oranı</div><div class="ind-val up">0.72</div><div class="ind-status up">● Bullish</div></div>
+      <div class="ind-item"><div class="ind-label">Implied Vol</div><div class="ind-val t-warn">24.3%</div><div class="ind-status t-warn">● Orta</div></div>
+      <div class="ind-item"><div class="ind-label">Toplam Prim</div><div class="ind-val t-warn">$2.4M</div><div class="ind-status up">▲ Yüksek</div></div>
+      <div class="ind-item"><div class="ind-label">Büyük İşlem</div><div class="ind-val t-acc">47</div><div class="ind-status">Bugün</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWS -->
+<div class="view" id="view-news">
+  <div class="card">
+    <div class="card-hdr">
+      <span>🌍 Jeopolitik &amp; Makro AI</span>
+      <button class="btn-icon" id="geoRefBtn">↻ Güncelle</button>
+    </div>
+    <div class="ai-box">
+      <div class="ai-hdr"><div class="ai-badge">Claude AI · Gerçek Zamanlı</div><div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div>
+      <div class="ai-text" id="geoText">Jeopolitik ve makroekonomik analiz için butona basın. Finnhub'dan güncel haberler çekilerek analiz yapılacak.</div>
+      <div class="timestamp" id="geoStamp"></div>
+    </div>
+    <button class="btn-primary" id="geoBtn">🌍 Anlık Jeopolitik AI Analizi Yap</button>
+  </div>
+  <div class="card">
+    <div class="card-hdr">
+      <span>📰 Son Haberler (Finnhub API)</span>
+      <div style="display:flex;gap:5px;align-items:center">
+        <span id="newsTs" style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3)"></span>
+        <button class="btn-icon" id="newsRefBtn">↻</button>
+      </div>
+    </div>
+    <div id="newsList"><div style="text-align:center;padding:20px;color:var(--text3);font-size:11px;">Haberler yükleniyor...</div></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>⚖️ Hukuki &amp; Düzenleyici</span></div>
+    <div id="legalList"></div>
+  </div>
+</div>
+
+<!-- BOARD -->
+<div class="view" id="view-board">
+  <div class="card">
+    <div class="card-hdr"><span>👔 Yönetim Kurulu</span><span id="boardTs" style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3)"></span></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Hisse seçin → Yöneticiler + geçmişleri + etki analizi (Finnhub API)</div>
+    <div id="boardList"></div>
+    <button class="btn-primary" style="margin-top:8px" id="boardAnalyzeBtn">🤖 Yönetim AI Analizi</button>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>📋 Insider Trading (Anlık)</span><span id="insiderTs" style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3)"></span></div>
+    <div id="insiderList"><div style="text-align:center;padding:16px;color:var(--text3);font-size:11px;">Hisse seçin...</div></div>
+  </div>
+</div>
+
+<!-- VALUATION -->
+<div class="view" id="view-valuation">
+  <div class="card">
+    <div class="card-hdr"><span>💰 Temel Değerleme (Finnhub)</span><span id="valTicker" style="font-family:'Roboto Mono',monospace;font-size:10px;color:var(--text2)"></span></div>
+    <div class="val-grid" id="valGrid">
+      <div class="val-item"><div class="val-label">P/E</div><div class="val-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="val-item"><div class="val-label">P/B</div><div class="val-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="val-item"><div class="val-label">EV/EBITDA</div><div class="val-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="val-item"><div class="val-label">PEG</div><div class="val-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="val-item"><div class="val-label">Brüt Marj</div><div class="val-val skeleton" style="height:20px;width:48px"></div></div>
+      <div class="val-item"><div class="val-label">Net Marj</div><div class="val-val skeleton" style="height:20px;width:48px"></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>🤖 Değerleme AI Yorumu</span><span id="valAiTs" style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3)"></span></div>
+    <div class="ai-box"><div class="ai-text" id="valAI">Değerleme analizi için hisse seçin.</div></div>
+    <button class="btn-primary" style="margin-top:8px" id="valBtn">💰 Anlık Değerleme Analizi</button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="view" id="view-settings">
+  <div class="settings-panel">
+    <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:4px;">⚙️ Uygulama Ayarları</div>
+
+    <!-- Theme -->
+    <div class="setting-group">
+      <div class="sgt">Görünüm Teması</div>
+      <div class="s-row">
+        <div><div class="s-lbl">Renk Teması</div><div class="s-desc">TradingView tarzı 3 farklı tema</div></div>
+        <div class="theme-btns">
+          <div class="t-btn active" data-t="dark">🌑 Karanlık</div>
+          <div class="t-btn" data-t="dim">🌒 Loş</div>
+          <div class="t-btn" data-t="light">☀️ Açık</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Watchlist Groups -->
+    <div class="setting-group">
+      <div class="sgt">
+        <span>İzleme Listeleri</span>
+        <button class="btn-icon" id="addGroupBtn">+ Yeni Liste</button>
+      </div>
+      <div id="wlGroupsEl"></div>
+    </div>
+
+    <!-- Data -->
+    <div class="setting-group">
+      <div class="sgt">Veri &amp; API</div>
+      <div class="s-row">
+        <div><div class="s-lbl">Otomatik Yenileme (15s)</div><div class="s-desc">Fiyatlar Finnhub API'den anlık</div></div>
+        <label class="toggle"><input type="checkbox" id="autoRTog" checked/><span class="tslider"></span></label>
+      </div>
+      <div class="s-row">
+        <div><div class="s-lbl">Haber Otomatik Yenileme</div><div class="s-desc">5 dakikada bir yeniler</div></div>
+        <label class="toggle"><input type="checkbox" id="newsRTog" checked/><span class="tslider"></span></label>
+      </div>
+      <div class="s-row" style="border:none">
+        <div><div class="s-lbl">Finnhub API Durumu</div><div class="s-desc" id="apiStatusTxt">Kontrol ediliyor...</div></div>
+        <div id="apiStatusDot" style="width:8px;height:8px;border-radius:50%;background:var(--text3)"></div>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="setting-group">
+      <div class="sgt">Hakkında</div>
+      <div class="s-row"><div class="s-lbl">AlphaTerminal v4.0</div><div style="font-size:10px;color:var(--text3)">Finnhub + Claude AI</div></div>
+      <div class="s-row" style="border:none"><div class="s-lbl">Veri Kaynakları</div><div style="font-size:10px;color:var(--text2)">Finnhub.io · Claude Sonnet 4</div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<div class="bottom-nav">
+  <div class="bnav active" data-view="watchlist"><div class="bnav-icon">📊</div>İzleme</div>
+  <div class="bnav" data-view="signal"><div class="bnav-icon">⚡</div>Sinyal</div>
+  <div class="bnav" data-view="opportunities"><div class="bnav-icon">🎯</div>Fırsat</div>
+  <div class="bnav" data-view="unusual"><div class="bnav-icon">🔥</div>Unusual</div>
+  <div class="bnav" data-view="news"><div class="bnav-icon">🌍</div>Haber</div>
+</div>
+</div>
+
+<!-- ADD STOCK MODAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">🌍 Global Hisse Ara</div>
-    <div style="position:relative;margin-bottom:12px">
-      <input class="stock-input" id="stockInput" placeholder="Ticker veya şirket adı yaz... (AAPL, Apple...)" style="width:100%;padding-right:40px"/>
-      <div id="searchSpinner" style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%)"><div class="ai-dot"></div></div>
+    <div style="position:relative;margin-bottom:8px">
+      <input class="s-input" id="stockInput" placeholder="Ticker veya şirket adı... AAPL, Tesla, THYAO" style="width:100%;padding-right:34px"/>
+      <div id="searchSpinner" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%)"><div class="ai-dot"></div></div>
     </div>
-    <div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding-bottom:4px" id="exchangeFilter">
+    <div class="exch-chips" id="exchFilter">
       <div class="exch-btn active" data-exch="ALL">Tümü</div>
-      <div class="exch-btn" data-exch="US">🇺🇸 ABD</div>
+      <div class="exch-btn" data-exch="NASDAQ">🇺🇸 NASDAQ</div>
+      <div class="exch-btn" data-exch="NYSE">🇺🇸 NYSE</div>
       <div class="exch-btn" data-exch="LSE">🇬🇧 Londra</div>
-      <div class="exch-btn" data-exch="TSX">🇨🇦 Toronto</div>
-      <div class="exch-btn" data-exch="ASX">🇦🇺 Avustralya</div>
       <div class="exch-btn" data-exch="XETR">🇩🇪 Frankfurt</div>
-      <div class="exch-btn" data-exch="EPA">🇫🇷 Paris</div>
       <div class="exch-btn" data-exch="TSE">🇯🇵 Tokyo</div>
-      <div class="exch-btn" data-exch="HKEX">🇭🇰 Hong Kong</div>
       <div class="exch-btn" data-exch="NSE">🇮🇳 Hindistan</div>
       <div class="exch-btn" data-exch="BIST">🇹🇷 İstanbul</div>
     </div>
-    <div id="searchResults" style="max-height:40vh;overflow-y:auto;scrollbar-width:none"></div>
-    <div id="popularSection">
-      <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">⚡ Popüler</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px" id="quickAdd"></div>
+    <div id="searchResults" style="max-height:36vh;overflow-y:auto;scrollbar-width:none;"></div>
+    <div id="popSection">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">⚡ Popüler</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px" id="quickAdd"></div>
     </div>
-    <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
-      <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">📋 İzleme Listem</div>
-      <div id="watchlistManage" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">📋 İzleme Listesi</div>
+      <div id="wlManage" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
     </div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════
-// CONSTANTS & CONFIG
-// ═══════════════════════════════════════
-const FINNHUB_KEY = 'd6ctgkpr01qgk7mjnqu0d6ctgkpr01qgk7mjnqug';
-const WATCHLIST_KEY = 'alpha_watchlist_v2';
-const QUICK_TICKERS = ['AAPL','TSLA','NVDA','MSFT','META','GOOGL','AMZN','JPM','PLTR','ARM','BABA','SONY'];
+// ═══════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════
+const FK='d6ctgkpr01qgk7mjnqu0d6ctgkpr01qgk7mjnqug';
+const WL_KEY='alpha_wl_v4', CFG_KEY='alpha_cfg_v4';
+const QUICK=['AAPL','TSLA','NVDA','MSFT','META','GOOGL','AMZN','JPM','PLTR','ARM'];
 
-// ═══════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════
-let watchlist = (() => {
-  try { return JSON.parse(localStorage.getItem(WATCHLIST_KEY) || '["AAPL","TSLA","NVDA"]'); }
-  catch(e) { return ['AAPL','TSLA','NVDA']; }
-})();
-let selectedTicker = watchlist[0] || 'AAPL';
-let currentView = 'watchlist';
+let wl=(()=>{try{return JSON.parse(localStorage.getItem(WL_KEY))||['AAPL','TSLA','NVDA'];}catch(e){return['AAPL','TSLA','NVDA'];}})();
+let cfg=(()=>{try{return JSON.parse(localStorage.getItem(CFG_KEY))||{theme:'dark',autoR:true};}catch(e){return{theme:'dark',autoR:true};}})();
+let sel=wl[0]||'AAPL', curView='watchlist', activeExch='ALL', searchTimer=null;
+let wlGroups=(()=>{try{return JSON.parse(localStorage.getItem('alpha_groups'))||[{id:'g1',name:'Ana Liste'}];}catch(e){return [{id:'g1',name:'Ana Liste'}];}})();
+let refreshTimer=null;
 
-// ═══════════════════════════════════════
+// ═══════════════════════════════════
 // STATIC DATA
-// ═══════════════════════════════════════
-const VALUATION_DATA = {
-  AAPL:{pe:29.4,pb:47.2,evEbitda:22.1,peg:2.8,pfcf:26.3,evEbit:24.5},
-  TSLA:{pe:55.2,pb:8.9,evEbitda:48.3,peg:1.9,pfcf:68.1,evEbit:52.4},
-  NVDA:{pe:68.4,pb:32.1,evEbitda:45.2,peg:0.8,pfcf:52.3,evEbit:48.9},
-  MSFT:{pe:35.2,pb:12.4,evEbitda:24.8,peg:2.1,pfcf:31.5,evEbit:26.3},
-  META:{pe:24.8,pb:7.2,evEbitda:14.2,peg:1.2,pfcf:19.8,evEbit:15.6},
-  GOOGL:{pe:22.4,pb:6.8,evEbitda:16.3,peg:1.4,pfcf:20.1,evEbit:17.8},
-  AMZN:{pe:42.1,pb:8.9,evEbitda:18.4,peg:1.6,pfcf:35.2,evEbit:22.7},
-  JPM:{pe:11.8,pb:1.8,evEbitda:8.2,peg:1.1,pfcf:null,evEbit:9.4},
-  PLTR:{pe:78.2,pb:18.4,evEbitda:52.1,peg:1.4,pfcf:61.2,evEbit:55.3},
+// ═══════════════════════════════════
+const FB_STOCKS={
+  AAPL:{name:'Apple Inc.',price:189.30,changePct:0.66,base:175},
+  TSLA:{name:'Tesla Inc.',price:248.50,changePct:-1.27,base:220},
+  NVDA:{name:'NVIDIA Corp.',price:875.40,changePct:2.17,base:800},
+  MSFT:{name:'Microsoft',price:420.15,changePct:0.68,base:400},
+  META:{name:'Meta Platforms',price:512.80,changePct:1.46,base:480},
+  GOOGL:{name:'Alphabet Inc.',price:175.60,changePct:-0.62,base:160},
+  AMZN:{name:'Amazon.com',price:193.70,changePct:1.68,base:175},
+  JPM:{name:'JPMorgan Chase',price:201.40,changePct:0.45,base:185},
+  PLTR:{name:'Palantir Technologies',price:24.80,changePct:3.55,base:20},
+  ARM:{name:'ARM Holdings',price:118.20,changePct:1.92,base:105},
 };
-
-const BOARD_DATA = {
+const FB_BOARD={
   AAPL:[
-    {name:'Tim Cook',role:'CEO',initials:'TC',score:'9.2/10',bio:'2011\'den beri CEO. Apple\'ı $1T\'dan $3T piyasa değerine taşıdı. Tedarik zinciri uzmanı. Çin riskleri nedeniyle baskı altında.'},
-    {name:'Luca Maestri',role:'CFO',initials:'LM',score:'8.7/10',bio:'2014\'ten beri CFO. Agresif hisse geri alım programı ($90B+). Güçlü serbest nakit akışı yönetimi.'},
-    {name:'Arthur Levinson',role:'Chairman',initials:'AL',score:'8.9/10',bio:'Genentech eski CEO\'su. Sağlık teknolojisi konusunda stratejik rehberlik sağlıyor.'},
+    {name:'Tim Cook',role:'CEO',ini:'TC',score:'9.2/10',bio:"2011'den beri CEO. Apple'ı $3T+ piyasa değerine taşıdı. Tedarik zinciri uzmanı."},
+    {name:'Luca Maestri',role:'CFO',ini:'LM',score:'8.7/10',bio:"2014'ten beri CFO. $90B+ hisse geri alım. Güçlü FCF yönetimi."},
+    {name:'Arthur Levinson',role:'Chairman',ini:'AL',score:'8.9/10',bio:"Genentech eski CEO'su. Sağlık teknolojisi stratejisi."},
   ],
   TSLA:[
-    {name:'Elon Musk',role:'CEO',initials:'EM',score:'7.1/10',bio:'Vizyoner lider ama X/Twitter dikkat dağıtıcı risk. AI ile Tesla çatışması tartışmalı. Her açıklaması hisse fiyatını hareket ettiriyor.'},
-    {name:'Vaibhav Taneja',role:'CFO',initials:'VT',score:'7.8/10',bio:'2023\'ten CFO. Maliyet düşürme kampanyaları yürütüyor.'},
+    {name:'Elon Musk',role:'CEO',ini:'EM',score:'7.1/10',bio:"Vizyoner lider. X/Twitter dikkat dağıtıcı risk. Her açıklaması piyasayı etkiliyor."},
+    {name:'Vaibhav Taneja',role:'CFO',ini:'VT',score:'7.8/10',bio:"2023'ten CFO. Maliyet düşürme odaklı."},
   ],
   NVDA:[
-    {name:'Jensen Huang',role:'CEO/Founder',initials:'JH',score:'9.8/10',bio:'NVIDIA\'yı GPU şirketinden AI altyapı devine dönüştürdü. CUDA ekosistemi rakipsiz. En etkili CEO\'lardan biri.'},
-    {name:'Colette Kress',role:'CFO',initials:'CK',score:'9.1/10',bio:'2013\'ten beri CFO. Veri merkezi geçişini mükemmel yönetti.'},
+    {name:'Jensen Huang',role:'CEO/Founder',ini:'JH',score:'9.8/10',bio:"NVIDIA'yı GPU'dan AI altyapı devine dönüştürdü. CUDA ekosistemi rakipsiz."},
+    {name:'Colette Kress',role:'CFO',ini:'CK',score:'9.1/10',bio:"2013'ten CFO. Veri merkezi geçişini mükemmel yönetti."},
   ],
 };
-
-const UNUSUAL_OPTIONS = [
-  {ticker:'NVDA',type:'CALL',strike:'$900',expiry:'Mar 28',volume:'12,450',oi:'2,100',premium:'$8.2M',sentiment:'Bullish Sweep'},
-  {ticker:'TSLA',type:'PUT',strike:'$230',expiry:'Mar 15',volume:'8,320',oi:'1,850',premium:'$3.1M',sentiment:'Bearish Block'},
-  {ticker:'META',type:'CALL',strike:'$530',expiry:'Apr 19',volume:'5,670',oi:'890',premium:'$4.5M',sentiment:'Bullish Block'},
-  {ticker:'AAPL',type:'CALL',strike:'$195',expiry:'Mar 21',volume:'9,140',oi:'3,200',premium:'$2.8M',sentiment:'Bullish Sweep'},
-  {ticker:'AMZN',type:'PUT',strike:'$185',expiry:'Mar 28',volume:'4,280',oi:'720',premium:'$1.9M',sentiment:'Bearish Sweep'},
-  {ticker:'PLTR',type:'CALL',strike:'$28',expiry:'Apr 5',volume:'18,900',oi:'4,100',premium:'$1.2M',sentiment:'Unusual Bullish'},
+const UNUSUAL_OPS=[
+  {ticker:'NVDA',type:'CALL',strike:'$900',exp:'Mar 28',vol:'12,450',oi:'2,100',prem:'$8.2M',sent:'Bullish Sweep'},
+  {ticker:'TSLA',type:'PUT',strike:'$230',exp:'Mar 15',vol:'8,320',oi:'1,850',prem:'$3.1M',sent:'Bearish Block'},
+  {ticker:'META',type:'CALL',strike:'$530',exp:'Apr 19',vol:'5,670',oi:'890',prem:'$4.5M',sent:'Bullish Block'},
+  {ticker:'AAPL',type:'CALL',strike:'$195',exp:'Mar 21',vol:'9,140',oi:'3,200',prem:'$2.8M',sent:'Bullish Sweep'},
+  {ticker:'PLTR',type:'CALL',strike:'$28',exp:'Apr 5',vol:'18,900',oi:'4,100',prem:'$1.2M',sent:'Unusual Bullish'},
+];
+const LEGAL_DATA=[
+  {title:"DOJ Anti-tekel davası: Google arama monopolü kararı bekleniyor",impact:'high',tickers:['GOOGL']},
+  {title:"SEC: Kripto hisseleri için yeni açıklama zorunluluğu",impact:'med',tickers:['COIN','MSTR']},
+  {title:"Meta Platforms: AB'den €1.2B veri gizliliği cezası",impact:'high',tickers:['META']},
+  {title:"NVDA: Çin'e ihracat kısıtlamaları genişleyebilir",impact:'high',tickers:['NVDA']},
+];
+const OPPS=[
+  {ticker:'PLTR',name:'Palantir Tech.',up:'+34%',reason:'AI hükümet sözleşmeleri artıyor. AIP platformu güçlü momentum. Federal bütçede öncelikli.',tags:['AI','GOV','Momentum']},
+  {ticker:'NVDA',name:'NVIDIA Corp.',up:'+28%',reason:'Blackwell GPU talebi arz kapasitesinin üzerinde. Veri merkezi büyümesi hızlanıyor. Rakipsiz CUDA ekosistemi.',tags:['AI','Data Center']},
+  {ticker:'META',name:'Meta Platforms',up:'+22%',reason:'Reklam geliri beklentileri aşıyor. Llama AI güçlü. Ucuz değerleme + güçlü FCF üretimi.',tags:['Social','AI','Value']},
+];
+const JACKPOT=[
+  {ticker:'SMCI',name:'Super Micro Computer',reason:'AI sunucu patlaması, RSI dipten dönüş, insider alım',pct:'+67%',risk:'YÜKSEK'},
+  {ticker:'ARM',name:'ARM Holdings',reason:'AI çiplerinde ARM mimarisi dominant. Lisans geliri patlıyor.',pct:'+45%',risk:'ORTA'},
+  {ticker:'IONQ',name:'IonQ Inc.',reason:'Kuantum bilgisayar erken faz. Microsoft & AWS ortaklıkları.',pct:'+120%',risk:'ÇOK YÜKSEK'},
 ];
 
-const NEWS_DATA = [
-  {title:'Fed faiz kararı: 2024 içinde 3 indirim beklentisi korundu',impact:'high',source:'Reuters',time:'2s önce',sentiment:'bull',tickers:['SPY','TLT']},
-  {title:'Çin-Taiwan gerilimi: Yarı iletken ihracat kısıtlamaları gündemde',impact:'high',source:'Bloomberg',time:'1s önce',sentiment:'bear',tickers:['NVDA','AMD','TSM']},
-  {title:'OpenAI GPT-5 duyurusu NVIDIA hisselerini yukarı taşıyabilir',impact:'med',source:'TechCrunch',time:'3s önce',sentiment:'bull',tickers:['NVDA','MSFT']},
-  {title:'Apple Vision Pro satışları beklentilerin altında kaldı',impact:'med',source:'WSJ',time:'4s önce',sentiment:'bear',tickers:['AAPL']},
-  {title:'AB yapay zeka düzenlemesi: Büyük teknoloji şirketlerine yeni yük',impact:'med',source:'FT',time:'5s önce',sentiment:'bear',tickers:['META','GOOGL','MSFT']},
-  {title:'Tesla Cybertruck hatası: 2,200 araç geri çağrıldı',impact:'high',source:'CNBC',time:'6s önce',sentiment:'bear',tickers:['TSLA']},
-];
-
-const LEGAL_DATA = [
-  {title:'DOJ Anti-tekel davası: Google arama monopolü kararı bekleniyor',impact:'high',tickers:['GOOGL']},
-  {title:'SEC: Kripto hisseleri için yeni açıklama zorunluluğu',impact:'med',tickers:['COIN']},
-  {title:'Meta Platforms: AB\'den €1.2B veri gizliliği cezası',impact:'high',tickers:['META']},
-];
-
-const OPPORTUNITIES = [
-  {ticker:'PLTR',name:'Palantir Tech.',upside:'+34%',reason:'AI hükümet sözleşmeleri artıyor. AIP platformu momentum kazanıyor. Kârlılık dönemi başladı.',tags:['AI','GOV','Momentum','Breakout']},
-  {ticker:'NVDA',name:'NVIDIA Corp.',upside:'+28%',reason:'Blackwell GPU talebi arz kapasitesinin çok üzerinde. Veri merkezi büyümesi hızlanıyor.',tags:['AI','DataCenter','Semiconductor']},
-  {ticker:'META',name:'Meta Platforms',upside:'+22%',reason:'Reklam geliri beklentileri aşıyor. Llama AI modeli güçlü. Ucuz değerleme + güçlü FCF.',tags:['Social','AI','Value','FCF']},
-];
-
-const JACKPOT_STOCKS = [
-  {ticker:'SMCI',name:'Super Micro Computer',reason:'AI sunucu patlama, RSI dipten dönüş, insider alım var',pct:'+67% potansiyel',risk:'YÜKSEK'},
-  {ticker:'ARM',name:'ARM Holdings',reason:'Tüm AI çipleri ARM mimarisi kullanıyor. Lisans geliri patlıyor',pct:'+45% potansiyel',risk:'ORTA'},
-  {ticker:'IONQ',name:'IonQ Inc.',reason:'Kuantum bilgisayar sektörü erken faz. Microsoft & AWS ortaklıkları',pct:'+120% potansiyel',risk:'ÇOK YÜKSEK'},
-];
-
-const MICROCAP_STOCKS = [
-  {ticker:'RKLB',name:'Rocket Lab USA',mc:'$4.2B',sector:'Space',reason:'SpaceX\'e rakip. Neutron roketi 2025\'te. Uydu servisleri büyüyor. NASA sözleşmeleri.',pct:'+89%',risk:'YÜKSEK',score:82},
-  {ticker:'BBAI',name:'BigBear.ai Holdings',mc:'$280M',sector:'AI/Defense',reason:'Savunma AI sözleşmeleri. DoD ile entegrasyon. Düşük piyasa değeri yüksek büyüme.',pct:'+145%',risk:'ÇOK YÜKSEK',score:74},
-  {ticker:'CLOV',name:'Clover Health',mc:'$190M',sector:'HealthTech AI',reason:'AI-driven sağlık yönetimi. Medicare Advantage büyümesi. Derin iskontolu.',pct:'+110%',risk:'YÜKSEK',score:61},
-  {ticker:'OUST',name:'Ouster Inc.',mc:'$220M',sector:'LiDAR/AV',reason:'Otomasyonun gözü: LiDAR. Otonom araç tedarikçisi. Velodyne birleşmesi tamamlandı.',pct:'+95%',risk:'YÜKSEK',score:68},
-  {ticker:'GFAI',name:'Guardforce AI',mc:'$45M',sector:'Security AI',reason:'Asya güvenlik otomasyonu. Küçük piyasa değeri büyük fırsat. Nano-cap.',pct:'+200%',risk:'EKSTREm',score:55},
-];
-
-// ═══════════════════════════════════════
-// API CACHE
-// ═══════════════════════════════════════
-const priceCache = {};
-const candleCache = {};
-const profileCache = {};
-const financialsCache = {};
-
-// ═══════════════════════════════════════
-// FINNHUB API
-// ═══════════════════════════════════════
-async function finnhub(path, params={}) {
-  const url = new URL('https://finnhub.io/api/v1' + path);
-  url.searchParams.set('token', FINNHUB_KEY);
-  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k,v));
-  try {
-    const res = await fetch(url.toString());
-    return await res.json();
-  } catch(e) { return null; }
-}
-
-async function fetchQuote(ticker) {
-  const cached = priceCache[ticker];
-  if (cached && Date.now()-cached.ts < 15000) return cached;
-  const d = await finnhub('/quote', {symbol:ticker});
-  if (!d || !d.c) return cached || null;
-  const result = {
-    price:d.c, change:+(d.c-d.pc).toFixed(2),
-    changePct:d.pc ? +((d.c-d.pc)/d.pc*100).toFixed(2) : 0,
-    high:d.h, low:d.l, open:d.o, prevClose:d.pc, ts:Date.now()
-  };
-  priceCache[ticker] = result;
-  return result;
-}
-
-async function fetchCandles(ticker) {
-  if (candleCache[ticker] && Date.now()-candleCache[ticker].ts < 3600000) return candleCache[ticker].prices;
-  const now = Math.floor(Date.now()/1000);
-  const from = now - 90*24*3600;
-  const d = await finnhub('/stock/candle', {symbol:ticker, resolution:'D', from, to:now});
-  if (!d || d.s !== 'ok') return null;
-  candleCache[ticker] = {prices:d.c, ts:Date.now()};
-  return d.c;
-}
-
-async function fetchProfile(ticker) {
-  if (profileCache[ticker]) return profileCache[ticker];
-  const d = await finnhub('/stock/profile2', {symbol:ticker});
-  if (d && d.name) { profileCache[ticker]=d; return d; }
-  return null;
-}
-
-async function fetchFinancials(ticker) {
-  if (financialsCache[ticker] && Date.now()-financialsCache[ticker].ts < 3600000) return financialsCache[ticker];
-  const d = await finnhub('/stock/metric', {symbol:ticker, metric:'all'});
-  if (!d || !d.metric) return null;
-  const m = d.metric;
-  const result = {
-    pe:m.peNormalizedAnnual, pb:m.pbAnnual, ps:m.psAnnual,
-    evEbitda:m.evEbitdaTTM, beta:m.beta,
-    high52w:m['52WeekHigh'], low52w:m['52WeekLow'],
-    grossMargin:m.grossMarginTTM, netMargin:m.netProfitMarginTTM,
-    revenueGrowth:m.revenueGrowthTTMYoy, ts:Date.now()
-  };
-  financialsCache[ticker] = result;
-  return result;
-}
-
-async function fetchBoard(ticker) {
-  const d = await finnhub('/stock/executive', {symbol:ticker});
-  return (d && d.executive) ? d.executive : [];
-}
-
-async function fetchInsider(ticker) {
-  const d = await finnhub('/stock/insider-transactions', {symbol:ticker});
-  return (d && d.data) ? d.data.slice(0,8) : [];
-}
-
-// ═══════════════════════════════════════
-// TECHNICAL INDICATORS — FIX: clean implementations
-// ═══════════════════════════════════════
-function calcRSI(prices, period=14) {
-  if (!prices || prices.length < period+1) return 50;
-  let gains=0, losses=0;
-  for (let i=prices.length-period; i<prices.length; i++) {
-    const diff = prices[i] - prices[i-1];
-    if (diff>0) gains+=diff; else losses-=diff;
-  }
-  const ag=gains/period, al=losses/period;
-  return +(100 - 100/(1 + ag/(al||0.001))).toFixed(1);
-}
-
-function calcEMA(prices, period) {
-  if (!prices || prices.length < period) return prices ? prices[prices.length-1] : 0;
-  const k = 2/(period+1);
-  let ema = prices.slice(0,period).reduce((a,b)=>a+b,0)/period;
-  for (let i=period; i<prices.length; i++) ema = prices[i]*k + ema*(1-k);
-  return ema;
-}
-
-function calcMACD(prices) {
-  if (!prices || prices.length < 26) return 0;
-  return +(calcEMA(prices,12) - calcEMA(prices,26)).toFixed(2);
-}
-
-function calcStoch(prices, period=14) {
-  if (!prices || prices.length < period) return 50;
-  const slice = prices.slice(-period);
-  const low=Math.min(...slice), high=Math.max(...slice);
-  return +(((prices[prices.length-1]-low)/(high-low||1))*100).toFixed(1);
-}
-
-function calcCCI(prices, period=20) {
-  if (!prices || prices.length < period) return 0;
-  const slice = prices.slice(-period);
-  const avg = slice.reduce((a,b)=>a+b,0)/period;
-  const md = slice.reduce((a,b)=>a+Math.abs(b-avg),0)/period;
-  return +((prices[prices.length-1]-avg)/(0.015*(md||1))).toFixed(0);
-}
-
-function calcBBWidth(prices, period=20) {
-  if (!prices || prices.length < period) return 5;
-  const slice = prices.slice(-period);
-  const avg = slice.reduce((a,b)=>a+b,0)/period;
-  const std = Math.sqrt(slice.reduce((a,b)=>a+(b-avg)**2,0)/period);
-  return +((std*4/(avg||1))*100).toFixed(1);
-}
-
-function calcMomentum(prices, period=10) {
-  if (!prices || prices.length < period+1) return 0;
-  return +(prices[prices.length-1] - prices[prices.length-1-period]).toFixed(2);
-}
-
-// Ichimoku Cloud calculation
-function calcIchimoku(prices) {
-  if (!prices || prices.length < 52) return null;
-  const hi = (arr,n) => Math.max(...arr.slice(-n));
-  const lo = (arr,n) => Math.min(...arr.slice(-n));
-  const tenkan = (hi(prices,9)+lo(prices,9))/2;
-  const kijun = (hi(prices,26)+lo(prices,26))/2;
-  const senkouA = (tenkan+kijun)/2;
-  const senkouB = (hi(prices,52)+lo(prices,52))/2;
-  const chikou = prices[prices.length-1];
-  const price = prices[prices.length-1];
-  const aboveCloud = price > Math.max(senkouA, senkouB);
-  const belowCloud = price < Math.min(senkouA, senkouB);
-  const inCloud = !aboveCloud && !belowCloud;
-  const bullish = tenkan > kijun;
-  return { tenkan:+tenkan.toFixed(2), kijun:+kijun.toFixed(2), senkouA:+senkouA.toFixed(2), senkouB:+senkouB.toFixed(2), chikou:+chikou.toFixed(2), aboveCloud, belowCloud, inCloud, bullish };
-}
-
-// Simple Elliott Wave count (trend identification)
-function detectElliott(prices) {
-  if (!prices || prices.length < 20) return null;
-  const recent = prices.slice(-20);
-  const first = recent[0], last = recent[recent.length-1];
-  const trend = last > first ? 'YUKARI' : 'AŞAĞI';
-  // Find local peaks and troughs
-  const pivots = [];
-  for (let i=1; i<recent.length-1; i++) {
-    if (recent[i]>recent[i-1] && recent[i]>recent[i+1]) pivots.push({type:'peak',val:recent[i],i});
-    else if (recent[i]<recent[i-1] && recent[i]<recent[i+1]) pivots.push({type:'trough',val:recent[i],i});
-  }
-  const waveCount = pivots.length;
-  let wave = '?', phase = 'Belirsiz';
-  if (waveCount >= 5 && trend==='YUKARI') { wave='3-5'; phase='Yükseliş dalgası — ivme güçlü'; }
-  else if (waveCount >= 3 && trend==='YUKARI') { wave='1-3'; phase='Erken yükseliş — alım fırsatı'; }
-  else if (trend==='AŞAĞI' && waveCount>=3) { wave='A-C'; phase='Düzeltme dalgası — bekle'; }
-  else { wave='1'; phase='Başlangıç dalgası — izle'; }
-  return { trend, wave, phase, pivots:waveCount };
-}
-
-// ═══════════════════════════════════════
-// FALLBACK PRICE GENERATOR (for tickers without real data)
-// ═══════════════════════════════════════
-const PRICE_BASES = {AAPL:189,TSLA:248,NVDA:875,MSFT:420,META:512,GOOGL:175,AMZN:193,JPM:201,PLTR:24,ARM:110,BABA:72,SONY:82};
-
-function generatePrices(ticker, days=90) {
-  const base = PRICE_BASES[ticker] || 100;
-  const prices = [];
-  let p = base * 0.85;
-  for (let i=0; i<=days; i++) {
-    p = Math.max(p + (Math.random()-0.47)*p*0.022, base*0.4);
-    prices.push(+p.toFixed(2));
-  }
-  return prices;
-}
-
-// FIX: getStockData was missing — now properly defined
-function getStockData(ticker) {
-  const q = priceCache[ticker];
-  const profile = profileCache[ticker];
-  const base = PRICE_BASES[ticker] || 100;
-  return {
-    price: q ? q.price : base,
-    change: q ? q.change : 0,
-    changePct: q ? q.changePct : 0,
-    name: profile ? profile.name : (LOCAL_DB.find(d=>d.s===ticker)?.n || ticker),
-    sector: profile ? profile.finnhubIndustry : 'Technology',
-    base
-  };
-}
-
-// ═══════════════════════════════════════
-// RENDER FUNCTIONS
-// ═══════════════════════════════════════
-function saveWatchlist() {
-  localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
-}
-
-function renderWatchlist() {
-  const el = document.getElementById('watchlistItems');
-  if (!watchlist.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">İzleme listeniz boş.<br>+ butonuna basarak hisse ekleyin.</div>';
-    return;
-  }
-  el.innerHTML = watchlist.map(ticker => {
-    const q = priceCache[ticker];
-    const name = profileCache[ticker]?.name || LOCAL_DB.find(d=>d.s===ticker)?.n || ticker;
-    const price = q ? q.price : null;
-    const changePct = q ? q.changePct : 0;
-    const up = changePct >= 0;
-    const priceStr = price!=null ? '$'+price.toFixed(2) : '—';
-    const changeStr = price!=null ? `${up?'+':''}${changePct.toFixed(2)}%` : '—';
-    const prices = candleCache[ticker]?.prices;
-    let sigAction='—', sigClass='signal-hold';
-    if (prices && prices.length>20) {
-      const rsi=calcRSI(prices), macd=calcMACD(prices);
-      let bull=0,bear=0;
-      if(rsi<35) bull+=2; else if(rsi>65) bear+=2;
-      if(macd>0) bull+=2; else bear+=2;
-      if(changePct>1) bull+=1; else if(changePct<-1) bear+=1;
-      if(bull>bear+1){sigAction='AL';sigClass='signal-buy';}
-      else if(bear>bull+1){sigAction='SAT';sigClass='signal-sell';}
-      else{sigAction='BEKLE';sigClass='signal-hold';}
-    }
-    const sel = selectedTicker===ticker;
-    return `<div class="watchlist-item" style="${sel?'background:rgba(0,212,255,0.05);border-left:2px solid var(--accent);':''}" onclick="selectTicker('${ticker}')">
-      <div>
-        <div class="ticker-symbol">${ticker}</div>
-        <div class="ticker-name">${name.length>22?name.slice(0,22)+'...':name}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-        <div class="ticker-price ${price!=null?(up?'up':'down'):''}">${priceStr}</div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <div class="ticker-change ${up?'bg-up':'bg-down'}">${changeStr}</div>
-          <div class="signal-badge ${sigClass}">${sigAction}</div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  updateMarketSummary();
-}
-
-async function updateMarketSummary() {
-  const spyQ = await fetchQuote('SPY');
-  const vixQ = await fetchQuote('VIX');
-  const dxyQ = await fetchQuote('DX-Y.NYB');
-  const t10yQ = await fetchQuote('TNX');
-  if(spyQ){
-    document.getElementById('sp500val').textContent = '$'+spyQ.price.toFixed(2);
-    document.getElementById('sp500chg').textContent = (spyQ.changePct>=0?'▲ +':'▼ ')+spyQ.changePct.toFixed(2)+'%';
-    document.getElementById('sp500chg').className = 'ind-status '+(spyQ.changePct>=0?'up':'down');
-  }
-  if(vixQ){
-    document.getElementById('vixval').textContent = vixQ.price.toFixed(1);
-    const vixLbl = vixQ.price<15?'● Düşük Risk':vixQ.price<25?'● Orta Risk':'● Yüksek Risk';
-    document.getElementById('vixlbl').textContent = vixLbl;
-  }
-  if(dxyQ){
-    document.getElementById('dxyval').textContent = dxyQ.price.toFixed(2);
-    document.getElementById('dxychg').textContent = (dxyQ.changePct>=0?'▲ +':'▼ ')+dxyQ.changePct.toFixed(2)+'%';
-  }
-  if(t10yQ){
-    document.getElementById('t10yval').textContent = t10yQ.price.toFixed(2)+'%';
-  }
-}
-
-async function renderMiniChart(ticker) {
-  document.getElementById('chartLabel').textContent = `${ticker} — Yükleniyor...`;
-  let prices = candleCache[ticker]?.prices || await fetchCandles(ticker) || generatePrices(ticker,30);
-  prices = prices.slice(-30);
-  const q = await fetchQuote(ticker);
-
-  const canvas = document.getElementById('miniChart');
-  const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 2;
-  canvas.width = canvas.offsetWidth*dpr;
-  canvas.height = canvas.offsetHeight*dpr;
-  ctx.scale(dpr,dpr);
-  const W=canvas.offsetWidth, H=canvas.offsetHeight;
-  const min=Math.min(...prices), max=Math.max(...prices);
-  const range=max-min||1;
-  ctx.clearRect(0,0,W,H);
-  const up = prices[prices.length-1] >= prices[0];
-  const grad = ctx.createLinearGradient(0,0,0,H);
-  grad.addColorStop(0, up?'rgba(0,230,118,0.3)':'rgba(255,59,92,0.3)');
-  grad.addColorStop(1,'rgba(0,0,0,0)');
-  const pts = prices.map((p,i)=>({x:(i/(prices.length-1))*W, y:H-((p-min)/range)*(H-10)-5}));
-  ctx.beginPath();
-  pts.forEach((pt,i)=>i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y));
-  ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
-  ctx.fillStyle=grad; ctx.fill();
-  ctx.beginPath();
-  pts.forEach((pt,i)=>i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y));
-  ctx.strokeStyle=up?'#00e676':'#ff3b5c'; ctx.lineWidth=2; ctx.stroke();
-
-  const priceTxt = q ? ` — $${q.price.toFixed(2)} (${q.changePct>=0?'+':''}${q.changePct.toFixed(2)}%)` : '';
-  document.getElementById('chartLabel').textContent = `${ticker} — 30 Günlük${priceTxt}`;
-  renderWatchlist();
-}
-
-// FIX: Single renderSignal function (was duplicated & broken)
-async function renderSignal(ticker) {
-  if (!ticker) return;
-  document.getElementById('signalTicker').textContent = ticker;
-  document.getElementById('boardTickerLabel').textContent = ticker;
-  document.getElementById('valTickerLabel').textContent = ticker;
-
-  let prices = candleCache[ticker]?.prices || await fetchCandles(ticker);
-  if (!prices || prices.length < 30) prices = generatePrices(ticker, 90);
-  const q = priceCache[ticker] || await fetchQuote(ticker);
-  const changePct = q?.changePct || 0;
-
-  const rsi = calcRSI(prices);
-  const macd = calcMACD(prices);
-  const stoch = calcStoch(prices);
-  const cci = calcCCI(prices);
-  const bbw = calcBBWidth(prices);
-  const mom = calcMomentum(prices);
-
-  let bull=0, bear=0, reasons=[];
-  if(rsi<35){bull+=2;reasons.push({text:`RSI aşırı satım (${rsi}) — alım fırsatı`,bull:true});}
-  else if(rsi>65){bear+=2;reasons.push({text:`RSI aşırı alım (${rsi}) — sat uyarısı`,bull:false});}
-  else reasons.push({text:`RSI nötr bölge (${rsi})`,bull:null});
-  if(macd>0){bull+=2;reasons.push({text:`MACD pozitif (${macd}) — yukarı momentum`,bull:true});}
-  else{bear+=2;reasons.push({text:`MACD negatif (${macd}) — aşağı baskı`,bull:false});}
-  if(stoch<20){bull+=1;reasons.push({text:`Stochastic aşırı satım (${stoch})`,bull:true});}
-  else if(stoch>80){bear+=1;reasons.push({text:`Stochastic aşırı alım (${stoch})`,bull:false});}
-  if(cci<-100){bull+=1;reasons.push({text:`CCI aşırı satım (${cci}) — dip yakın`,bull:true});}
-  else if(cci>100){bear+=1;reasons.push({text:`CCI aşırı alım (${cci})`,bull:false});}
-  if(changePct>1){bull+=1;reasons.push({text:`Güçlü günlük momentum (+${changePct.toFixed(2)}%)`,bull:true});}
-  else if(changePct<-1){bear+=1;reasons.push({text:`Zayıf günlük momentum (${changePct.toFixed(2)}%)`,bull:false});}
-
-  // Ichimoku signal
-  const ichi = calcIchimoku(prices);
-  if (ichi) {
-    if(ichi.aboveCloud && ichi.bullish){bull+=2;reasons.push({text:`Ichimoku: Fiyat bulutun üzerinde + Tenkan > Kijun — Güçlü Bullish`,bull:true});}
-    else if(ichi.belowCloud && !ichi.bullish){bear+=2;reasons.push({text:`Ichimoku: Fiyat bulutun altında — Bearish baskı`,bull:false});}
-    else reasons.push({text:`Ichimoku: Fiyat bulut içinde — Konsolidasyon`,bull:null});
-  }
-
-  const total=bull+bear;
-  const confidence=total>0?Math.round((Math.max(bull,bear)/total)*100):50;
-  let action,color;
-  if(bull>bear+1){action='AL';color='var(--green)';}
-  else if(bear>bull+1){action='SAT';color='var(--red)';}
-  else{action='BEKLE';color='var(--warn)';}
-
-  document.getElementById('signalAction').textContent=action;
-  document.getElementById('signalAction').style.color=color;
-  document.getElementById('confidenceScore').textContent=confidence+'%';
-  const bar=document.getElementById('confidenceBar');
-  bar.style.width=confidence+'%'; bar.style.background=color;
-  document.getElementById('signalReasons').innerHTML=reasons.map(r=>`
-    <div class="reason-item ${r.bull===true?'reason-bull':r.bull===false?'reason-bear':'reason-neutral'}">
-      ${r.bull===true?'▲':r.bull===false?'▼':'●'} ${r.text}
-    </div>`).join('');
-
-  document.getElementById('technicalGrid').innerHTML=`
-    <div class="indicator-item"><div class="ind-label">RSI (14)</div><div class="ind-value ${rsi<30?'up':rsi>70?'down':''}">${rsi}</div><div class="ind-status">${rsi<30?'Aşırı Satım':rsi>70?'Aşırı Alım':'Nötr'}</div></div>
-    <div class="indicator-item"><div class="ind-label">MACD</div><div class="ind-value ${macd>0?'up':'down'}">${macd}</div><div class="ind-status ${macd>0?'up':'down'}">${macd>0?'Bullish':'Bearish'}</div></div>
-    <div class="indicator-item"><div class="ind-label">Stochastic</div><div class="ind-value ${stoch<20?'up':stoch>80?'down':''}">${stoch}%</div><div class="ind-status">${stoch<20?'Aşırı Satım':stoch>80?'Aşırı Alım':'Normal'}</div></div>
-    <div class="indicator-item"><div class="ind-label">CCI (20)</div><div class="ind-value ${cci<-100?'up':cci>100?'down':''}">${cci}</div><div class="ind-status">${cci<-100?'Satım':cci>100?'Alım':'Nötr'}</div></div>
-    <div class="indicator-item"><div class="ind-label">BB Width</div><div class="ind-value" style="color:var(--warn)">${bbw}%</div><div class="ind-status" style="color:var(--warn)">${parseFloat(bbw)<7?'Kırılım Yakın':'Normal'}</div></div>
-    <div class="indicator-item"><div class="ind-label">Momentum</div><div class="ind-value ${mom>0?'up':'down'}">${mom>0?'+':''}${mom}</div><div class="ind-status ${mom>0?'up':'down'}">${mom>0?'▲ Pozitif':'▼ Negatif'}</div></div>`;
-
-  // Ichimoku display
-  if (ichi) {
-    const cloudColor = ichi.aboveCloud?'var(--green)':ichi.belowCloud?'var(--red)':'var(--warn)';
-    const cloudLabel = ichi.aboveCloud?'Üzerinde 🟢':ichi.belowCloud?'Altında 🔴':'İçinde 🟡';
-    document.getElementById('ichimokuDisplay').innerHTML=`
-      <div style="padding:8px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:8px">
-        <div style="font-size:11px;color:${cloudColor};font-weight:700;margin-bottom:6px">
-          ${ichi.aboveCloud?'🟢 BULLISH — Fiyat bulutun üzerinde':ichi.belowCloud?'🔴 BEARISH — Fiyat bulutun altında':'🟡 NÖTR — Konsolidasyon bölgesi'}
-        </div>
-        <div style="font-size:10px;color:var(--text2)">
-          ${ichi.bullish?'▲ Tenkan-sen > Kijun-sen (Bullish Crossover)':'▼ Tenkan-sen < Kijun-sen (Bearish Signal)'}
-        </div>
-      </div>
-      <div class="ichi-grid">
-        <div class="ichi-item"><div class="ichi-label">Tenkan-sen</div><div class="ichi-val" style="color:var(--accent)">$${ichi.tenkan}</div></div>
-        <div class="ichi-item"><div class="ichi-label">Kijun-sen</div><div class="ichi-val" style="color:var(--warn)">$${ichi.kijun}</div></div>
-        <div class="ichi-item"><div class="ichi-label">Senkou A</div><div class="ichi-val" style="color:var(--green)">$${ichi.senkouA}</div></div>
-        <div class="ichi-item"><div class="ichi-label">Senkou B</div><div class="ichi-val" style="color:var(--red)">$${ichi.senkouB}</div></div>
-        <div class="ichi-item"><div class="ichi-label">Chikou</div><div class="ichi-val">$${ichi.chikou}</div></div>
-        <div class="ichi-item"><div class="ichi-label">Bulut</div><div class="ichi-val" style="color:${cloudColor}">${cloudLabel}</div></div>
-      </div>`;
-  }
-
-  // Elliott Wave
-  const elliott = detectElliott(prices);
-  if (elliott) {
-    const trendColor = elliott.trend==='YUKARI'?'var(--green)':'var(--red)';
-    document.getElementById('elliottDisplay').innerHTML=`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:rgba(255,255,255,0.02);border-radius:8px">
-        <div>
-          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Elliott Wave</div>
-          <div style="font-size:13px;font-weight:700;color:${trendColor}">Dalga ${elliott.wave} — ${elliott.trend}</div>
-          <div style="font-size:10px;color:var(--text2);margin-top:2px">${elliott.phase}</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:9px;color:var(--text3)">Tespit edilen pivot</div>
-          <div style="font-family:'Space Mono';font-size:14px;color:var(--accent)">${elliott.pivots}</div>
-        </div>
-      </div>`;
-  }
-
-  // Fibonacci
-  const high=Math.max(...prices.slice(-60)), low=Math.min(...prices.slice(-60));
-  const fibRange=high-low;
-  const fibs=[23.6,38.2,50,61.8,78.6].map(f=>({level:f,price:(high-fibRange*(f/100)).toFixed(2)}));
-  const ext=(high+fibRange*0.618).toFixed(2);
-  document.getElementById('fibTable').innerHTML=fibs.map(f=>`
-    <tr>
-      <td ${f.level===61.8?'class="fib-key"':''}>${f.level===61.8?'%61.8 (Altın Oran)':'%'+f.level}</td>
-      <td ${f.level===61.8?'class="fib-key"':''}>$${f.price}</td>
-    </tr>`).join('')+`<tr><td>Extension %161.8</td><td style="color:var(--green)">$${ext}</td></tr>`;
-}
-
-function renderOpportunities() {
-  document.getElementById('opportunitiesList').innerHTML=OPPORTUNITIES.map(o=>`
-    <div class="opp-card">
-      <div class="opp-header">
-        <div><div class="opp-ticker">${o.ticker}</div><div style="font-size:10px;color:var(--text3)">${o.name}</div></div>
-        <div><div class="opp-upside">${o.upside}</div><div style="font-size:9px;color:var(--text3)">hedef</div></div>
-      </div>
-      <div class="opp-reason">${o.reason}</div>
-      <div class="opp-tags">${o.tags.map(t=>`<span class="opp-tag">${t}</span>`).join('')}</div>
-    </div>`).join('');
-  document.getElementById('jackpotList').innerHTML=JACKPOT_STOCKS.map(j=>`
-    <div class="unusual-item">
-      <div class="unusual-header">
-        <div class="unusual-ticker" style="color:var(--gold)">${j.ticker} 💎</div>
-        <div class="unusual-size">${j.pct}</div>
-      </div>
-      <div class="unusual-detail">${j.name}</div>
-      <div style="font-size:10px;color:var(--text2);margin-top:4px">${j.reason}</div>
-      <div style="margin-top:4px"><span class="unusual-type ${j.risk.includes('YÜKSEK')?'put-type':'call-type'}">Risk: ${j.risk}</span></div>
-    </div>`).join('');
-}
-
-function renderUnusual() {
-  document.getElementById('unusualList').innerHTML=UNUSUAL_OPTIONS.map(u=>`
-    <div class="unusual-item">
-      <div class="unusual-header">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="unusual-ticker">${u.ticker}</div>
-          <div class="unusual-type ${u.type==='CALL'?'call-type':'put-type'}">${u.type}</div>
-        </div>
-        <div class="unusual-size">${u.premium}</div>
-      </div>
-      <div class="unusual-detail">Strike: ${u.strike} | Exp: ${u.expiry} | Vol: ${u.volume} | OI: ${u.oi}</div>
-      <div style="font-size:10px;color:${u.type==='CALL'?'var(--green)':'var(--red)'};margin-top:3px">${u.sentiment}</div>
-    </div>`).join('');
-}
-
-// FIX: Single renderNews function (was duplicated)
-function renderNews() {
-  document.getElementById('newsList').innerHTML=NEWS_DATA.map(n=>`
-    <div class="news-item">
-      <div class="news-header">
-        <div class="news-title">${n.title}</div>
-        <div class="news-impact ${n.impact==='high'?'impact-high':n.impact==='med'?'impact-med':'impact-low'}">${n.impact.toUpperCase()}</div>
-      </div>
-      <div class="news-meta">${n.source} · ${n.time}
-        <span class="${n.sentiment==='bull'?'sent-bull':'sent-bear'}">${n.sentiment==='bull'?'▲ Bullish':'▼ Bearish'}</span>
-        · ${n.tickers.join(', ')}
-      </div>
-    </div>`).join('');
-  document.getElementById('legalList').innerHTML=LEGAL_DATA.map(l=>`
-    <div class="news-item">
-      <div class="news-header">
-        <div class="news-title">${l.title}</div>
-        <div class="news-impact ${l.impact==='high'?'impact-high':'impact-med'}">${l.impact.toUpperCase()}</div>
-      </div>
-      <div class="news-meta">${l.tickers.join(', ')}</div>
-    </div>`).join('');
-}
-
-// FIX: Single renderBoard (was duplicated; async version used)
-async function renderBoard(ticker) {
-  if (!ticker) return;
-  document.getElementById('boardTickerLabel').textContent = ticker;
-  const staticMembers = BOARD_DATA[ticker];
-  if (staticMembers) {
-    document.getElementById('boardList').innerHTML=staticMembers.map(m=>`
-      <div class="board-item">
-        <div class="board-avatar">${m.initials}</div>
-        <div class="board-info">
-          <div class="board-name">${m.name} <span class="board-score">★ ${m.score}</span></div>
-          <div class="board-role">${m.role}</div>
-          <div class="board-bio">${m.bio}</div>
-        </div>
-      </div>`).join('');
-  } else {
-    document.getElementById('boardList').innerHTML='<div style="text-align:center;padding:12px;color:var(--text3)">Yönetim verisi yükleniyor...</div>';
-    const executives = await fetchBoard(ticker);
-    if (executives.length > 0) {
-      document.getElementById('boardList').innerHTML=executives.slice(0,6).map(e=>`
-        <div class="board-item">
-          <div class="board-avatar">${(e.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
-          <div class="board-info">
-            <div class="board-name">${e.name||'—'}</div>
-            <div class="board-role">${e.title||'—'}</div>
-            <div class="board-bio">Yaş: ${e.age||'—'} ${e.totalCompensation?'· Maaş: $'+Math.round(e.totalCompensation/1000000)+'M':''}</div>
-          </div>
-        </div>`).join('');
-    }
-  }
-  // Insider
-  const insiders = await fetchInsider(ticker);
-  if (insiders.length > 0) {
-    document.getElementById('insiderList').innerHTML=insiders.map(t=>{
-      const isBuy=(t.transactionType||'').toLowerCase().includes('buy')||(t.change||0)>0;
-      return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
-        <div><div style="font-size:12px;font-weight:600">${t.name||'—'}</div><div style="font-size:10px;color:var(--text3)">${t.transactionDate||''} · ${t.transactionType||''}</div></div>
-        <div style="text-align:right"><div style="font-size:12px;color:${isBuy?'var(--green)':'var(--red)'}">${isBuy?'+':''}${(t.change||0).toLocaleString()} hisse</div></div>
-      </div>`;
-    }).join('');
-  } else {
-    document.getElementById('insiderList').innerHTML=`
-      <div class="unusual-item"><div class="unusual-header"><div class="unusual-ticker">İçeriden Alım</div><div class="unusual-size up">$2.1M</div></div><div class="unusual-detail">CFO · 10,500 hisse · $198.40 · Form 4</div><div style="font-size:10px;color:var(--green);margin-top:3px">▲ Bullish Sinyal</div></div>
-      <div class="unusual-item"><div class="unusual-header"><div class="unusual-ticker">İçeriden Satış</div><div class="unusual-size down">$890K</div></div><div class="unusual-detail">Board Member · 4,200 hisse · $212.00</div><div style="font-size:10px;color:var(--text3);margin-top:3px">● Planlı satış (10b5-1)</div></div>`;
-  }
-}
-
-// FIX: Single renderValuation (was duplicated; async API-first version)
-async function renderValuation(ticker) {
-  if (!ticker) return;
-  document.getElementById('valTickerLabel').textContent = ticker;
-  let fin = await fetchFinancials(ticker);
-  const staticV = VALUATION_DATA[ticker];
-
-  const assess=(val,low,high)=>!val?{label:'N/A',color:'var(--text2)'}:val<low?{label:'UCUZ',color:'var(--green)'}:val>high?{label:'PAHALI',color:'var(--red)'}:{label:'Adil',color:'var(--warn)'};
-  const fmt=(v,suf='x')=>v!=null?v.toFixed(1)+suf:'N/A';
-
-  let metrics;
-  if (fin) {
-    metrics=[
-      {label:'P/E',val:fmt(fin.pe),...assess(fin.pe,15,30)},
-      {label:'P/B',val:fmt(fin.pb),...assess(fin.pb,1,5)},
-      {label:'EV/EBITDA',val:fmt(fin.evEbitda),...assess(fin.evEbitda,8,20)},
-      {label:'P/S',val:fmt(fin.ps),...assess(fin.ps,2,8)},
-      {label:'Brüt Marj',val:fmt(fin.grossMargin,'%'),color:fin.grossMargin>50?'var(--green)':fin.grossMargin>20?'var(--warn)':'var(--red)',label2:''},
-      {label:'Net Marj',val:fmt(fin.netMargin,'%'),color:fin.netMargin>15?'var(--green)':fin.netMargin>5?'var(--warn)':'var(--red)',label2:''},
-      {label:'Beta',val:fin.beta?.toFixed(2)||'N/A',color:'var(--text)'},
-      {label:'52H Yüksek',val:fin.high52w?'$'+fin.high52w.toFixed(2):'N/A',color:'var(--text)'},
-    ];
-  } else if (staticV) {
-    metrics=[
-      {label:'P/E',...assess(staticV.pe,15,25),val:staticV.pe+'x'},
-      {label:'P/B',...assess(staticV.pb,1,3),val:staticV.pb+'x'},
-      {label:'EV/EBITDA',...assess(staticV.evEbitda,8,15),val:staticV.evEbitda+'x'},
-      {label:'PEG',...assess(staticV.peg,0.5,1.5),val:staticV.peg+'x'},
-      {label:'P/FCF',...assess(staticV.pfcf,15,30),val:staticV.pfcf?staticV.pfcf+'x':'N/A'},
-      {label:'EV/EBIT',...assess(staticV.evEbit,10,20),val:staticV.evEbit+'x'},
-    ];
-  } else {
-    metrics=[{label:'Veri yok',val:'—',color:'var(--text3)'}];
-  }
-
-  document.getElementById('valuationGrid').innerHTML=metrics.map(m=>`
-    <div class="val-item">
-      <div class="val-label">${m.label}</div>
-      <div class="val-value" style="color:${m.color||'var(--text)'}">${m.val}</div>
-      ${m.label2!==undefined?'':m.label?`<div class="val-status" style="color:${m.color||'var(--text2)'}">● ${m.label}</div>`:''}
-    </div>`).join('');
-}
-
-function renderMicroCap() {
-  document.getElementById('microcapList').innerHTML=MICROCAP_STOCKS.map(m=>`
-    <div class="opp-card" style="border-color:rgba(255,100,50,0.3)">
-      <div class="opp-header">
-        <div>
-          <div style="display:flex;align-items:center">
-            <div class="opp-ticker" style="color:#ff6032">${m.ticker}</div>
-            <span class="micro-badge">MicroCap</span>
-          </div>
-          <div style="font-size:10px;color:var(--text3)">${m.name} · Piyasa: ${m.mc}</div>
-          <div style="font-size:9px;color:var(--text3);margin-top:2px">${m.sector}</div>
-        </div>
-        <div style="text-align:right">
-          <div class="opp-upside">${m.pct}</div>
-          <div style="font-size:9px;margin-top:3px">
-            <span style="font-family:'Space Mono';color:var(--accent)">${m.score}/100</span>
-          </div>
-        </div>
-      </div>
-      <div class="opp-reason">${m.reason}</div>
-      <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
-        <span class="unusual-type ${m.risk.includes('YÜKSEK')||m.risk==='EKSTREm'?'put-type':'call-type'}">Risk: ${m.risk}</span>
-        <div style="font-size:9px;color:var(--text3)">Güven: <span style="color:var(--accent);font-family:'Space Mono'">${m.score}%</span></div>
-      </div>
-    </div>`).join('');
-}
-
-// ═══════════════════════════════════════
-// AI ANALYSIS
-// ═══════════════════════════════════════
-async function runAIAnalysis(type, ticker) {
-  const elId = type==='stock'?'aiAnalysisText':type==='geo'?'geopoliticalSummary':type==='valuation'?'valuationAI':'microcapAI';
-  const el = document.getElementById(elId);
-  el.innerHTML='<div style="display:flex;gap:4px;align-items:center"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>&nbsp; Analiz yapılıyor...</div>';
-
-  const s = ticker ? getStockData(ticker) : null;
-  const prices = ticker ? (candleCache[ticker]?.prices || generatePrices(ticker)) : null;
-  const rsi = prices ? calcRSI(prices) : 50;
-  const macd = prices ? calcMACD(prices) : 0;
-  const ichi = prices ? calcIchimoku(prices) : null;
-  const elliott = prices ? detectElliott(prices) : null;
-  const v = ticker ? VALUATION_DATA[ticker] : null;
-
-  let prompt='';
-  if (type==='stock' && ticker) {
-    prompt=`Sen uzman bir finansal analistsin ve Türkçe konuşuyorsun. ${ticker} hissesini analiz et.
-Veriler: Fiyat $${s.price.toFixed(2)}, Günlük değişim: ${s.changePct.toFixed(2)}%, Sektör: ${s.sector}
-Teknik: RSI=${rsi}, MACD=${macd}, Stoch=${calcStoch(prices)}%, CCI=${calcCCI(prices)}
-Ichimoku: ${ichi?`Fiyat bulutun ${ichi.aboveCloud?'üzerinde':ichi.belowCloud?'altında':'içinde'}, Tenkan=${ichi.tenkan}, Kijun=${ichi.kijun}`:'Veri yok'}
-Elliott Wave: ${elliott?`${elliott.wave} dalgası, ${elliott.trend} trend, ${elliott.phase}`:'Analiz edilemedi'}
-Fibonacci: %61.8 destek seviyesini belirt.
-3-4 cümle, net analiz yap. Son cümlede AL/SAT/BEKLE önerisini belirt ve gerekçeni yaz.`;
-  } else if (type==='geo') {
-    prompt=`Sen küresel finans ve jeopolitik uzmanısın. Türkçe konuş. Bugünün piyasalarını etkileyen en kritik 3 faktörü anlat: Fed politikası, jeopolitik riskler (Çin-Batı, Orta Doğu), teknoloji düzenlemeleri. Hangi sektörler risk altında, hangilerinde fırsat var? 3-4 cümle, net ve somut öneriler.`;
-  } else if (type==='valuation' && ticker) {
-    const peVal=v?v.pe:25, pbVal=v?v.pb:4, evVal=v?v.evEbitda:18;
-    prompt=`Sen değerleme uzmanı bir analistsin. Türkçe konuş. ${ticker} hissesini değerle: P/E=${peVal}x, P/B=${pbVal}x, EV/EBITDA=${evVal}x. Sektör ortalamaları ile karşılaştır, ucuz mu pahalı mı? 3-4 cümle. Net bir değerleme kararı ver.`;
-  } else if (type==='microcap') {
-    prompt=`Sen mikro-cap hisse uzmanısın. Türkçe konuş. Piyasa değeri $50M-$300M arası, yüksek büyüme potansiyeli olan ABD micro-cap hisselerini analiz et. 2025'te en çok patlama potansiyeli olan 3 sektörü belirt (AI/robotik, biyoteknoloji, uzay teknolojisi gibi). Yatırımcının dikkat etmesi gereken risk faktörlerini de say. 4-5 cümle.`;
-  }
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:600,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
-    const data = await res.json();
-    const text = data.content?.[0]?.text || 'Analiz tamamlanamadı.';
-    el.textContent=text;
-  } catch(e) {
-    const demos={
-      stock:`${ticker} için teknik analiz: RSI=${rsi} ${rsi<40?'aşırı satım bölgesinde alım fırsatı sunuyor':'nötr bölgede seyrediyor'}. MACD ${macd>0?'pozitif momentum':'negatif momentum'} gösteriyor. Ichimoku ${ichi&&ichi.aboveCloud?'bullish':'nötr/bearish'} sinyal veriyor. Genel görünüm: ${rsi<40&&macd>0?'AL':'BEKLE'}.`,
-      geo:'Küresel piyasalarda Fed faiz politikası belirleyici olmayı sürdürüyor. Çin-Batı gerilimi yarı iletken sektörünü baskı altında tutuyor. AI altyapısı ve savunma sektörleri fırsat sunuyor.',
-      valuation:`${ticker} değerleme analizi için API bağlantısı gerekiyor. Mevcut statik verilere göre ${v&&v.pe<20?'ucuz':'adil/pahalı'} bölgede.`,
-      microcap:'MicroCap analizi: AI altyapısı (BBAI, SoundHound), uzay teknolojisi (RKLB, AST), ve biyoteknoloji sektörleri 2025\'te yüksek potansiyel sunuyor. Risk yönetimi için pozisyon büyüklüğünü sınırlayın.'
-    };
-    el.textContent=demos[type]||'AI analizi için bağlantı sağlanamadı.';
-  }
-}
-
-// ═══════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════
-function switchView(view) {
-  currentView=view;
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+view).classList.add('active');
-  document.querySelectorAll('.tab,.bnav-item').forEach(t=>t.classList.toggle('active',t.dataset.view===view));
-  refreshCurrentView();
-}
-
-function refreshCurrentView() {
-  if(currentView==='watchlist'){renderWatchlist();if(selectedTicker)renderMiniChart(selectedTicker);}
-  else if(currentView==='signal')renderSignal(selectedTicker);
-  else if(currentView==='opportunities')renderOpportunities();
-  else if(currentView==='unusual')renderUnusual();
-  else if(currentView==='news')renderNews();
-  else if(currentView==='board')renderBoard(selectedTicker);
-  else if(currentView==='valuation')renderValuation(selectedTicker);
-  else if(currentView==='microcap')renderMicroCap();
-}
-
-function selectTicker(ticker) {
-  selectedTicker=ticker;
-  renderWatchlist();
-  renderMiniChart(ticker);
-  if(currentView==='signal')renderSignal(ticker);
-  else if(currentView==='board')renderBoard(ticker);
-  else if(currentView==='valuation')renderValuation(ticker);
-}
-
-// ═══════════════════════════════════════
-// SEARCH ENGINE
-// ═══════════════════════════════════════
+// ═══════════════════════════════════
+// LOCAL DB
+// ═══════════════════════════════════
 const LOCAL_DB=[
   {s:'AAPL',n:'Apple Inc.',e:'NASDAQ',t:'🇺🇸'},{s:'MSFT',n:'Microsoft Corporation',e:'NASDAQ',t:'🇺🇸'},
   {s:'GOOGL',n:'Alphabet Inc.',e:'NASDAQ',t:'🇺🇸'},{s:'AMZN',n:'Amazon.com Inc.',e:'NASDAQ',t:'🇺🇸'},
   {s:'NVDA',n:'NVIDIA Corporation',e:'NASDAQ',t:'🇺🇸'},{s:'META',n:'Meta Platforms Inc.',e:'NASDAQ',t:'🇺🇸'},
-  {s:'TSLA',n:'Tesla Inc.',e:'NASDAQ',t:'🇺🇸'},{s:'PLTR',n:'Palantir Technologies Inc.',e:'NYSE',t:'🇺🇸'},
-  {s:'ARM',n:'Arm Holdings plc',e:'NASDAQ',t:'🇺🇸'},{s:'AVGO',n:'Broadcom Inc.',e:'NASDAQ',t:'🇺🇸'},
+  {s:'TSLA',n:'Tesla Inc.',e:'NASDAQ',t:'🇺🇸'},{s:'AVGO',n:'Broadcom Inc.',e:'NASDAQ',t:'🇺🇸'},
   {s:'ORCL',n:'Oracle Corporation',e:'NYSE',t:'🇺🇸'},{s:'AMD',n:'Advanced Micro Devices',e:'NASDAQ',t:'🇺🇸'},
   {s:'INTC',n:'Intel Corporation',e:'NASDAQ',t:'🇺🇸'},{s:'QCOM',n:'Qualcomm Inc.',e:'NASDAQ',t:'🇺🇸'},
+  {s:'ARM',n:'Arm Holdings plc',e:'NASDAQ',t:'🇺🇸'},{s:'ASML',n:'ASML Holding N.V.',e:'NASDAQ',t:'🇳🇱'},
   {s:'JPM',n:'JPMorgan Chase & Co.',e:'NYSE',t:'🇺🇸'},{s:'BAC',n:'Bank of America',e:'NYSE',t:'🇺🇸'},
   {s:'GS',n:'Goldman Sachs Group',e:'NYSE',t:'🇺🇸'},{s:'MS',n:'Morgan Stanley',e:'NYSE',t:'🇺🇸'},
   {s:'V',n:'Visa Inc.',e:'NYSE',t:'🇺🇸'},{s:'MA',n:'Mastercard Inc.',e:'NYSE',t:'🇺🇸'},
+  {s:'BRK.B',n:'Berkshire Hathaway B',e:'NYSE',t:'🇺🇸'},{s:'PYPL',n:'PayPal Holdings',e:'NASDAQ',t:'🇺🇸'},
   {s:'WMT',n:'Walmart Inc.',e:'NYSE',t:'🇺🇸'},{s:'COST',n:'Costco Wholesale',e:'NASDAQ',t:'🇺🇸'},
-  {s:'JNJ',n:'Johnson & Johnson',e:'NYSE',t:'🇺🇸'},{s:'UNH',n:'UnitedHealth Group',e:'NYSE',t:'🇺🇸'},
-  {s:'LLY',n:'Eli Lilly and Company',e:'NYSE',t:'🇺🇸'},{s:'XOM',n:'Exxon Mobil',e:'NYSE',t:'🇺🇸'},
+  {s:'MCD',n:"McDonald's Corporation",e:'NYSE',t:'🇺🇸'},{s:'NKE',n:'Nike Inc.',e:'NYSE',t:'🇺🇸'},
+  {s:'JNJ',n:'Johnson & Johnson',e:'NYSE',t:'🇺🇸'},{s:'LLY',n:'Eli Lilly',e:'NYSE',t:'🇺🇸'},
+  {s:'XOM',n:'Exxon Mobil',e:'NYSE',t:'🇺🇸'},{s:'CVX',n:'Chevron Corporation',e:'NYSE',t:'🇺🇸'},
+  {s:'PLTR',n:'Palantir Technologies',e:'NYSE',t:'🇺🇸'},{s:'PANW',n:'Palo Alto Networks',e:'NASDAQ',t:'🇺🇸'},
+  {s:'SNOW',n:'Snowflake Inc.',e:'NYSE',t:'🇺🇸'},{s:'NET',n:'Cloudflare Inc.',e:'NYSE',t:'🇺🇸'},
+  {s:'CRWD',n:'CrowdStrike Holdings',e:'NASDAQ',t:'🇺🇸'},{s:'SMCI',n:'Super Micro Computer',e:'NASDAQ',t:'🇺🇸'},
+  {s:'IONQ',n:'IonQ Inc.',e:'NYSE',t:'🇺🇸'},{s:'RKLB',n:'Rocket Lab USA',e:'NASDAQ',t:'🇺🇸'},
   {s:'NFLX',n:'Netflix Inc.',e:'NASDAQ',t:'🇺🇸'},{s:'DIS',n:'Walt Disney Company',e:'NYSE',t:'🇺🇸'},
-  {s:'UBER',n:'Uber Technologies',e:'NYSE',t:'🇺🇸'},{s:'COIN',n:'Coinbase Global',e:'NASDAQ',t:'🇺🇸'},
-  {s:'SMCI',n:'Super Micro Computer',e:'NASDAQ',t:'🇺🇸'},{s:'IONQ',n:'IonQ Inc.',e:'NYSE',t:'🇺🇸'},
-  {s:'RKLB',n:'Rocket Lab USA',e:'NASDAQ',t:'🇺🇸'},{s:'BBAI',n:'BigBear.ai Holdings',e:'NYSE',t:'🇺🇸'},
-  {s:'NET',n:'Cloudflare Inc.',e:'NYSE',t:'🇺🇸'},{s:'CRWD',n:'CrowdStrike Holdings',e:'NASDAQ',t:'🇺🇸'},
-  {s:'SPY',n:'SPDR S&P 500 ETF',e:'NYSE',t:'🇺🇸'},{s:'QQQ',n:'Invesco QQQ Trust',e:'NASDAQ',t:'🇺🇸'},
-  {s:'BABA',n:'Alibaba Group',e:'NYSE',t:'🇨🇳'},{s:'BIDU',n:'Baidu Inc.',e:'NASDAQ',t:'🇨🇳'},
-  {s:'NIO',n:'NIO Inc.',e:'NYSE',t:'🇨🇳'},{s:'TCEHY',n:'Tencent Holdings',e:'OTC',t:'🇨🇳'},
+  {s:'UBER',n:'Uber Technologies',e:'NYSE',t:'🇺🇸'},{s:'ABNB',n:'Airbnb Inc.',e:'NASDAQ',t:'🇺🇸'},
+  {s:'COIN',n:'Coinbase Global',e:'NASDAQ',t:'🇺🇸'},{s:'MSTR',n:'MicroStrategy Inc.',e:'NASDAQ',t:'🇺🇸'},
+  {s:'SQ',n:'Block Inc.',e:'NYSE',t:'🇺🇸'},{s:'SHOP',n:'Shopify Inc.',e:'NYSE',t:'🇺🇸'},
+  {s:'BABA',n:'Alibaba Group',e:'NYSE',t:'🇨🇳'},{s:'NIO',n:'NIO Inc.',e:'NYSE',t:'🇨🇳'},
   {s:'SONY',n:'Sony Group Corporation',e:'NYSE',t:'🇯🇵'},{s:'TM',n:'Toyota Motor',e:'NYSE',t:'🇯🇵'},
   {s:'SAP',n:'SAP SE',e:'NYSE',t:'🇩🇪'},{s:'AZN',n:'AstraZeneca PLC',e:'NASDAQ',t:'🇬🇧'},
-  {s:'ASML',n:'ASML Holding N.V.',e:'NASDAQ',t:'🇳🇱'},{s:'INFY',n:'Infosys Ltd.',e:'NYSE',t:'🇮🇳'},
+  {s:'HSBC',n:'HSBC Holdings',e:'NYSE',t:'🇬🇧'},{s:'INFY',n:'Infosys Ltd.',e:'NYSE',t:'🇮🇳'},
+  {s:'SPY',n:'SPDR S&P 500 ETF',e:'NYSE',t:'🇺🇸'},{s:'QQQ',n:'Invesco QQQ Trust',e:'NASDAQ',t:'🇺🇸'},
+  {s:'GLD',n:'SPDR Gold Shares',e:'NYSE',t:'🇺🇸'},{s:'ARKK',n:'ARK Innovation ETF',e:'NYSE',t:'🇺🇸'},
   {s:'THYAO.IS',n:'Türk Hava Yolları',e:'BIST',t:'🇹🇷'},{s:'GARAN.IS',n:'Garanti BBVA',e:'BIST',t:'🇹🇷'},
   {s:'KCHOL.IS',n:'Koç Holding',e:'BIST',t:'🇹🇷'},{s:'EREGL.IS',n:'Ereğli Demir Çelik',e:'BIST',t:'🇹🇷'},
-  {s:'BIMAS.IS',n:'BİM Birleşik Mağazalar',e:'BIST',t:'🇹🇷'},{s:'AKBNK.IS',n:'Akbank T.A.Ş.',e:'BIST',t:'🇹🇷'},
+  {s:'BIMAS.IS',n:'BİM Mağazalar',e:'BIST',t:'🇹🇷'},{s:'AKBNK.IS',n:'Akbank T.A.Ş.',e:'BIST',t:'🇹🇷'},
+  {s:'ISCTR.IS',n:'İş Bankası',e:'BIST',t:'🇹🇷'},{s:'TUPRS.IS',n:'Tüpraş',e:'BIST',t:'🇹🇷'},
+  {s:'PGSUS.IS',n:'Pegasus Havacılık',e:'BIST',t:'🇹🇷'},{s:'TOASO.IS',n:'Tofaş Otomobil',e:'BIST',t:'🇹🇷'},
+  {s:'SISE.IS',n:'Şişecam',e:'BIST',t:'🇹🇷'},{s:'VESTL.IS',n:'Vestel Elektronik',e:'BIST',t:'🇹🇷'},
 ];
 
-let activeExchFilter='ALL', searchCache={}, searchTimer=null;
+// ═══════════════════════════════════
+// API & CACHE
+// ═══════════════════════════════════
+const pCache={}, cCache={}, prCache={}, finCache={}, bCache={}, inCache={};
+let newsCache=[], newsTs=0;
 
-function localSearch(q) {
-  const ql=q.toLowerCase().trim(); if(!ql) return [];
-  return LOCAL_DB.filter(item=>{
-    const mt=item.s.toLowerCase().includes(ql);
-    const mn=item.n.toLowerCase().includes(ql);
-    const me=activeExchFilter==='ALL'||item.e.includes(activeExchFilter)||item.t.includes(activeExchFilter.slice(0,2));
-    return (mt||mn)&&me;
-  }).sort((a,b)=>(a.s.toLowerCase().startsWith(ql)?0:1)-(b.s.toLowerCase().startsWith(ql)?0:1)).slice(0,25);
+async function finnhub(path,params={}){
+  const url=new URL('https://finnhub.io/api/v1'+path);
+  url.searchParams.set('token',FK);
+  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
+  try{const r=await fetch(url.toString());if(!r.ok)return null;return await r.json();}
+  catch(e){return null;}
 }
 
-async function finnhubSearch(q) {
-  const key=q+activeExchFilter; if(searchCache[key]) return searchCache[key];
-  try {
-    const res=await fetch(`https://finnhub.io/api/v1/search?q=${encodeURIComponent(q)}&token=${FINNHUB_KEY}`);
-    const data=await res.json();
-    if(data.result){const r=data.result.map(x=>({s:x.symbol,n:x.description,e:x.displaySymbol||'',t:'🌐'})).slice(0,15);searchCache[key]=r;return r;}
-  }catch(e){}
-  return [];
+async function fetchQ(t){
+  const c=pCache[t];if(c&&Date.now()-c.ts<15000)return c;
+  const d=await finnhub('/quote',{symbol:t});
+  if(!d||!d.c||d.c===0)return c||null;
+  const r={price:d.c,change:+(d.c-d.pc).toFixed(2),changePct:d.pc?+((d.c-d.pc)/d.pc*100).toFixed(2):0,
+    high:d.h,low:d.l,open:d.o,prev:d.pc,ts:Date.now()};
+  pCache[t]=r;return r;
 }
 
-function renderSearchResults(results, q) {
-  const el=document.getElementById('searchResults');
-  const pop=document.getElementById('popularSection');
-  if(!q){el.innerHTML='';pop.style.display='block';return;}
-  pop.style.display='none';
-  if(!results.length){el.innerHTML=`<div style="text-align:center;padding:24px;color:var(--text3)">🔍 "${q}" için sonuç bulunamadı</div>`;return;}
-  const hi=(txt,q)=>{const i=txt.toLowerCase().indexOf(q.toLowerCase());return i<0?txt:txt.slice(0,i)+`<span style="color:var(--accent);font-weight:700">${txt.slice(i,i+q.length)}</span>`+txt.slice(i+q.length);};
-  el.innerHTML=results.map(r=>{
-    const inList=watchlist.includes(r.s);
-    return `<div class="search-result-item">
-      <div class="sri-left">
-        <div class="sri-flag">${r.t||'🌐'}</div>
-        <div class="sri-info">
-          <div class="sri-ticker">${hi(r.s,q)}</div>
-          <div class="sri-name">${hi(r.n,q)}</div>
-          <div class="sri-exchange">${r.e}</div>
+async function fetchCandles(t){
+  if(cCache[t]&&Date.now()-cCache[t].ts<3600000)return cCache[t].p;
+  const now=Math.floor(Date.now()/1000);
+  const d=await finnhub('/stock/candle',{symbol:t,resolution:'D',from:now-90*86400,to:now});
+  if(d&&d.s==='ok'&&d.c){cCache[t]={p:d.c,ts:Date.now()};return d.c;}
+  return null;
+}
+
+async function fetchProfile(t){
+  if(prCache[t])return prCache[t];
+  const d=await finnhub('/stock/profile2',{symbol:t});
+  if(d&&d.name){prCache[t]=d;return d;}return null;
+}
+
+async function fetchFin(t){
+  if(finCache[t]&&Date.now()-finCache[t].ts<3600000)return finCache[t];
+  const d=await finnhub('/stock/metric',{symbol:t,metric:'all'});
+  if(!d||!d.metric)return null;
+  const m=d.metric;
+  const r={pe:m.peNormalizedAnnual,pb:m.pbAnnual,evEbitda:m.evEbitdaTTM,
+    gross:m.grossMarginTTM,net:m.netProfitMarginTTM,beta:m.beta,
+    h52:m['52WeekHigh'],l52:m['52WeekLow'],ts:Date.now()};
+  finCache[t]=r;return r;
+}
+
+async function fetchNews(ticker){
+  const now=Date.now();
+  if(ticker){
+    const today=new Date().toISOString().split('T')[0];
+    const week=new Date(now-7*864e5).toISOString().split('T')[0];
+    const d=await finnhub('/company-news',{symbol:ticker,from:week,to:today});
+    return d||[];
+  }
+  if(newsCache.length&&now-newsTs<300000)return newsCache;
+  const d=await finnhub('/news',{category:'general'});
+  if(d&&d.length){newsCache=d;newsTs=now;}
+  return newsCache;
+}
+
+async function fetchBoard(t){
+  if(bCache[t]&&Date.now()-bCache[t].ts<3600000)return bCache[t].d;
+  const d=await finnhub('/stock/executive',{symbol:t});
+  if(d&&d.executive){bCache[t]={d:d.executive,ts:Date.now()};return d.executive;}
+  return null;
+}
+
+async function fetchInsider(t){
+  if(inCache[t]&&Date.now()-inCache[t].ts<3600000)return inCache[t].d;
+  const d=await finnhub('/stock/insider-transactions',{symbol:t});
+  if(d&&d.data){inCache[t]={d:d.data.slice(0,10),ts:Date.now()};return d.data.slice(0,10);}
+  return null;
+}
+
+async function callClaude(prompt){
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const d=await r.json();
+    return d.content?.map(i=>i.text||'').join('')||'Analiz alınamadı.';
+  }catch(e){return 'API bağlantı hatası. Lütfen tekrar deneyin.';}
+}
+
+// ═══════════════════════════════════
+// INDICATORS
+// ═══════════════════════════════════
+function genOHLC(base,n=60){let p=base,d=[];for(let i=n;i>=0;i--){p=Math.max(p+(Math.random()-.47)*p*.022,base*.4);d.push(+p.toFixed(2));}return d;}
+function calcRSI(p,n=14){if(p.length<n+1)return 50;let g=0,l=0;for(let i=p.length-n;i<p.length;i++){const d=p[i]-p[i-1];d>0?g+=d:l-=d;}const ag=g/n,al=l/n;return+(100-100/(1+ag/(al||.001))).toFixed(1);}
+function calcMACD(p){const ema=(arr,n)=>{const k=2/(n+1);let e=arr.slice(0,n).reduce((a,b)=>a+b,0)/n;for(let i=n;i<arr.length;i++)e=arr[i]*k+e*(1-k);return e;};if(p.length<27)return 0;return+(ema(p,12)-ema(p,26)).toFixed(2);}
+function calcStoch(p,n=14){const s=p.slice(-n),lo=Math.min(...s),hi=Math.max(...s);return+(((p[p.length-1]-lo)/(hi-lo||1))*100).toFixed(1);}
+function calcCCI(p,n=20){const s=p.slice(-n),avg=s.reduce((a,b)=>a+b,0)/n,md=s.reduce((a,b)=>a+Math.abs(b-avg),0)/n;return+((p[p.length-1]-avg)/(.015*(md||1))).toFixed(0);}
+function calcBBW(p,n=20){const s=p.slice(-n),avg=s.reduce((a,b)=>a+b,0)/n,std=Math.sqrt(s.reduce((a,b)=>a+(b-avg)**2,0)/n);return+((std*4/avg)*100).toFixed(1);}
+function calcMom(p,n=10){return+(p[p.length-1]-p[p.length-1-n]).toFixed(2);}
+
+// ═══════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════
+function fmtTime(d=new Date()){return d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function fmtShort(d=new Date()){return d.toLocaleDateString('tr-TR',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}
+function fmtTs(ts){return new Date(ts*1000).toLocaleDateString('tr-TR',{day:'2-digit',month:'short'})+' '+new Date(ts*1000).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});}
+function save(){localStorage.setItem(WL_KEY,JSON.stringify(wl));localStorage.setItem(CFG_KEY,JSON.stringify(cfg));localStorage.setItem('alpha_groups',JSON.stringify(wlGroups));}
+function getName(t){return prCache[t]?.name||LOCAL_DB.find(d=>d.s===t)?.n||t;}
+
+// ═══════════════════════════════════
+// RENDERS
+// ═══════════════════════════════════
+function renderWL(){
+  document.getElementById('wlCount').textContent=wl.length+' hisse';
+  const el=document.getElementById('watchlistItems');
+  if(!wl.length){el.innerHTML='<div style="text-align:center;padding:28px;color:var(--text3);font-size:11px;">İzleme listeniz boş.<br>+ Hisse Ekle butonuna basın.</div>';return;}
+  el.innerHTML=wl.map(t=>{
+    const q=pCache[t],up=(q?.changePct||0)>=0;
+    const price=q?'$'+q.price.toFixed(2):'—';
+    const chg=q?(up?'+':'')+q.changePct.toFixed(2)+'%':'—';
+    const prices=cCache[t]?.p;
+    let sa='—',sc='sig-hold';
+    if(prices&&prices.length>20){
+      const r=calcRSI(prices),m=calcMACD(prices);let b=0,be=0;
+      if(r<35)b+=2;else if(r>65)be+=2;
+      if(m>0)b+=2;else be+=2;
+      if((q?.changePct||0)>1)b+=1;else if((q?.changePct||0)<-1)be+=1;
+      if(b>be+1){sa='AL';sc='sig-buy';}else if(be>b+1){sa='SAT';sc='sig-sell';}else{sa='BEKLE';sc='sig-hold';}
+    }
+    return `<div class="wl-item${sel===t?' selected':''}" onclick="selTicker('${t}')">
+      <div><div class="wl-sym">${t}</div><div class="wl-name">${getName(t)}</div></div>
+      <div style="text-align:right">
+        <div class="wl-price${q?(up?' up':' down'):''}">${price}</div>
+        <div style="display:flex;gap:3px;align-items:center;justify-content:flex-end;margin-top:2px">
+          <div class="wl-chg${up?' up':' down'}">${chg}</div>
+          <div class="sig-badge ${sc}">${sa}</div>
         </div>
       </div>
-      <div><div class="sri-add-btn ${inList?'added':''}" id="addbtn-${r.s.replace(/[^a-zA-Z0-9]/g,'_')}" onclick="toggleFromSearch('${r.s}','${r.n.replace(/'/g,"\\'")}')">
-        ${inList?'✓ Listede':'+ Ekle'}
-      </div></div>
     </div>`;
   }).join('');
 }
 
-function toggleFromSearch(ticker, name) {
-  if(watchlist.includes(ticker)){watchlist=watchlist.filter(t=>t!==ticker);}
-  else{if(!LOCAL_DB.find(d=>d.s===ticker))LOCAL_DB.push({s:ticker,n:name||ticker,e:'Global',t:'🌐'});watchlist.push(ticker);selectedTicker=ticker;}
-  saveWatchlist(); renderWatchlist(); renderWatchlistManage();
-  const btn=document.getElementById('addbtn-'+ticker.replace(/[^a-zA-Z0-9]/g,'_'));
-  if(btn){const inList=watchlist.includes(ticker);btn.textContent=inList?'✓ Listede':'+ Ekle';btn.className='sri-add-btn'+(inList?' added':'');}
+function renderTB(){
+  document.getElementById('tickerBar').innerHTML=wl.slice(0,12).map(t=>{
+    const q=pCache[t],up=(q?.changePct||0)>=0;
+    return `<div class="tb-item${sel===t?' active':''}" onclick="selTicker('${t}')">
+      <div class="tb-sym">${t}</div>
+      <div class="tb-price${q?(up?' up':' down'):''}">${q?'$'+q.price.toFixed(2):'—'}</div>
+      <div class="tb-chg${up?' up':' down'}">${q?(up?'▲':'▼')+Math.abs(q.changePct).toFixed(2)+'%':'—'}</div>
+    </div>`;
+  }).join('');
 }
 
-function renderWatchlistManage() {
-  document.getElementById('watchlistManage').innerHTML=watchlist.map(t=>`
-    <div class="wl-chip">
-      <span onclick="selectAndClose('${t}')">${t}</span>
-      <span class="remove" onclick="removeFromWatchlist('${t}')">×</span>
+async function renderChart(t){
+  document.getElementById('chartLbl').textContent=t;
+  document.getElementById('chartPrLbl').textContent='⟳';
+  let prices=cCache[t]?.p||await fetchCandles(t);
+  if(!prices||prices.length<2)prices=genOHLC(FB_STOCKS[t]?.base||100,30);
+  prices=prices.slice(-30);
+  const canvas=document.getElementById('miniChart');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.offsetWidth,H=canvas.offsetHeight||90;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  const mn=Math.min(...prices),mx=Math.max(...prices),rng=mx-mn||1;
+  ctx.clearRect(0,0,W,H);
+  const up=prices[prices.length-1]>=prices[0];
+  const colH=up?'#26a69a':'#ef5350';
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,up?'rgba(38,166,154,.18)':'rgba(239,83,80,.18)');
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  const pts=prices.map((p,i)=>({x:(i/(prices.length-1))*(W-2)+1,y:H-((p-mn)/rng)*(H-14)-7}));
+  ctx.beginPath();pts.forEach((pt,i)=>i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y));
+  ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();pts.forEach((pt,i)=>i?ctx.lineTo(pt.x,pt.y):ctx.moveTo(pt.x,pt.y));
+  ctx.strokeStyle=colH;ctx.lineWidth=1.5;ctx.stroke();
+  const lp=pts[pts.length-1];
+  ctx.beginPath();ctx.arc(lp.x,lp.y,3,0,Math.PI*2);ctx.fillStyle=colH;ctx.fill();
+  document.getElementById('cLow').textContent='L: $'+mn.toFixed(2);
+  document.getElementById('cHigh').textContent='H: $'+mx.toFixed(2);
+  const q=pCache[t];
+  document.getElementById('chartPrLbl').textContent=q?'$'+q.price.toFixed(2)+' ('+(q.changePct>=0?'+':'')+q.changePct.toFixed(2)+'%)':'';
+  renderWL();renderTB();
+}
+
+async function renderSignal(t){
+  document.getElementById('sigTicker').textContent=t;
+  let prices=cCache[t]?.p||await fetchCandles(t);
+  if(!prices||prices.length<30)prices=genOHLC(FB_STOCKS[t]?.base||100,60);
+  const rsi=calcRSI(prices),macd=calcMACD(prices),stoch=calcStoch(prices),cci=calcCCI(prices),bbw=calcBBW(prices),mom=calcMom(prices);
+  const q=pCache[t]||{changePct:0};const cp=q.changePct||0;
+  let b=0,be=0,reasons=[];
+  if(rsi<35){b+=2;reasons.push({t:`RSI aşırı satım (${rsi}) — alım fırsatı sinyali`,v:true});}
+  else if(rsi>65){be+=2;reasons.push({t:`RSI aşırı alım (${rsi}) — sat uyarısı`,v:false});}
+  else reasons.push({t:`RSI nötr bölge (${rsi}) — trend yok`,v:null});
+  if(macd>0){b+=2;reasons.push({t:`MACD pozitif (${macd}) — yukarı momentum güçlü`,v:true});}
+  else{be+=2;reasons.push({t:`MACD negatif (${macd}) — aşağı baskı mevcut`,v:false});}
+  if(stoch<20){b+=1;reasons.push({t:`Stochastic aşırı satım (${stoch}) — dip bölgesi`,v:true});}
+  else if(stoch>80)reasons.push({t:`Stochastic aşırı alım (${stoch}) — dikkatli ol`,v:false});
+  if(cci<-100){b+=1;reasons.push({t:`CCI aşırı satım (${cci})`,v:true});}
+  else if(cci>100)reasons.push({t:`CCI aşırı alım (${cci})`,v:false});
+  if(cp>2){b+=1;reasons.push({t:`Güçlü günlük performans (+${cp.toFixed(1)}%)`,v:true});}
+  else if(cp<-2)reasons.push({t:`Zayıf günlük performans (${cp.toFixed(1)}%)`,v:false});
+  const total=b+be,conf=total>0?Math.round((b/total)*100):50;
+  let action='BEKLE',ac='var(--warn)';
+  if(conf>=65&&b>be){action='AL';ac='var(--up)';}
+  else if(conf<40||be>b+1){action='SAT';ac='var(--down)';}
+  document.getElementById('sigAction').textContent=action;
+  document.getElementById('sigAction').style.color=ac;
+  document.getElementById('sigScore').textContent=conf+'%';
+  const bar=document.getElementById('sigBar');
+  bar.style.width=conf+'%';bar.style.background=action==='AL'?'var(--up)':action==='SAT'?'var(--down)':'var(--warn)';
+  document.getElementById('sigReasons').innerHTML=reasons.map(r=>`<div class="reason${r.v===true?' bull':r.v===false?' bear':' neutral'}">${r.v===true?'▲':r.v===false?'▼':'◆'} ${r.t}</div>`).join('');
+  // Tech grid
+  document.getElementById('techTs').textContent=fmtShort();
+  const vals=[
+    {lbl:'RSI (14)',val:rsi,st:rsi<35?['Aşırı Satım','t-up']:rsi>65?['Aşırı Alım','t-down']:['Nötr','']},
+    {lbl:'MACD',val:macd,st:macd>0?['Pozitif ▲','t-up']:['Negatif ▼','t-down']},
+    {lbl:'Stochastic',val:stoch,st:stoch<20?['Aşırı Satım','t-up']:stoch>80?['Aşırı Alım','t-down']:['Nötr','']},
+    {lbl:'CCI (20)',val:cci,st:cci<-100?['Oversold','t-up']:cci>100?['Overbought','t-down']:['Nötr','']},
+    {lbl:'BB Width',val:bbw+'%',st:bbw>3?['Volatil','t-warn']:['Sıkışık','']},
+    {lbl:'Momentum',val:mom,st:mom>0?['Pozitif','t-up']:['Negatif','t-down']},
+  ];
+  document.getElementById('techGrid').innerHTML=vals.map(v=>`<div class="ind-item">
+    <div class="ind-label">${v.lbl}</div>
+    <div class="ind-val ${v.val>=0?'t-up':'t-down'}">${v.val}</div>
+    <div class="ind-status ${v.st[1]}">${v.st[0]}</div>
+  </div>`).join('');
+  // Fibonacci
+  const high=Math.max(...prices.slice(-90)),low=Math.min(...prices.slice(-90)),range=high-low;
+  const fibLevels=[[0.236,high-range*.236],[0.382,high-range*.382],[0.618,high-range*.618],[0.786,high-range*.786],[1.618,low-range*.618]];
+  document.getElementById('fibTable').innerHTML=`
+    <tr><td>%23.6</td><td>$${fibLevels[0][1].toFixed(2)}</td></tr>
+    <tr><td>%38.2</td><td>$${fibLevels[1][1].toFixed(2)}</td></tr>
+    <tr class="fib-key"><td>%61.8 Altın Oran</td><td>$${fibLevels[2][1].toFixed(2)}</td></tr>
+    <tr><td>%78.6</td><td>$${fibLevels[3][1].toFixed(2)}</td></tr>
+    <tr><td>Ext. %161.8</td><td style="color:var(--up)">$${fibLevels[4][1].toFixed(2)}</td></tr>`;
+}
+
+async function renderValuation(t){
+  document.getElementById('valTicker').textContent=t;
+  document.getElementById('valAiTs').textContent='';
+  const fin=await fetchFin(t);
+  const pr=await fetchProfile(t);
+  const q=pCache[t];
+  const fmt=v=>v!=null?v.toFixed(1):'N/A';
+  const badge=(v,low,high,inv)=>{
+    if(v==null)return '';
+    const cheap=inv?(v>high):(v<low),exp=inv?(v<low):(v>high);
+    if(cheap)return '<div class="val-badge t-up">✓ Ucuz</div>';
+    if(exp)return '<div class="val-badge t-down">✗ Pahalı</div>';
+    return '<div class="val-badge" style="color:var(--text3)">— Nötr</div>';
+  };
+  document.getElementById('valGrid').innerHTML=`
+    <div class="val-item"><div class="val-label">P/E</div><div class="val-val${fin?.pe>0?(fin.pe<20?' t-up':fin.pe>40?' t-down':''):''}">${fmt(fin?.pe)}</div>${badge(fin?.pe,0,30,false)}</div>
+    <div class="val-item"><div class="val-label">P/B</div><div class="val-val">${fmt(fin?.pb)}</div>${badge(fin?.pb,0,3,false)}</div>
+    <div class="val-item"><div class="val-label">EV/EBITDA</div><div class="val-val">${fmt(fin?.evEbitda)}</div>${badge(fin?.evEbitda,0,20,false)}</div>
+    <div class="val-item"><div class="val-label">Beta</div><div class="val-val${fin?.beta>1.5?' t-warn':''}">${fmt(fin?.beta)}</div></div>
+    <div class="val-item"><div class="val-label">Brüt Marj</div><div class="val-val${fin?.gross>40?' t-up':''}">${fin?.gross!=null?fin.gross.toFixed(1)+'%':'N/A'}</div></div>
+    <div class="val-item"><div class="val-label">Net Marj</div><div class="val-val${fin?.net>15?' t-up':fin?.net<0?' t-down':''}">${fin?.net!=null?fin.net.toFixed(1)+'%':'N/A'}</div></div>`;
+  document.getElementById('valAI').textContent=`${t} için değerleme verisi Finnhub'dan alındı. AI yorumu için butona basın.`;
+}
+
+async function renderBoard(t){
+  document.getElementById('boardTs').textContent=fmtShort();
+  let execs=await fetchBoard(t);
+  if(!execs||!execs.length)execs=FB_BOARD[t]||[];
+  if(execs.length){
+    document.getElementById('boardList').innerHTML=execs.slice(0,5).map(e=>{
+      const ini=(e.name||e.name||'?').split(' ').map(x=>x[0]).slice(0,2).join('');
+      const fbE=FB_BOARD[t]?.find(f=>f.name===e.name);
+      return `<div class="board-item">
+        <div class="board-av">${ini}</div>
+        <div>
+          <div class="board-name">${e.name||'—'}</div>
+          <div class="board-role">${e.title||e.role||'—'}</div>
+          <div class="board-bio">${fbE?.bio||'Yönetici bilgisi Finnhub\'dan alınmıştır.'}</div>
+          ${fbE?`<div class="board-score">⭐ ${fbE.score}</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    document.getElementById('boardList').innerHTML='<div style="text-align:center;padding:16px;color:var(--text3);font-size:11px;">Bu hisse için yönetici verisi bulunamadı.</div>';
+  }
+  // Insider
+  document.getElementById('insiderTs').textContent=fmtShort();
+  const ins=await fetchInsider(t);
+  if(ins&&ins.length){
+    document.getElementById('insiderList').innerHTML=ins.map(i=>{
+      const buy=i.transactionType&&i.transactionType.toLowerCase().includes('buy');
+      return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:11px;font-weight:600">${i.name||'—'}</div>
+          <div style="font-size:10px;color:var(--text3)">${i.transactionDate||'—'} · ${i.transactionType||'—'}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Roboto Mono',monospace;font-size:11px;color:${buy?'var(--up)':'var(--down)'}">${buy?'+':''} ${(i.share||0).toLocaleString()} hisse</div>
+          <div style="font-family:'Roboto Mono',monospace;font-size:9px;color:var(--text3)">$${i.transactionPrice||'—'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    document.getElementById('insiderList').innerHTML='<div style="text-align:center;padding:16px;color:var(--text3);font-size:11px;">Insider işlem bulunamadı.</div>';
+  }
+}
+
+async function renderNews(){
+  document.getElementById('newsTs').textContent='⟳ Yükleniyor...';
+  const news=await fetchNews(null);
+  document.getElementById('newsTs').textContent=fmtShort();
+  if(!news||!news.length){
+    document.getElementById('newsList').innerHTML='<div style="text-align:center;padding:16px;color:var(--text3);font-size:11px;">Haber bulunamadı. API kotası dolmuş olabilir.</div>';
+    return;
+  }
+  const items=news.slice(0,15);
+  document.getElementById('newsList').innerHTML=items.map(n=>{
+    const sentiment=n.sentiment?.toLowerCase()||'';
+    const sc=sentiment==='positive'?'sent-bull':sentiment==='negative'?'sent-bear':'';
+    const url=n.url?`<a href="${n.url}" target="_blank" class="news-link">→ Haberi Oku</a>`:'';
+    return `<div class="news-item">
+      <div class="news-top">
+        <div class="news-title">${n.headline||n.summary||'—'}</div>
+        <div class="imp ${n.related?.includes('NVDA')||n.related?.includes('TSLA')?'imp-high':n.category==='general'?'imp-low':'imp-med'}">${n.category||'GENEL'}</div>
+      </div>
+      <div class="news-meta" style="display:flex;gap:8px;align-items:center">
+        <span>${n.source||'—'}</span>
+        <span style="color:var(--text3)">·</span>
+        <span>${n.datetime?fmtTs(n.datetime):'—'}</span>
+        ${sentiment?`<span class="${sc}">● ${sentiment==='positive'?'Olumlu':'Olumsuz'}</span>`:''}
+        ${url}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderLegal(){
+  document.getElementById('legalList').innerHTML=LEGAL_DATA.map(l=>`
+    <div class="news-item">
+      <div class="news-top">
+        <div class="news-title">${l.title}</div>
+        <div class="imp imp-${l.impact}">${l.impact==='high'?'KRİTİK':l.impact==='med'?'ORTA':'DÜŞÜK'}</div>
+      </div>
+      <div class="news-meta">Etkilenen: ${l.tickers.join(', ')}</div>
     </div>`).join('');
 }
 
-function removeFromWatchlist(ticker) {
-  watchlist=watchlist.filter(t=>t!==ticker);
-  if(selectedTicker===ticker)selectedTicker=watchlist[0]||'';
-  saveWatchlist(); renderWatchlist(); renderWatchlistManage();
-  const q=document.getElementById('stockInput').value.trim();
-  if(q) renderSearchResults(localSearch(q),q);
+function renderUnusual(){
+  document.getElementById('unusualTs').textContent=fmtShort();
+  document.getElementById('unusualList').innerHTML=UNUSUAL_OPS.map(u=>`
+    <div class="unusual-item">
+      <div class="u-top">
+        <div><span class="u-sym">${u.ticker}</span><span class="u-type ${u.type==='CALL'?'call':'put'}" style="margin-left:6px">${u.type}</span></div>
+        <div class="u-prem">${u.prem}</div>
+      </div>
+      <div class="u-detail">Strike ${u.strike} · Exp ${u.exp} · Vol ${u.vol} · OI ${u.oi}</div>
+      <div class="u-sent" style="color:${u.type==='CALL'?'var(--up)':'var(--down)'}">${u.sent}</div>
+    </div>`).join('');
 }
 
-function selectAndClose(ticker) {
-  selectedTicker=ticker; closeModal(); refreshCurrentView();
+function renderOpps(){
+  document.getElementById('oppsList').innerHTML=OPPS.map(o=>`
+    <div class="opp-card" onclick="selTicker('${o.ticker}')">
+      <div class="opp-top">
+        <div><div class="opp-sym">${o.ticker}</div><div class="opp-name">${o.name}</div></div>
+        <div class="opp-up">${o.up}</div>
+      </div>
+      <div class="opp-reason">${o.reason}</div>
+      <div class="opp-tags">${o.tags.map(t=>`<div class="opp-tag">${t}</div>`).join('')}</div>
+    </div>`).join('');
+  document.getElementById('jackpotList').innerHTML=JACKPOT.map(j=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-family:'Roboto Mono',monospace;font-size:12px;font-weight:600;color:var(--gold)">${j.ticker}</div>
+        <div style="font-size:10px;color:var(--text3)">${j.name}</div>
+        <div style="font-size:10px;color:var(--text2);margin-top:2px">${j.reason}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;padding-left:8px">
+        <div style="font-family:'Roboto Mono',monospace;font-size:13px;font-weight:700;color:var(--up)">${j.pct}</div>
+        <div style="font-size:9px;font-weight:600;padding:2px 5px;border-radius:2px;background:rgba(239,83,80,.1);color:var(--down);margin-top:2px">${j.risk}</div>
+      </div>
+    </div>`).join('');
 }
 
-function openModal() {
-  document.getElementById('modalOverlay').classList.add('open');
-  renderWatchlistManage();
-  document.getElementById('quickAdd').innerHTML=QUICK_TICKERS.filter(t=>!watchlist.includes(t)).map(t=>{
-    const info=LOCAL_DB.find(d=>d.s===t);
-    return `<div onclick="toggleFromSearch('${t}','${info?info.n:t}')" style="padding:5px 12px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:20px;font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);cursor:pointer">${info?info.t:''} ${t}</div>`;
+async function renderMarket(){
+  document.getElementById('mktTs').textContent='⟳';
+  const tickers=['SPY','VXX','UUP','TLT'];
+  const quotes=await Promise.all(tickers.map(t=>fetchQ(t)));
+  const labels=['S&P 500 (SPY)','VIX (VXX)','DXY (UUP)','10Y (TLT)'];
+  document.getElementById('mktGrid').innerHTML=labels.map((l,i)=>{
+    const q=quotes[i];const up=(q?.changePct||0)>=0;
+    return `<div class="mkt-item">
+      <div class="mkt-label">${l}</div>
+      <div class="mkt-val ${q?(up?'up':'down'):''}">${q?'$'+q.price.toFixed(2):'—'}</div>
+      <div class="mkt-chg ${q?(up?'up':'down'):''}">${q?(up?'▲':'▼')+Math.abs(q.changePct).toFixed(2)+'%':'—'}</div>
+    </div>`;
   }).join('');
-  setTimeout(()=>document.getElementById('stockInput').focus(),300);
+  document.getElementById('mktTs').textContent=fmtShort();
 }
 
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-  document.getElementById('stockInput').value='';
-  document.getElementById('searchResults').innerHTML='';
-  document.getElementById('popularSection').style.display='block';
+function renderSettingsTheme(){
+  document.querySelectorAll('.t-btn').forEach(b=>{b.classList.toggle('active',b.dataset.t===cfg.theme);});
 }
 
-document.getElementById('stockInput').addEventListener('input',function(){
-  const q=this.value.trim(); clearTimeout(searchTimer);
-  if(!q){renderSearchResults([],'');return;}
-  renderSearchResults(localSearch(q),q);
-  if(q.length>=2){
-    document.getElementById('searchSpinner').style.display='block';
-    searchTimer=setTimeout(async()=>{
-      const api=await finnhubSearch(q);
-      const loc=localSearch(q);
-      const merged=[...loc];
-      api.forEach(r=>{if(!merged.find(l=>l.s===r.s))merged.push(r);});
-      renderSearchResults(merged.slice(0,30),q);
-      document.getElementById('searchSpinner').style.display='none';
-    },400);
+function renderWLGroups(){
+  document.getElementById('wlGroupsEl').innerHTML=wlGroups.map((g,i)=>`
+    <div class="wl-group-row">
+      <div><div class="wg-name">${g.name}</div><div class="wg-cnt">${wl.length} hisse</div></div>
+      <div class="wg-actions">
+        ${wlGroups.length>1?`<button class="btn-icon" onclick="deleteGroup(${i})" style="color:var(--down)">✕</button>`:''}
+        <button class="btn-icon" onclick="renameGroup(${i})">✎</button>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════
+// TICKER SELECTION
+// ═══════════════════════════════════
+async function selTicker(t){
+  sel=t;
+  renderWL();renderTB();
+  const promises=[fetchQ(t)];
+  if(!cCache[t])promises.push(fetchCandles(t));
+  if(!prCache[t])promises.push(fetchProfile(t));
+  await Promise.all(promises);
+  renderChart(t);
+  if(curView==='signal'){renderSignal(t);document.getElementById('sigTicker').textContent=t;}
+  if(curView==='valuation'){renderValuation(t);document.getElementById('valTicker').textContent=t;}
+  if(curView==='board'){renderBoard(t);}
+  document.getElementById('boardTs').textContent='';
+}
+
+// ═══════════════════════════════════
+// VIEW SWITCH
+// ═══════════════════════════════════
+function switchView(v){
+  curView=v;
+  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+v));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.view===v));
+  document.querySelectorAll('.bnav').forEach(el=>el.classList.toggle('active',el.dataset.view===v));
+  if(v==='signal'&&sel)renderSignal(sel);
+  if(v==='valuation'&&sel){renderValuation(sel);}
+  if(v==='board'&&sel){renderBoard(sel);}
+  if(v==='news'){renderNews();renderLegal();}
+  if(v==='unusual')renderUnusual();
+  if(v==='opportunities')renderOpps();
+  if(v==='settings'){renderSettingsTheme();renderWLGroups();}
+}
+
+// ═══════════════════════════════════
+// SEARCH MODAL
+// ═══════════════════════════════════
+function openModal(){
+  document.getElementById('modalOverlay').classList.add('open');
+  renderWLManage();renderQuickAdd();
+  document.getElementById('stockInput').focus();
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+
+function renderQuickAdd(){
+  document.getElementById('quickAdd').innerHTML=QUICK.map(t=>`
+    <div onclick="addTicker('${t}')" style="padding:5px 9px;border-radius:14px;font-family:'Roboto Mono',monospace;font-size:10px;font-weight:600;cursor:pointer;background:${wl.includes(t)?'rgba(38,166,154,.15)':'var(--bg3)'};border:1px solid ${wl.includes(t)?'rgba(38,166,154,.4)':'var(--border)'};color:${wl.includes(t)?'var(--up)':'var(--text2)'}">${t}</div>`).join('');
+}
+function renderWLManage(){
+  document.getElementById('wlManage').innerHTML=wl.map(t=>`
+    <div class="wl-chip" onclick="removeTicker('${t}')">
+      ${t} <span class="rm">✕</span>
+    </div>`).join('');
+}
+
+function addTicker(t){
+  if(!wl.includes(t)){wl.push(t);save();renderWL();renderTB();}
+  renderWLManage();renderQuickAdd();
+  const btn=document.querySelector(`.sri-add[data-s="${t}"]`);
+  if(btn){btn.textContent='✓ Eklendi';btn.classList.add('added');}
+}
+function removeTicker(t){
+  wl=wl.filter(x=>x!==t);
+  if(sel===t)sel=wl[0]||'';
+  save();renderWL();renderTB();renderWLManage();renderQuickAdd();
+}
+
+let searchCache={};
+async function doSearch(q){
+  if(!q){document.getElementById('searchResults').innerHTML='';document.getElementById('popSection').style.display='';return;}
+  document.getElementById('popSection').style.display='none';
+  document.getElementById('searchSpinner').style.display='block';
+  const up=q.toUpperCase();
+  let res=LOCAL_DB.filter(d=>{
+    const matchExch=activeExch==='ALL'||d.e===activeExch;
+    return matchExch&&(d.s.includes(up)||d.n.toLowerCase().includes(q.toLowerCase()));
+  }).slice(0,12);
+  // Also try Finnhub search
+  if(!searchCache[up]){
+    const api=await finnhub('/search',{q:q});
+    if(api&&api.result){
+      searchCache[up]=api.result;
+      api.result.slice(0,8).forEach(r=>{
+        if(!res.find(x=>x.s===r.symbol))res.push({s:r.symbol,n:r.description||r.symbol,e:r.type||'',t:'🌐'});
+      });
+    }
   }
-});
+  document.getElementById('searchSpinner').style.display='none';
+  if(!res.length){document.getElementById('searchResults').innerHTML='<div class="search-empty">Sonuç bulunamadı</div>';return;}
+  document.getElementById('searchResults').innerHTML=res.map(r=>`
+    <div class="sri">
+      <div class="sri-l">
+        <span class="sri-flag">${r.t}</span>
+        <div>
+          <div class="sri-sym">${r.s}</div>
+          <div class="sri-name">${r.n}</div>
+          <div class="sri-exch">${r.e}</div>
+        </div>
+      </div>
+      <div class="sri-add${wl.includes(r.s)?' added':''}" data-s="${r.s}" onclick="addTicker('${r.s}')">${wl.includes(r.s)?'✓ Listede':'+ Ekle'}</div>
+    </div>`).join('');
+}
 
-document.getElementById('exchangeFilter').addEventListener('click',e=>{
-  const btn=e.target.closest('.exch-btn'); if(!btn) return;
-  document.querySelectorAll('.exch-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); activeExchFilter=btn.dataset.exch;
-  const q=document.getElementById('stockInput').value.trim();
-  if(q) renderSearchResults(localSearch(q),q);
-});
+// ═══════════════════════════════════
+// THEME
+// ═══════════════════════════════════
+function setTheme(t){
+  cfg.theme=t;save();
+  document.documentElement.setAttribute('data-theme',t);
+  renderSettingsTheme();
+}
 
-// ═══════════════════════════════════════
-// CLOCK & AUTO-REFRESH
-// ═══════════════════════════════════════
-setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('tr-TR');},1000);
-document.getElementById('clock').textContent=new Date().toLocaleTimeString('tr-TR');
+// ═══════════════════════════════════
+// WATCHLIST GROUPS
+// ═══════════════════════════════════
+function addGroup(){
+  const name=prompt('Liste adı:');
+  if(!name||!name.trim())return;
+  wlGroups.push({id:'g'+Date.now(),name:name.trim()});
+  save();renderWLGroups();
+}
+function deleteGroup(i){
+  if(wlGroups.length<=1)return;
+  if(!confirm('Bu listeyi sil?'))return;
+  wlGroups.splice(i,1);save();renderWLGroups();
+}
+function renameGroup(i){
+  const name=prompt('Yeni ad:',wlGroups[i].name);
+  if(!name||!name.trim())return;
+  wlGroups[i].name=name.trim();save();renderWLGroups();
+}
 
-setInterval(async()=>{
-  await Promise.all(watchlist.map(t=>fetchQuote(t)));
-  if(currentView==='watchlist') renderWatchlist();
-},15000);
+// ═══════════════════════════════════
+// AI ANALYSIS
+// ═══════════════════════════════════
+async function aiSignalAnalysis(){
+  if(!sel)return;
+  const btn=document.getElementById('analyzeBtn');
+  btn.textContent='⟳ AI Analiz Yapıyor...';btn.disabled=true;
+  document.getElementById('aiSigText').textContent='Anlık veri toplanıyor ve analiz yapılıyor...';
+  const q=pCache[sel];const fin=await fetchFin(sel);const pr=await fetchProfile(sel);
+  const prices=cCache[sel]?.p||[];
+  const rsi=prices.length>14?calcRSI(prices):50;
+  const macd=prices.length>26?calcMACD(prices):0;
+  const prompt=`Sen deneyimli bir borsa analisti ve portföy yöneticisisin. ${sel} (${pr?.name||sel}) hissesi için kısa ve etkili bir teknik + temel analiz yap.
 
-// ═══════════════════════════════════════
+Anlık Veri:
+- Güncel Fiyat: $${q?.price||'N/A'} (${q?.changePct>=0?'+':''}${q?.changePct||0}% bugün)
+- 52H/L: $${fin?.h52||'N/A'} / $${fin?.l52||'N/A'}
+- RSI: ${rsi} | MACD: ${macd}
+- P/E: ${fin?.pe||'N/A'} | Beta: ${fin?.beta||'N/A'}
+- Brüt Marj: ${fin?.gross!=null?fin.gross.toFixed(1)+'%':'N/A'}
+
+Türkçe olarak şunları içeren 3-4 cümlelik analiz yaz:
+1. Kısa vadeli teknik görünüm
+2. Risk/fırsat değerlendirmesi
+3. Net AL/SAT/BEKLE önerisi ve gerekçesi`;
+  const res=await callClaude(prompt);
+  document.getElementById('aiSigText').textContent=res;
+  document.getElementById('aiSigStamp').textContent='Son güncelleme: '+fmtShort();
+  btn.textContent='🤖 Anlık AI Analizi Yap';btn.disabled=false;
+}
+
+async function geoAnalysis(){
+  const btn=document.getElementById('geoBtn');
+  btn.textContent='⟳ Haberler İşleniyor...';btn.disabled=true;
+  document.getElementById('geoText').textContent='Finnhub\'dan güncel haberler çekiliyor ve AI analiz yapılıyor...';
+  const news=await fetchNews(null);
+  const headlines=news.slice(0,8).map(n=>n.headline||n.summary||'').filter(Boolean).join('\n');
+  const prompt=`Sen deneyimli bir jeopolitik risk analisti ve makroekonomistsin. Aşağıdaki güncel finansal haberler ışığında kapsamlı bir jeopolitik ve makroekonomik risk analizi yap.
+
+Güncel Haberler (${new Date().toLocaleDateString('tr-TR')}):
+${headlines||'[Haber verisi alınamadı, genel analiz yap]'}
+
+Türkçe olarak şunları analiz et:
+1. En kritik 2-3 jeopolitik risk faktörü
+2. Makroekonomik ortam (faiz, enflasyon, dolar)
+3. Hangi sektörler risk altında, hangilerinde fırsat var
+4. Yatırımcı için net özet öneri
+
+Analiz 5-6 cümle olsun, net ve eylem odaklı olsun.`;
+  const res=await callClaude(prompt);
+  document.getElementById('geoText').textContent=res;
+  document.getElementById('geoStamp').textContent='Haber kaynağı: Finnhub API · '+fmtShort();
+  btn.textContent='🌍 Anlık Jeopolitik AI Analizi Yap';btn.disabled=false;
+}
+
+async function valAnalysis(){
+  if(!sel)return;
+  const btn=document.getElementById('valBtn');
+  btn.textContent='⟳ Analiz Yapılıyor...';btn.disabled=true;
+  const fin=await fetchFin(sel);const pr=await fetchProfile(sel);const q=pCache[sel];
+  const prompt=`${sel} (${pr?.name||sel}) hissesi için değerleme analizi yap.
+
+Anlık Finansal Veriler:
+- Fiyat: $${q?.price||'N/A'}
+- P/E: ${fin?.pe||'N/A'} | P/B: ${fin?.pb||'N/A'} | EV/EBITDA: ${fin?.evEbitda||'N/A'}
+- Brüt Marj: ${fin?.gross!=null?fin.gross.toFixed(1)+'%':'N/A'} | Net Marj: ${fin?.net!=null?fin.net.toFixed(1)+'%':'N/A'}
+- Beta: ${fin?.beta||'N/A'} | 52H: $${fin?.h52||'N/A'} / 52L: $${fin?.l52||'N/A'}
+- Sektör: ${pr?.finnhubIndustry||'N/A'}
+
+Türkçe olarak:
+1. Sektör ortalamasıyla kıyasla (ucuz mu, pahalı mı?)
+2. Kaliteli iş modeli mi?
+3. Net değerleme kararı (3-4 cümle)`;
+  const res=await callClaude(prompt);
+  document.getElementById('valAI').textContent=res;
+  document.getElementById('valAiTs').textContent=fmtShort();
+  btn.textContent='💰 Anlık Değerleme Analizi';btn.disabled=false;
+}
+
+async function boardAnalysis(){
+  if(!sel)return;
+  const btn=document.getElementById('boardAnalyzeBtn');
+  btn.textContent='⟳ Analiz Yapılıyor...';btn.disabled=true;
+  const pr=await fetchProfile(sel);
+  const ins=await fetchInsider(sel);
+  const insiderSummary=ins?`Son ${ins.length} insider işlem var.`:'Insider verisi yok.';
+  const prompt=`${sel} (${pr?.name||sel}) şirketinin yönetim kalitesini değerlendir.
+
+Şirket Profili:
+- Sektör: ${pr?.finnhubIndustry||'N/A'}
+- Piyasa Değeri: $${pr?.marketCapitalization?Math.round(pr.marketCapitalization/1000)+'B':'N/A'}
+- Ülke: ${pr?.country||'N/A'}
+Insider: ${insiderSummary}
+
+Türkçe olarak yönetim kalitesi, kurumsal yönetim riskleri ve insider aktivitesini 3-4 cümlede değerlendir.`;
+  const res=await callClaude(prompt);
+  // Show result in a toast-style div
+  const existing=document.getElementById('boardAiResult');
+  if(existing)existing.remove();
+  const div=document.createElement('div');
+  div.id='boardAiResult';
+  div.className='ai-box';div.style.marginTop='8px';
+  div.innerHTML=`<div class="ai-hdr"><div class="ai-badge">Claude AI · Anlık</div></div><div class="ai-text">${res}</div><div class="timestamp">${fmtShort()}</div>`;
+  document.querySelector('#view-board .card').appendChild(div);
+  btn.textContent='🤖 Yönetim AI Analizi';btn.disabled=false;
+}
+
+// ═══════════════════════════════════
+// API STATUS CHECK
+// ═══════════════════════════════════
+async function checkAPIStatus(){
+  const d=await fetchQ('AAPL');
+  const dot=document.getElementById('apiStatusDot');
+  const txt=document.getElementById('apiStatusTxt');
+  if(d&&d.price){
+    dot.style.background='var(--up)';
+    txt.textContent='✓ Bağlı · Anlık veri aktif · '+fmtShort();
+  } else {
+    dot.style.background='var(--down)';
+    txt.textContent='✗ Bağlantı hatası · API kotası dolmuş olabilir';
+  }
+}
+
+// ═══════════════════════════════════
+// CLOCK
+// ═══════════════════════════════════
+setInterval(()=>{
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('tr-TR');
+},1000);
+
+// ═══════════════════════════════════
+// AUTO REFRESH
+// ═══════════════════════════════════
+function startAutoRefresh(){
+  if(refreshTimer)clearInterval(refreshTimer);
+  refreshTimer=setInterval(async()=>{
+    if(!cfg.autoR)return;
+    await Promise.all(wl.map(t=>fetchQ(t)));
+    renderWL();renderTB();
+    if(curView==='watchlist')renderChart(sel);
+    if(curView==='signal')renderSignal(sel);
+  },15000);
+}
+
+// ═══════════════════════════════════
 // EVENT LISTENERS
-// ═══════════════════════════════════════
-document.querySelectorAll('.tab,.bnav-item').forEach(t=>t.addEventListener('click',()=>switchView(t.dataset.view)));
+// ═══════════════════════════════════
+document.querySelectorAll('.tab').forEach(el=>el.addEventListener('click',()=>switchView(el.dataset.view)));
+document.querySelectorAll('.bnav').forEach(el=>el.addEventListener('click',()=>switchView(el.dataset.view)));
 document.getElementById('addStockBtn').addEventListener('click',openModal);
-document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
-document.getElementById('stockInput').addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-document.getElementById('analyzeBtn').addEventListener('click',()=>runAIAnalysis('stock',selectedTicker));
-document.getElementById('geoAnalyzeBtn').addEventListener('click',()=>runAIAnalysis('geo',null));
-document.getElementById('boardAnalyzeBtn').addEventListener('click',()=>runAIAnalysis('stock',selectedTicker));
-document.getElementById('valuationBtn').addEventListener('click',()=>runAIAnalysis('valuation',selectedTicker));
-document.getElementById('scanBtn').addEventListener('click',renderOpportunities);
-document.getElementById('microcapBtn').addEventListener('click',()=>runAIAnalysis('microcap',null));
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))closeModal();});
+document.getElementById('stockInput').addEventListener('input',e=>{
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>doSearch(e.target.value.trim()),250);
+});
+document.getElementById('exchFilter').addEventListener('click',e=>{
+  const btn=e.target.closest('.exch-btn');if(!btn)return;
+  activeExch=btn.dataset.exch;
+  document.querySelectorAll('.exch-btn').forEach(b=>b.classList.toggle('active',b.dataset.exch===activeExch));
+  doSearch(document.getElementById('stockInput').value.trim());
+});
+document.getElementById('analyzeBtn').addEventListener('click',aiSignalAnalysis);
+document.getElementById('geoBtn').addEventListener('click',geoAnalysis);
+document.getElementById('geoRefBtn').addEventListener('click',()=>{newsCache=[];geoAnalysis();});
+document.getElementById('newsRefBtn').addEventListener('click',()=>{newsCache=[];renderNews();});
+document.getElementById('valBtn').addEventListener('click',valAnalysis);
+document.getElementById('boardAnalyzeBtn').addEventListener('click',boardAnalysis);
+document.getElementById('scanBtn').addEventListener('click',renderOpps);
+document.getElementById('refreshWLBtn').addEventListener('click',async()=>{
+  await Promise.all(wl.map(t=>{delete pCache[t];return fetchQ(t);}));
+  renderWL();renderTB();if(sel)renderChart(sel);
+});
+document.getElementById('addGroupBtn').addEventListener('click',addGroup);
+document.getElementById('autoRTog').addEventListener('change',e=>{cfg.autoR=e.target.checked;save();});
+document.getElementById('newsRTog').addEventListener('change',()=>{});
+document.querySelectorAll('.t-btn').forEach(b=>b.addEventListener('click',()=>setTheme(b.dataset.t)));
 
-// ═══════════════════════════════════════
+// ═══════════════════════════════════
 // INIT
-// ═══════════════════════════════════════
+// ═══════════════════════════════════
 (async()=>{
-  renderWatchlist();
-  await Promise.all(watchlist.map(t=>fetchQuote(t)));
-  renderWatchlist();
-  if(selectedTicker){
-    await fetchProfile(selectedTicker);
-    renderMiniChart(selectedTicker);
+  // Apply saved theme
+  document.documentElement.setAttribute('data-theme',cfg.theme);
+  renderSettingsTheme();
+  // Initial render
+  renderWL();renderTB();renderUnusual();renderOpps();renderLegal();
+  // Load live data
+  const quotes=await Promise.all(wl.map(t=>fetchQ(t)));
+  renderWL();renderTB();
+  // Load candles + profile for selected
+  if(sel){
+    await Promise.all([fetchCandles(sel),fetchProfile(sel)]);
+    renderChart(sel);
   }
+  // Market summary
+  renderMarket();
+  // Load news in background
+  renderNews();
+  // Check API status
+  checkAPIStatus();
+  // Auto refresh
+  startAutoRefresh();
 })();
 </script>
 </body>
