@@ -2,610 +2,787 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AlphaTerminal Pro v5</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AlphaTerminal Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-/* ── RESET & BASE ──────────────────────────────── */
+/* ═══════════════════════════════════════════
+   RESET — no overflow tricks anywhere
+═══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { height: 100%; }
-body {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: #040812;
-  color: #d8e4f0;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 12px;
-  overflow: hidden;
-}
 
-/* ── COLORS ────────────────────────────────────── */
+/* ═══════════════════════════════════════════
+   ROOT
+═══════════════════════════════════════════ */
 :root {
-  --bg:      #040812;
-  --panel:   #080e1c;
-  --card:    #0c1424;
-  --border:  #162035;
-  --b2:      #1d2d48;
-  --accent:  #00ccff;
-  --green:   #00e09a;
-  --red:     #ff3d71;
-  --gold:    #f5a623;
-  --purple:  #9b8ef0;
-  --muted:   #3a4f6a;
-  --dim:     #5e7a96;
-  --text:    #d8e4f0;
+  --bg:     #03080f;
+  --p1:     #060d1a;
+  --p2:     #0a1422;
+  --b1:     #132030;
+  --b2:     #1c2e44;
+  --cyan:   #00d4ff;
+  --green:  #00e090;
+  --red:    #ff3d5a;
+  --gold:   #f59e20;
+  --violet: #a78bfa;
+  --dim:    #3d5570;
+  --dim2:   #6080a0;
+  --text:   #ccd8ec;
+  --white:  #e8f2ff;
+  --topH:   0px; /* set by JS */
 }
 
-/* ── TOP BAR ───────────────────────────────────── */
+/* ═══════════════════════════════════════════
+   BASE — NO overflow:hidden on html/body
+═══════════════════════════════════════════ */
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════
+   TOPBAR — 2 rows on mobile, 1 row on desktop
+═══════════════════════════════════════════ */
 #topbar {
-  flex-shrink: 0;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
-  padding: 8px 14px;
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background: var(--p1);
+  border-bottom: 1px solid var(--b1);
+  /* two flex rows on mobile */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+}
+
+.tb-row1 {
+  display: contents; /* logo + gap + ai-btn always visible */
+}
+
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  white-space: nowrap;
+  line-height: 1;
+}
+.logo em { color: var(--red); font-style: normal; }
+
+.tb-spacer { flex: 1; min-width: 8px; }
+
+/* inputs row */
+.tb-inputs {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
   flex-wrap: nowrap;
-  overflow: hidden;
+  width: 100%;
+  order: 10; /* push below logo row on mobile */
 }
-#topbar .logo {
-  font-family: Arial Black, sans-serif;
-  font-size: 14px;
-  font-weight: 900;
-  color: var(--accent);
-  letter-spacing: 2px;
-  white-space: nowrap;
-  margin-right: 4px;
+
+@media (min-width: 680px) {
+  .tb-inputs {
+    width: auto;
+    order: 0;
+    flex: 1;
+  }
+  .logo { order: -1; }
 }
-#topbar .logo span { color: var(--red); }
-#topbar input {
-  background: var(--card);
+
+input.sym-in {
+  width: 76px;
+  flex-shrink: 0;
+  background: var(--p2);
   border: 1px solid var(--b2);
-  color: var(--text);
-  padding: 5px 9px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: bold;
-  width: 90px;
-  outline: none;
-  text-transform: uppercase;
-}
-#topbar input:focus { border-color: var(--accent); }
-#topbar select {
-  background: var(--card);
-  border: 1px solid var(--b2);
-  color: var(--text);
+  color: var(--white);
   padding: 5px 7px;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
   outline: none;
-  cursor: pointer;
+  border-radius: 2px;
+  -webkit-appearance: none;
 }
-.tbtn {
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  padding: 5px 12px;
+input.sym-in:focus { border-color: var(--cyan); }
+
+select.sel {
+  flex-shrink: 0;
+  background: var(--p2);
+  border: 1px solid var(--b2);
+  color: var(--text);
+  padding: 5px 5px;
   font-family: inherit;
   font-size: 11px;
+  outline: none;
+  border-radius: 2px;
+  -webkit-appearance: none;
   cursor: pointer;
-  letter-spacing: 1px;
-  white-space: nowrap;
-  transition: background .15s, color .15s;
 }
-.tbtn:hover { background: var(--accent); color: #000; }
-.tbtn.ai { border-color: var(--purple); color: var(--purple); background: rgba(155,142,240,.08); }
-.tbtn.ai:hover { background: var(--purple); color: #000; }
-.tbtn:disabled { opacity: .45; cursor: wait; }
-#spacer { flex: 1; }
 
-/* ── STATUS BAR ────────────────────────────────── */
-#statusbar {
+.btn {
   flex-shrink: 0;
-  background: #060b17;
-  border-bottom: 1px solid var(--border);
-  padding: 3px 14px;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  padding: 5px 11px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: 2px;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .12s, color .12s;
+}
+.btn:active, .btn:hover { background: var(--cyan); color: #000; }
+
+.btn-ai {
+  border-color: var(--violet);
+  color: var(--violet);
+  background: rgba(167,139,250,.1);
+}
+.btn-ai:active, .btn-ai:hover { background: var(--violet); color: #000; }
+.btn-ai:disabled { opacity: .4; pointer-events: none; }
+
+/* ═══════════════════════════════════════════
+   STATUS BAR
+═══════════════════════════════════════════ */
+#stbar {
+  background: #040a14;
+  border-bottom: 1px solid var(--b1);
+  padding: 3px 10px;
+  font-size: 10px;
+  color: var(--dim2);
   display: flex;
   align-items: center;
-  gap: 16px;
-  font-size: 10px;
-  color: var(--dim);
+  gap: 14px;
   white-space: nowrap;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
-#statusbar .dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--muted); display: inline-block; margin-right: 4px;
-}
-#statusbar .dot.live { background: var(--green); animation: blink 1.4s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-#statusbar #st-version { margin-left: auto; color: var(--purple); }
-
-/* ── MAIN GRID ─────────────────────────────────── */
-#main {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  min-height: 0; /* critical for flex children */
-  overflow: hidden;
-}
-
-/* ── LEFT COLUMN ───────────────────────────────── */
-#left {
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--border);
-  overflow: hidden;
-  min-height: 0;
-}
-
-/* chart area */
-#chart-header {
+#stbar::-webkit-scrollbar { display: none; }
+.sdot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--dim);
+  margin-right: 4px;
+  vertical-align: middle;
   flex-shrink: 0;
-  padding: 10px 14px 8px;
+}
+.sdot.live { background: var(--green); animation: blink 1.4s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+#stv { margin-left: auto; color: var(--violet); flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════
+   PRICE HEADER
+═══════════════════════════════════════════ */
+#price-hdr {
+  padding: 10px 12px 9px;
+  border-bottom: 1px solid var(--b1);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-bottom: 1px solid var(--border);
+  background: var(--p1);
 }
-#sym-name { font-size: 22px; font-weight: bold; color: var(--accent); }
-#sym-sub  { font-size: 10px; color: var(--dim); margin-top: 2px; }
-#price-val { font-size: 22px; font-weight: bold; text-align: right; }
-#price-chg { font-size: 11px; text-align: right; margin-top: 3px; }
+#sym-name { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--cyan); line-height: 1; }
+#sym-sub  { font-size: 10px; color: var(--dim2); margin-top: 3px; }
+#price-v  { font-size: 22px; font-weight: 800; text-align: right; line-height: 1; }
+#price-c  { font-size: 11px; text-align: right; margin-top: 4px; }
+.up { color: var(--green); }
+.dn { color: var(--red); }
+.nu { color: var(--dim2); }
 
-#chart-wrap {
-  flex-shrink: 0;
-  height: 340px;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
+/* ═══════════════════════════════════════════
+   CHART
+═══════════════════════════════════════════ */
+#chart-box {
   position: relative;
+  height: 240px;
+  background: var(--p1);
+  border-bottom: 1px solid var(--b1);
 }
-#chart-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
-#chart-placeholder {
+@media (min-width: 600px) { #chart-box { height: 320px; } }
+@media (min-width: 900px) { #chart-box { height: 380px; } }
+#chart-box iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+#chart-ph {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  color: var(--dim); gap: 8px; font-size: 13px;
+  color: var(--dim2); gap: 8px;
+}
+#chart-ph .ci { font-size: 30px; }
+
+/* ═══════════════════════════════════════════
+   MAIN LAYOUT
+   Mobile: single column (natural scroll)
+   Desktop 900px+: left + sticky right panel
+═══════════════════════════════════════════ */
+#main {
+  display: block;
+}
+@media (min-width: 900px) {
+  #main {
+    display: flex;
+    align-items: flex-start;
+  }
+  #left {
+    flex: 1;
+    min-width: 0;
+  }
+  #right {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: var(--topH, 100px);
+    max-height: calc(100vh - var(--topH, 100px));
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--b1);
+    background: var(--p1);
+  }
 }
 
-/* tabs */
+/* ═══════════════════════════════════════════
+   TAB BAR — sticky, JS sets the top offset
+═══════════════════════════════════════════ */
 #tab-bar {
-  flex-shrink: 0;
+  position: sticky;
+  top: var(--topH, 100px); /* updated by JS */
+  z-index: 100;
   display: flex;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
+  background: var(--p1);
+  border-bottom: 1px solid var(--b1);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 #tab-bar::-webkit-scrollbar { display: none; }
 .tab {
-  padding: 7px 13px;
+  padding: 8px 11px;
   font-size: 10px;
-  color: var(--dim);
+  color: var(--dim2);
   cursor: pointer;
   border-bottom: 2px solid transparent;
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: .8px;
   flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
   transition: color .15s;
+  user-select: none;
 }
 .tab:hover { color: var(--text); }
-.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab.on { color: var(--cyan); border-bottom-color: var(--cyan); }
 
-/* tab content area */
-#tab-area {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-#tab-area::-webkit-scrollbar { width: 4px; }
-#tab-area::-webkit-scrollbar-thumb { background: var(--b2); }
+/* ═══════════════════════════════════════════
+   PANES
+═══════════════════════════════════════════ */
+.pane { display: none; padding: 12px; }
+.pane.on { display: block; }
 
-.tab-pane { display: none; padding: 12px; }
-.tab-pane.active { display: block; }
-
-/* ── RIGHT COLUMN (AI) ─────────────────────────── */
-#right {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-#ai-header {
-  flex-shrink: 0;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(155,142,240,.04);
+/* ═══════════════════════════════════════════
+   SECTION HEADER
+═══════════════════════════════════════════ */
+.sh {
+  font-size: 10px;
+  color: var(--dim2);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 14px 0 8px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 7px;
 }
-#ai-header .title { font-size: 13px; font-weight: bold; color: var(--purple); }
-#ai-header .badge {
-  font-size: 9px; color: var(--purple);
-  background: rgba(155,142,240,.12);
-  border: 1px solid rgba(155,142,240,.25);
-  padding: 2px 7px; letter-spacing: 1px;
-}
+.sh::after { content: ''; flex: 1; height: 1px; background: var(--b1); }
+.sh:first-child { margin-top: 0; }
 
-/* score */
-#score-area {
-  flex-shrink: 0;
-  padding: 14px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: var(--panel);
+/* ═══════════════════════════════════════════
+   INDICATOR CARDS
+═══════════════════════════════════════════ */
+.ig {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
 }
-#score-ring-wrap { position: relative; width: 90px; height: 90px; flex-shrink: 0; }
-#score-ring-wrap svg { transform: rotate(-90deg); }
-#score-num {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; font-weight: bold; color: var(--purple);
-}
-#score-info { flex: 1; min-width: 0; }
-#score-label { font-size: 16px; font-weight: bold; color: var(--purple); }
-#score-sub { font-size: 10px; color: var(--dim); margin-top: 3px; line-height: 1.5; }
+@media (min-width: 500px) { .ig { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 760px) { .ig { grid-template-columns: repeat(4, 1fr); } }
 
-/* signal bars */
-#sig-bars {
-  flex-shrink: 0;
-  padding: 10px 14px 12px;
-  border-bottom: 1px solid var(--border);
-}
-.sig-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 5px;
-}
-.sig-lbl { font-size: 9px; color: var(--dim); width: 108px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sig-track { flex: 1; height: 4px; background: var(--border); }
-.sig-fill { height: 100%; width: 0; transition: width 1s ease; }
-.sig-pct { font-size: 9px; font-weight: bold; width: 28px; text-align: right; color: var(--dim); }
-
-/* ai output */
-#ai-out {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 14px;
-  min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
-}
-#ai-out::-webkit-scrollbar { width: 4px; }
-#ai-out::-webkit-scrollbar-thumb { background: var(--b2); }
-
-/* ai chat */
-#ai-chat {
-  flex-shrink: 0;
-  padding: 8px 14px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 6px;
-}
-#ai-chat input {
-  flex: 1;
-  background: var(--card);
-  border: 1px solid var(--b2);
-  color: var(--text);
-  padding: 6px 10px;
-  font-family: inherit;
-  font-size: 11px;
-  outline: none;
-}
-#ai-chat input:focus { border-color: var(--purple); }
-#ai-chat button {
-  background: rgba(155,142,240,.12);
-  border: 1px solid var(--purple);
-  color: var(--purple);
-  padding: 6px 12px;
-  font-family: inherit;
-  font-size: 11px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background .15s;
-}
-#ai-chat button:hover { background: var(--purple); color: #000; }
-
-/* ── SHARED COMPONENTS ─────────────────────────── */
-.sec-hdr {
-  font-size: 10px; color: var(--dim); text-transform: uppercase;
-  letter-spacing: 2px; margin: 14px 0 8px;
-  display: flex; align-items: center; gap: 8px;
-}
-.sec-hdr::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-.sec-hdr:first-child { margin-top: 0; }
-
-/* indicator cards */
-.ig { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 5px; }
 .ic {
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 8px 10px;
+  background: var(--p2);
+  border: 1px solid var(--b1);
+  padding: 8px 9px;
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* clip the left accent bar only */
 }
-.ic::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; }
+.ic::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%;
+}
 .ic.bull::before { background: var(--green); }
 .ic.bear::before { background: var(--red); }
-.ic.neut::before { background: var(--gold); }
-.ic .n { font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
-.ic .v { font-size: 14px; font-weight: bold; }
-.ic.bull .v { color: var(--green); }
-.ic.bear .v { color: var(--red); }
-.ic.neut .v { color: var(--gold); }
-.ic .s { font-size: 9px; color: var(--dim); margin-top: 2px; }
+.ic.neu::before  { background: var(--gold); }
+.in { font-size: 9px; color: var(--dim2); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 3px; }
+.iv { font-size: 13px; font-weight: 700; }
+.ic.bull .iv { color: var(--green); }
+.ic.bear .iv { color: var(--red); }
+.ic.neu  .iv { color: var(--gold); }
+.is { font-size: 9px; color: var(--dim2); margin-top: 2px; }
 
-/* formation cards */
-.fg { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 5px; }
-.fc {
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 7px 10px;
-  display: flex; align-items: center; gap: 8px;
+/* ═══════════════════════════════════════════
+   FORMATION CARDS
+═══════════════════════════════════════════ */
+.fg {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
 }
-.fc .fi { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
-.fc .fn { font-size: 10px; font-weight: bold; }
-.fc .fs { font-size: 9px; margin-top: 2px; }
+@media (min-width: 520px) { .fg { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 800px) { .fg { grid-template-columns: repeat(4, 1fr); } }
+.fc {
+  background: var(--p2);
+  border: 1px solid var(--b1);
+  padding: 7px 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.fi { font-size: 13px; flex-shrink: 0; width: 18px; text-align: center; }
+.fn { font-size: 10px; font-weight: 700; color: var(--white); }
+.fs { font-size: 9px; margin-top: 2px; }
 .det { color: var(--green); }
 .pos { color: var(--gold); }
-.no  { color: var(--muted); }
+.no  { color: var(--dim); }
 
-/* fibonacci */
-.fib-tbl { width: 100%; border-collapse: collapse; }
-.fib-tbl th { font-size: 9px; color: var(--dim); text-transform: uppercase; padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--border); letter-spacing: 1px; }
-.fib-tbl th:first-child { text-align: left; }
-.fib-tbl td { padding: 5px 8px; border-bottom: 1px solid var(--border); font-size: 11px; text-align: right; }
-.fib-tbl td:first-child { text-align: left; font-weight: bold; color: var(--purple); }
-.fib-tbl tr.curr td { background: rgba(0,204,255,.06); }
-.fib-tbl tr.curr td:first-child { color: var(--accent); }
-.fib-tbl tr:last-child td { border-bottom: none; }
-.fib-near-tag { font-size: 8px; color: var(--accent); background: rgba(0,204,255,.1); padding: 1px 5px; margin-left: 4px; }
+/* ═══════════════════════════════════════════
+   FIBONACCI TABLE
+═══════════════════════════════════════════ */
+.ftbl { width: 100%; border-collapse: collapse; }
+.ftbl th {
+  font-size: 9px; color: var(--dim2);
+  text-transform: uppercase; letter-spacing: .8px;
+  padding: 5px 7px;
+  border-bottom: 1px solid var(--b1);
+  text-align: right;
+  white-space: nowrap;
+}
+.ftbl th:first-child { text-align: left; }
+.ftbl td {
+  padding: 5px 7px;
+  border-bottom: 1px solid var(--b1);
+  font-size: 11px;
+  text-align: right;
+}
+.ftbl td:first-child { text-align: left; font-weight: 700; color: var(--violet); }
+.ftbl tr.crow td { background: rgba(0,212,255,.05); }
+.ftbl tr.crow td:first-child { color: var(--cyan); }
+.ftbl tr:last-child td { border-bottom: none; }
+.ntag {
+  display: inline-block;
+  font-size: 8px; color: var(--cyan);
+  background: rgba(0,212,255,.12);
+  padding: 1px 4px; margin-left: 4px;
+}
 
-/* ichimoku */
-.ich-cells { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-.ich-cell { background: var(--card); border: 1px solid var(--border); padding: 8px; text-align: center; }
-.ich-cell .lbl { font-size: 8px; color: var(--dim); text-transform: uppercase; letter-spacing: .8px; }
-.ich-cell .val { font-size: 13px; font-weight: bold; margin-top: 4px; }
+/* ═══════════════════════════════════════════
+   ICHIMOKU
+═══════════════════════════════════════════ */
+.ichg {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+@media (min-width: 420px) { .ichg { grid-template-columns: repeat(3, 1fr); } }
+.ichc { background: var(--p2); border: 1px solid var(--b1); padding: 8px; text-align: center; }
+.ichl { font-size: 8px; color: var(--dim2); text-transform: uppercase; letter-spacing: .7px; }
+.ichv { font-size: 12px; font-weight: 700; margin-top: 4px; }
 
-/* elliott */
-.wave-chart { display: flex; align-items: flex-end; gap: 5px; height: 90px; margin: 10px 0; padding: 0 4px; }
-.wb { flex: 1; position: relative; min-height: 8px; border-radius: 2px 2px 0 0; }
-.wb .wl { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: bold; }
-.wb.imp { background: linear-gradient(to top, var(--green) 0%, rgba(0,224,154,.15) 100%); }
-.wb.cor { background: linear-gradient(to top, var(--red) 0%, rgba(255,61,113,.15) 100%); }
-.wb.active-w { outline: 2px solid var(--accent); }
+/* ═══════════════════════════════════════════
+   ELLIOTT WAVE
+   IMPORTANT: padding-top leaves room for labels
+═══════════════════════════════════════════ */
+.wave-wrap {
+  padding-top: 24px; /* room for wave labels above bars */
+  margin-bottom: 10px;
+}
+.wave-ch {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 80px;
+}
+.wb {
+  flex: 1;
+  position: relative;
+  min-height: 8px;
+  border-radius: 2px 2px 0 0;
+}
+.wlbl {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  user-select: none;
+}
+.wb.imp { background: linear-gradient(to top, var(--green) 0%, rgba(0,224,144,.08) 100%); }
+.wb.cor { background: linear-gradient(to top, var(--red) 0%, rgba(255,61,90,.08) 100%); }
+.wb.act { outline: 2px solid var(--cyan); outline-offset: 1px; }
 
-/* valuation */
-.val-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 5px; }
-.vc { background: var(--card); border: 1px solid var(--border); padding: 8px 10px; }
-.vc .vn { font-size: 9px; color: var(--dim); text-transform: uppercase; letter-spacing: .8px; }
-.vc .vv { font-size: 17px; font-weight: bold; margin-top: 4px; }
-.vc .vb { font-size: 9px; color: var(--muted); margin-top: 2px; }
-.vc .vt { font-size: 9px; margin-top: 3px; }
+/* ═══════════════════════════════════════════
+   VALUATION
+═══════════════════════════════════════════ */
+.vg {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+@media (min-width: 480px) { .vg { grid-template-columns: repeat(4, 1fr); } }
+.vc { background: var(--p2); border: 1px solid var(--b1); padding: 8px 9px; }
+.vn { font-size: 9px; color: var(--dim2); text-transform: uppercase; letter-spacing: .7px; }
+.vv { font-size: 16px; font-weight: 800; margin-top: 4px; }
+.vb { font-size: 9px; color: var(--dim); margin-top: 2px; }
+.vt { font-size: 9px; margin-top: 3px; }
 
-/* ai boxes */
-.ai-sec { margin-top: 12px; }
-.ai-sec-hdr {
-  font-size: 10px; font-weight: bold; text-transform: uppercase;
-  letter-spacing: 1.5px; padding-bottom: 5px; margin-bottom: 6px;
+/* ═══════════════════════════════════════════
+   AI PANEL (right on desktop, bottom on mobile)
+═══════════════════════════════════════════ */
+#right {
+  border-top: 2px solid var(--b1);
+  background: var(--p1);
+}
+@media (min-width: 900px) {
+  #right {
+    border-top: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--b2) transparent;
+  }
+}
+
+/* Score */
+#score-box {
+  padding: 12px;
+  border-bottom: 1px solid var(--b1);
+  display: flex; align-items: center; gap: 12px;
+  background: var(--p2);
+  flex-shrink: 0;
+}
+#ring { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+#ring svg { transform: rotate(-90deg); }
+#snum {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px; color: var(--violet);
+}
+#slabel { font-size: 14px; font-weight: 700; color: var(--violet); }
+#ssub   { font-size: 10px; color: var(--dim2); margin-top: 4px; line-height: 1.6; }
+
+/* Signal bars */
+#sig-box { padding: 10px 12px; border-bottom: 1px solid var(--b1); flex-shrink: 0; }
+#sig-ttl { font-size: 9px; color: var(--dim2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 7px; }
+.sr { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.sl { font-size: 9px; color: var(--dim2); width: 100px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st { flex: 1; height: 4px; background: var(--b1); border-radius: 2px; overflow: hidden; }
+.sf { height: 100%; width: 0; border-radius: 2px; transition: width 1.1s ease; }
+.sp { font-size: 9px; font-weight: 700; width: 28px; text-align: right; }
+
+/* AI output */
+#ai-hdr {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--b1);
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(167,139,250,.04);
+  flex-shrink: 0;
+}
+#ai-hdr .t { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; color: var(--violet); }
+#ai-hdr .b {
+  font-size: 9px; color: var(--violet);
+  background: rgba(167,139,250,.12);
+  border: 1px solid rgba(167,139,250,.25);
+  padding: 2px 7px; letter-spacing: .8px;
+}
+#ai-out { padding: 12px; }
+@media (min-width: 900px) {
+  #ai-out { flex: 1; overflow-y: auto; }
+}
+
+/* AI boxes */
+.asec { margin-top: 12px; }
+.asec:first-child { margin-top: 0; }
+.ahdr {
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.2px;
+  padding-bottom: 5px; margin-bottom: 5px;
   border-bottom: 1px solid var(--b2);
 }
-.ai-box {
-  padding: 8px 10px; font-size: 11px; line-height: 1.8;
-  border-left: 2px solid; margin-bottom: 3px;
+.abox {
+  padding: 9px 11px;
+  font-size: 11px; line-height: 1.8;
+  border-left: 2px solid;
+  margin-bottom: 3px;
 }
-.ai-box.info { border-color: var(--accent); background: rgba(0,204,255,.05); }
-.ai-box.bull { border-color: var(--green); background: rgba(0,224,154,.05); }
-.ai-box.bear { border-color: var(--red); background: rgba(255,61,113,.05); }
-.ai-box.neut { border-color: var(--gold); background: rgba(245,166,35,.05); }
-.ai-box.chat-q { border-color: var(--b2); background: rgba(22,32,53,.4); color: var(--dim); font-size: 10px; }
-.ai-box.chat-a { border-color: var(--purple); background: rgba(155,142,240,.05); }
+.abox.info { border-color: var(--cyan);   background: rgba(0,212,255,.04); }
+.abox.bull { border-color: var(--green);  background: rgba(0,224,144,.04); }
+.abox.bear { border-color: var(--red);    background: rgba(255,61,90,.04); }
+.abox.neu  { border-color: var(--gold);   background: rgba(245,158,32,.04); }
+.abox.cq   { border-color: var(--b2);     background: rgba(12,20,34,.6); color: var(--dim2); font-size: 10px; }
+.abox.ca   { border-color: var(--violet); background: rgba(167,139,250,.04); }
 
-/* thinking dots */
-.thinking {
-  display: flex; align-items: center; gap: 8px;
-  color: var(--purple); font-size: 11px; padding: 8px 0;
-}
-.dots span {
-  display: inline-block; width: 5px; height: 5px;
-  background: var(--purple); border-radius: 50%;
-  animation: dp 1.2s ease infinite; margin: 0 2px;
-}
+.thinking { display: flex; align-items: center; gap: 8px; color: var(--violet); font-size: 11px; padding: 8px 0; }
+.dots span { display: inline-block; width: 5px; height: 5px; background: var(--violet); border-radius: 50%; animation: dp 1.2s ease infinite; margin: 0 2px; }
 .dots span:nth-child(2) { animation-delay: .2s; }
 .dots span:nth-child(3) { animation-delay: .4s; }
 @keyframes dp { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1.2)} }
 
-/* welcome screen */
-.welcome { padding: 16px 0; color: var(--dim); }
-.welcome .wt { font-size: 14px; font-weight: bold; color: var(--purple); margin-bottom: 10px; }
-.welcome .wl { font-size: 11px; line-height: 2; }
-.welcome .wl .g { color: var(--green); }
+/* Chat */
+#ai-chat {
+  padding: 8px 12px;
+  border-top: 1px solid var(--b1);
+  display: flex; gap: 6px;
+  background: var(--p1);
+  flex-shrink: 0;
+}
+#chat-in {
+  flex: 1;
+  background: var(--p2); border: 1px solid var(--b2);
+  color: var(--text); padding: 7px 9px;
+  font-family: inherit; font-size: 11px;
+  outline: none; border-radius: 2px;
+  -webkit-appearance: none;
+}
+#chat-in:focus { border-color: var(--violet); }
+#chat-send {
+  background: rgba(167,139,250,.1);
+  border: 1px solid var(--violet); color: var(--violet);
+  padding: 7px 12px; font-family: inherit; font-size: 11px;
+  cursor: pointer; white-space: nowrap; border-radius: 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+#chat-send:active, #chat-send:hover { background: var(--violet); color: #000; }
 
-/* util */
-.up { color: var(--green); }
-.dn { color: var(--red); }
-.note { font-size: 10px; color: var(--dim); padding: 8px 10px; border: 1px solid rgba(155,142,240,.2); background: rgba(155,142,240,.05); margin-top: 10px; line-height: 1.7; }
+/* Welcome */
+.wt  { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; color: var(--violet); margin-bottom: 10px; }
+.wli { font-size: 11px; line-height: 2.1; color: var(--dim2); }
+.wli .g { color: var(--green); }
+
+/* Note */
+.note {
+  margin-top: 8px; padding: 7px 9px;
+  font-size: 10px; color: var(--violet); line-height: 1.7;
+  background: rgba(167,139,250,.05);
+  border: 1px solid rgba(167,139,250,.18);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
+<!-- ═══ TOPBAR ═══ -->
 <div id="topbar">
-  <div class="logo">ALPHA<span>TERMINAL</span></div>
-  <input id="inp-sym" type="text" value="THYAO" maxlength="12" placeholder="SEMBOL">
-  <select id="inp-exch">
-    <option value="BIST">BIST</option>
-    <option value="NASDAQ">NASDAQ</option>
-    <option value="NYSE">NYSE</option>
-    <option value="XETR">Frankfurt</option>
-    <option value="CRYPTO">Kripto</option>
-  </select>
-  <select id="inp-intv">
-    <option value="D">Günlük</option>
-    <option value="W">Haftalık</option>
-    <option value="240">4 Saat</option>
-    <option value="60">1 Saat</option>
-    <option value="15">15dk</option>
-  </select>
-  <button class="tbtn" onclick="loadSymbol()">▶ YÜKLE</button>
-  <div id="spacer"></div>
-  <button class="tbtn ai" id="ai-btn" onclick="runAI()">🤖 TAM ANALİZ</button>
+  <div class="logo">ALPHA<em>TERM</em></div>
+  <div class="tb-spacer"></div>
+  <button class="btn btn-ai" id="ai-btn" onclick="runAI()">🤖 ANALİZ</button>
+  <!-- second row on mobile, same row on desktop -->
+  <div class="tb-inputs">
+    <input class="sym-in" id="sym" type="text" value="THYAO" maxlength="12"
+      placeholder="SEMBOL" autocomplete="off" autocorrect="off"
+      autocapitalize="characters" spellcheck="false">
+    <select class="sel" id="exch">
+      <option value="BIST">BIST</option>
+      <option value="NASDAQ">NASDAQ</option>
+      <option value="NYSE">NYSE</option>
+      <option value="XETR">Frankfurt</option>
+      <option value="CRYPTO">Kripto</option>
+    </select>
+    <select class="sel" id="intv">
+      <option value="D">Günlük</option>
+      <option value="W">Haftalık</option>
+      <option value="240">4S</option>
+      <option value="60">1S</option>
+      <option value="15">15dk</option>
+    </select>
+    <button class="btn" onclick="load()">▶ YÜKLE</button>
+  </div>
 </div>
 
-<!-- STATUS BAR -->
-<div id="statusbar">
-  <span><span class="dot" id="st-dot"></span><span id="st-sym">Sembol yükleyin</span></span>
-  <span id="st-price"></span>
-  <span id="st-vol"></span>
-  <span id="st-mcap"></span>
-  <span id="st-cur"></span>
-  <span id="st-time"></span>
-  <span id="st-version">AlphaTerminal Pro v5</span>
+<!-- ═══ STATUS BAR ═══ -->
+<div id="stbar">
+  <span><span class="sdot" id="sdot"></span><span id="s-sym">Sembol yükleyin</span></span>
+  <span id="s-price"></span>
+  <span id="s-vol"></span>
+  <span id="s-mcap"></span>
+  <span id="stv">AlphaTerminal Pro</span>
 </div>
 
-<!-- MAIN -->
+<!-- ═══ PRICE HEADER ═══ -->
+<div id="price-hdr">
+  <div>
+    <div id="sym-name">—</div>
+    <div id="sym-sub">Sembol seçin</div>
+  </div>
+  <div>
+    <div id="price-v" class="nu">—</div>
+    <div id="price-c" class="nu">—</div>
+  </div>
+</div>
+
+<!-- ═══ CHART ═══ -->
+<div id="chart-box">
+  <div id="chart-ph">
+    <div class="ci">📊</div>
+    <div style="font-size:12px">▶ YÜKLE butonuna basın</div>
+    <div style="font-size:10px;color:var(--dim)">Sembol yazın ve yükleyin</div>
+  </div>
+</div>
+
+<!-- ═══ MAIN: left tabs + right AI ═══ -->
 <div id="main">
 
   <!-- LEFT -->
   <div id="left">
 
-    <!-- chart header -->
-    <div id="chart-header">
-      <div>
-        <div id="sym-name">—</div>
-        <div id="sym-sub">Sembol seçin</div>
-      </div>
-      <div>
-        <div id="price-val">—</div>
-        <div id="price-chg">—</div>
-      </div>
-    </div>
-
-    <!-- chart -->
-    <div id="chart-wrap">
-      <div id="chart-placeholder">
-        <span style="font-size:32px">📊</span>
-        <span>▶ YÜKLE butonuna basın</span>
-        <span style="font-size:10px;color:var(--muted)">Sembol yazıp YÜKLE'ye tıklayın</span>
-      </div>
-    </div>
-
-    <!-- tabs -->
+    <!-- Tab bar — sticky offset set by JS -->
     <div id="tab-bar">
-      <div class="tab active" onclick="switchTab(this,'technical')">Teknik</div>
-      <div class="tab" onclick="switchTab(this,'formations')">Formasyonlar</div>
-      <div class="tab" onclick="switchTab(this,'candles')">Mum</div>
-      <div class="tab" onclick="switchTab(this,'fibonacci')">Fibonacci</div>
-      <div class="tab" onclick="switchTab(this,'ichimoku')">Ichimoku</div>
-      <div class="tab" onclick="switchTab(this,'elliott')">Elliott</div>
-      <div class="tab" onclick="switchTab(this,'valuation')">Değerleme</div>
+      <div class="tab on"  onclick="ST(this,'technical')">Teknik</div>
+      <div class="tab" onclick="ST(this,'formations')">Formasyon</div>
+      <div class="tab" onclick="ST(this,'candles')">Mum</div>
+      <div class="tab" onclick="ST(this,'fibonacci')">Fibonacci</div>
+      <div class="tab" onclick="ST(this,'ichimoku')">Ichimoku</div>
+      <div class="tab" onclick="ST(this,'elliott')">Elliott</div>
+      <div class="tab" onclick="ST(this,'valuation')">Değerleme</div>
     </div>
 
-    <!-- tab content -->
-    <div id="tab-area">
+    <!-- Teknik -->
+    <div class="pane on" id="pane-technical">
+      <div class="sh">Trend &amp; Hareketli Ortalamalar</div>
+      <div class="ig" id="ig-trend"></div>
+      <div class="sh">Momentum Osilatörleri</div>
+      <div class="ig" id="ig-mom"></div>
+      <div class="sh">Hacim &amp; Volatilite</div>
+      <div class="ig" id="ig-vol"></div>
+    </div>
 
-      <div id="pane-technical" class="tab-pane active">
-        <div class="sec-hdr">Trend & Hareketli Ortalamalar</div>
-        <div class="ig" id="ig-trend"></div>
-        <div class="sec-hdr">Momentum Osilatörleri</div>
-        <div class="ig" id="ig-mom"></div>
-        <div class="sec-hdr">Hacim & Volatilite</div>
-        <div class="ig" id="ig-vol"></div>
+    <!-- Formasyon -->
+    <div class="pane" id="pane-formations">
+      <div class="sh">Grafik Formasyonları</div>
+      <div class="fg" id="fg-main"></div>
+    </div>
+
+    <!-- Mum -->
+    <div class="pane" id="pane-candles">
+      <div class="sh">Mum Formasyonları</div>
+      <div class="fg" id="fg-candles"></div>
+    </div>
+
+    <!-- Fibonacci -->
+    <div class="pane" id="pane-fibonacci">
+      <div id="fib-wrap">
+        <p style="color:var(--dim2);font-size:11px;padding:8px 0">Sembol yükleyince Fibonacci seviyeleri görünür.</p>
       </div>
+    </div>
 
-      <div id="pane-formations" class="tab-pane">
-        <div class="sec-hdr">Grafik Formasyonları</div>
-        <div class="fg" id="fg-main"></div>
+    <!-- Ichimoku -->
+    <div class="pane" id="pane-ichimoku">
+      <div class="sh">Ichimoku Kinko Hyo</div>
+      <div class="ichg" id="ich-cells"></div>
+      <div id="ich-comment" style="margin-top:10px"></div>
+    </div>
+
+    <!-- Elliott -->
+    <div class="pane" id="pane-elliott">
+      <div class="sh">Elliott Dalga Analizi</div>
+      <div class="wave-wrap">
+        <div class="wave-ch" id="wave-ch"></div>
       </div>
+      <div id="ew-comment"></div>
+    </div>
 
-      <div id="pane-candles" class="tab-pane">
-        <div class="sec-hdr">Mum Formasyonları</div>
-        <div class="fg" id="fg-candles"></div>
-      </div>
+    <!-- Değerleme -->
+    <div class="pane" id="pane-valuation">
+      <div class="sh" id="val-hdr">Değerleme Çarpanları</div>
+      <div class="vg" id="val-grid"></div>
+      <div class="note" id="val-note" style="display:none"></div>
+    </div>
 
-      <div id="pane-fibonacci" class="tab-pane">
-        <div id="fib-content">
-          <p style="color:var(--dim);font-size:11px">Sembol yükleyince Fibonacci seviyeleri burada görünür.</p>
-        </div>
-      </div>
-
-      <div id="pane-ichimoku" class="tab-pane">
-        <div class="sec-hdr">Ichimoku Kinko Hyo</div>
-        <div class="ich-cells" id="ich-cells"></div>
-        <div id="ich-comment" style="margin-top:10px"></div>
-      </div>
-
-      <div id="pane-elliott" class="tab-pane">
-        <div class="sec-hdr">Elliott Dalga Analizi</div>
-        <div class="wave-chart" id="wave-chart"></div>
-        <div id="elliott-comment" style="margin-top:26px"></div>
-      </div>
-
-      <div id="pane-valuation" class="tab-pane">
-        <div class="sec-hdr" id="val-hdr">Değerleme Çarpanları</div>
-        <div class="val-grid" id="val-grid"></div>
-        <div id="val-note" class="note" style="display:none"></div>
-      </div>
-
-    </div><!-- /tab-area -->
   </div><!-- /left -->
 
-  <!-- RIGHT: AI -->
+  <!-- RIGHT: AI Panel -->
   <div id="right">
 
-    <div id="ai-header">
-      <span class="title">🤖 AI ANALİZ MOTORU</span>
-      <span class="badge">CLAUDE POWERED</span>
+    <div id="ai-hdr">
+      <span class="t">AI ANALİZ</span>
+      <span class="b">CLAUDE POWERED</span>
     </div>
 
-    <div id="score-area">
-      <div id="score-ring-wrap">
-        <svg width="90" height="90" viewBox="0 0 90 90">
-          <circle cx="45" cy="45" r="37" fill="none" stroke="#162035" stroke-width="8"/>
-          <circle id="score-arc" cx="45" cy="45" r="37" fill="none"
-            stroke="#9b8ef0" stroke-width="8"
-            stroke-dasharray="232" stroke-dashoffset="232"
+    <div id="score-box">
+      <div id="ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="32" fill="none" stroke="var(--b2)" stroke-width="7"/>
+          <circle id="score-arc" cx="40" cy="40" r="32" fill="none"
+            stroke="var(--violet)" stroke-width="7"
+            stroke-dasharray="201" stroke-dashoffset="201"
             stroke-linecap="round"
-            style="transition: stroke-dashoffset 1.3s ease, stroke .4s"/>
+            style="transition:stroke-dashoffset 1.2s ease,stroke .3s"/>
         </svg>
-        <div id="score-num">—</div>
+        <div id="snum">—</div>
       </div>
-      <div id="score-info">
-        <div id="score-label">Analiz Bekleniyor</div>
-        <div id="score-sub">TAM ANALİZ butonuna basın</div>
+      <div>
+        <div id="slabel">Analiz Bekleniyor</div>
+        <div id="ssub">ANALİZ butonuna basın</div>
       </div>
     </div>
 
-    <div id="sig-bars">
-      <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px">Sinyal Dağılımı</div>
-      <!-- rows filled by JS -->
+    <div id="sig-box">
+      <div id="sig-ttl">SİNYAL DAĞILIMI</div>
+      <div id="sig-rows"></div>
     </div>
 
     <div id="ai-out">
-      <div class="welcome">
-        <div class="wt">TAM ANALİZ Motoru</div>
-        <div class="wl">
-          <span class="g">✓</span> Teknik: SMA/WMA/EMA, SAR, MACD, RSI, Stoch, CCI, Momentum, BB, OBV, A/D<br>
-          <span class="g">✓</span> Formasyonlar: OBO, İkili Tepe/Dip, Üçgenler, Takozlar, Bayrak, Flama<br>
-          <span class="g">✓</span> Mum: Doji, Sabah/Akşam Yıldızı, 3 Asker, Engulfing, Harami...<br>
-          <span class="g">✓</span> Fibonacci: Düzeltme, Extension, Fan, Kanallar<br>
-          <span class="g">✓</span> Ichimoku: Tenkan, Kijun, Senkou A/B, Chikou<br>
-          <span class="g">✓</span> Elliott Wave: 5+3 dalga analizi<br>
-          <span class="g">✓</span> Temel: P/E, P/FCF, EV/EBITDA, PEG, P/B
-        </div>
+      <div class="wt">TAM ANALİZ MOTORU</div>
+      <div class="wli">
+        <span class="g">✓</span> Teknik: SMA/WMA/EMA, SAR, MACD, RSI, Stoch, CCI, BB, OBV, A/D<br>
+        <span class="g">✓</span> Formasyonlar: OBO, İkili Tepe/Dip, Üçgenler, Takozlar, Bayrak<br>
+        <span class="g">✓</span> Mum: Doji, Sabah/Akşam Yıldızı, Engulfing, Harami, 3 Asker<br>
+        <span class="g">✓</span> Fibonacci: Düzeltme + Extension + Fan + Kanal<br>
+        <span class="g">✓</span> Ichimoku: Tenkan, Kijun, Senkou A/B, Chikou<br>
+        <span class="g">✓</span> Elliott Wave: 5 impuls + 3 düzeltme dalgası<br>
+        <span class="g">✓</span> Temel: P/E, P/FCF, EV/EBITDA, PEG, P/B
       </div>
     </div>
 
     <div id="ai-chat">
-      <input id="chat-in" placeholder="Soru sor: RSI durumu? Destek nerede?">
-      <button onclick="sendChat()">GÖNDER</button>
+      <input id="chat-in" placeholder="Soru: RSI? Destek nerede?">
+      <button id="chat-send" onclick="sendChat()">GÖNDER</button>
     </div>
 
   </div><!-- /right -->
@@ -614,898 +791,683 @@ body {
 <script>
 "use strict";
 
-// ══════════════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════════════
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
 const G = {
-  sym: '', exch: 'BIST', intv: 'D',
-  price: 0, cur: '₺',
-  d: {},          // computed indicator data
-  chatHist: [],   // conversation history
-  ready: false
+  sym:'', exch:'BIST', intv:'D',
+  price:0, cur:'₺',
+  d:{}, hist:[], ready:false
 };
 
-// ══════════════════════════════════════════════════════
-// EXCHANGE CONFIG
-// ══════════════════════════════════════════════════════
-const EXCH_CUR   = { BIST:'₺', NASDAQ:'$', NYSE:'$', XETR:'€', CRYPTO:'$' };
-const EXCH_PFX   = { BIST:'BIST:', NASDAQ:'NASDAQ:', NYSE:'NYSE:', XETR:'XETR:', CRYPTO:'BINANCE:' };
-const EXCH_LABEL = { BIST:'Borsa İstanbul', NASDAQ:'NASDAQ', NYSE:'NYSE', XETR:'Frankfurt', CRYPTO:'Kripto' };
-const INTV_LABEL = { D:'Günlük', W:'Haftalık', '240':'4 Saat', '60':'1 Saat', '15':'15dk' };
+/* ════════════════════════════════════════════
+   CONSTANTS
+════════════════════════════════════════════ */
+const CUR  = {BIST:'₺',NASDAQ:'$',NYSE:'$',XETR:'€',CRYPTO:'$'};
+const PFX  = {BIST:'BIST:',NASDAQ:'NASDAQ:',NYSE:'NYSE:',XETR:'XETR:',CRYPTO:'BINANCE:'};
+const ELAB = {BIST:'Borsa İstanbul',NASDAQ:'NASDAQ',NYSE:'NYSE',XETR:'Frankfurt',CRYPTO:'Kripto'};
+const ILAB = {D:'Günlük',W:'Haftalık','240':'4 Saat','60':'1 Saat','15':'15dk'};
 
-// Known realistic prices (approximate)
-const KNOWN_PRICE = {
-  // BIST
-  THYAO:285, GARAN:95, AKBNK:52, SASA:48, EREGL:42, BIMAS:365,
-  KCHOL:175, TUPRS:175, ASELS:58, ISCTR:12, TOASO:185, FROTO:1050,
-  // US
-  AAPL:198, MSFT:415, NVDA:875, AMZN:202, GOOGL:172, META:510,
-  TSLA:185, NFLX:670, AMD:165, INTC:22, PLTR:24, PL:3.1,
-  GME:22, AMC:4, RIVN:11,
-  // EUR
-  SAP:192, AKB2:4.4, DAIMLER:73, BMW:90, SIEMENS:183,
-  // CRYPTO
-  BTCUSDT:93500, ETHUSDT:3350, BNBUSDT:595, SOLUSDT:182,
-  XRPUSDT:0.51, ADAUSDT:0.55, DOGEUSDT:0.17,
-  BTC:93500, ETH:3350, BNB:595, SOL:182
+/* Known realistic prices */
+const KP = {
+  THYAO:285,GARAN:95,AKBNK:52,SASA:48,EREGL:42,BIMAS:365,KCHOL:175,
+  TUPRS:178,ASELS:58,ISCTR:12,TOASO:185,FROTO:1050,PETKM:19,SAHOL:54,
+  ARCLK:120,TAVHL:155,SISE:36,KOZAL:145,
+  AAPL:198,MSFT:415,NVDA:875,AMZN:202,GOOGL:172,META:510,TSLA:185,
+  NFLX:670,AMD:165,INTC:22,PLTR:24,PL:3.1,GME:22,AMC:4,F:11,
+  SAP:192,AKB2:4.4,BMW:90,SIEMENS:183,
+  BTCUSDT:93500,ETHUSDT:3350,BNBUSDT:595,SOLUSDT:182,
+  XRPUSDT:0.51,ADAUSDT:0.55,DOGEUSDT:0.17,AVAXUSDT:38,
+  BTC:93500,ETH:3350,BNB:595,SOL:182,XRP:0.51
 };
 
-// ══════════════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════════════
-function rnd(a, b) { return Math.random() * (b - a) + a; }
-function rndI(a, b) { return Math.round(rnd(a, b)); }
-function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+/* ════════════════════════════════════════════
+   UTILS
+════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+function rnd(a,b){return Math.random()*(b-a)+a}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 
-// Format price with appropriate decimals
-function fp(n) {
-  if (n >= 100000) return n.toFixed(0);
-  if (n >= 10000)  return n.toFixed(0);
-  if (n >= 1000)   return n.toFixed(1);
-  if (n >= 100)    return n.toFixed(2);
-  if (n >= 10)     return n.toFixed(2);
-  if (n >= 1)      return n.toFixed(3);
-  if (n >= 0.1)    return n.toFixed(4);
+function fp(n){
+  if(n >= 100000) return n.toFixed(0);
+  if(n >= 10000)  return n.toFixed(0);
+  if(n >= 1000)   return n.toFixed(1);
+  if(n >= 100)    return n.toFixed(2);
+  if(n >= 10)     return n.toFixed(2);
+  if(n >= 1)      return n.toFixed(3);
+  if(n >= 0.1)    return n.toFixed(4);
   return n.toFixed(6);
 }
 
-function fmtBig(n) {
-  const a = Math.abs(n);
-  if (a >= 1e12) return (n/1e12).toFixed(2) + 'T';
-  if (a >= 1e9)  return (n/1e9).toFixed(2) + 'B';
-  if (a >= 1e6)  return (n/1e6).toFixed(2) + 'M';
-  if (a >= 1e3)  return (n/1e3).toFixed(1) + 'K';
+function fmtBig(n){
+  if(n>=1e12) return (n/1e12).toFixed(1)+'T';
+  if(n>=1e9)  return (n/1e9).toFixed(1)+'B';
+  if(n>=1e6)  return (n/1e6).toFixed(1)+'M';
+  if(n>=1e3)  return (n/1e3).toFixed(0)+'K';
   return n.toFixed(0);
 }
 
-function getPrice(sym, exch) {
-  if (KNOWN_PRICE[sym]) return KNOWN_PRICE[sym] * rnd(0.93, 1.07);
-  // Log-uniform distribution for realistic range
-  const ranges = { BIST:[8,1200], NASDAQ:[3,900], NYSE:[3,700], XETR:[2,500], CRYPTO:[0.01,98000] };
-  const [lo, hi] = ranges[exch] || [5, 500];
-  return Math.exp(rnd(Math.log(lo), Math.log(hi)));
+function getBasePrice(sym,exch){
+  if(KP[sym]) return KP[sym];
+  const R={BIST:[8,1200],NASDAQ:[3,900],NYSE:[3,700],XETR:[2,500],CRYPTO:[0.01,98000]};
+  const[lo,hi]=R[exch]||[5,500];
+  return Math.exp(rnd(Math.log(lo),Math.log(hi)));
 }
 
-// ══════════════════════════════════════════════════════
-// TAB SWITCHING
-// ══════════════════════════════════════════════════════
-function switchTab(el, name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('pane-' + name).classList.add('active');
+/* ════════════════════════════════════════════
+   STICKY TOPBAR HEIGHT — fix tab-bar offset
+════════════════════════════════════════════ */
+function updateTopH(){
+  const h = $('topbar').getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--topH', h + 'px');
 }
 
-// ══════════════════════════════════════════════════════
-// LOAD SYMBOL
-// ══════════════════════════════════════════════════════
-function loadSymbol() {
-  const sym  = document.getElementById('inp-sym').value.trim().toUpperCase();
-  const exch = document.getElementById('inp-exch').value;
-  const intv = document.getElementById('inp-intv').value;
-  if (!sym) return;
+/* ════════════════════════════════════════════
+   TAB SWITCHING
+════════════════════════════════════════════ */
+function ST(el,name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  $('pane-'+name).classList.add('on');
+}
+
+/* ════════════════════════════════════════════
+   LOAD SYMBOL
+════════════════════════════════════════════ */
+function load(){
+  const sym  = $('sym').value.trim().toUpperCase();
+  const exch = $('exch').value;
+  const intv = $('intv').value;
+  if(!sym){ alert('Sembol girin'); return; }
 
   G.sym   = sym;
   G.exch  = exch;
   G.intv  = intv;
-  G.cur   = EXCH_CUR[exch] || '$';
-  G.price = getPrice(sym, exch);
-  G.chatHist = [];
+  G.cur   = CUR[exch] || '$';
+  G.price = getBasePrice(sym, exch) * rnd(0.93, 1.07);
+  G.hist  = [];
 
-  // Header
-  document.getElementById('sym-name').textContent = sym;
-  document.getElementById('sym-sub').textContent  = (EXCH_LABEL[exch]||exch) + '  ·  ' + (INTV_LABEL[intv]||intv);
+  const chg = rnd(-6.5, 6.5);
+  const ca  = G.price * chg / 100;
+  const cl  = chg >= 0 ? 'up' : 'dn';
 
-  // Price
-  const chgPct = rnd(-7, 7);
-  const chgAbs = G.price * chgPct / 100;
-  const cls = chgPct >= 0 ? 'up' : 'dn';
-  document.getElementById('price-val').textContent = fp(G.price) + ' ' + G.cur;
-  document.getElementById('price-val').className   = cls;
-  document.getElementById('price-chg').textContent = (chgPct>=0?'+':'') + chgPct.toFixed(2) + '%  (' + (chgPct>=0?'+':'') + fp(Math.abs(chgAbs)) + ' ' + G.cur + ')';
-  document.getElementById('price-chg').className   = cls;
+  $('sym-name').textContent = sym;
+  $('sym-sub').textContent  = (ELAB[exch]||exch) + ' · ' + (ILAB[intv]||intv);
+  $('price-v').textContent  = fp(G.price) + ' ' + G.cur;
+  $('price-v').className    = cl;
+  $('price-c').textContent  = (chg>=0?'+':'') + chg.toFixed(2) + '%  (' + (chg>=0?'+':'') + fp(Math.abs(ca)) + ' ' + G.cur + ')';
+  $('price-c').className    = cl;
 
-  // Status bar
-  document.getElementById('st-dot').className = 'dot live';
-  document.getElementById('st-sym').textContent   = sym + ' — ' + (EXCH_LABEL[exch]||exch);
-  document.getElementById('st-price').textContent = fp(G.price) + ' ' + G.cur;
-  document.getElementById('st-vol').textContent   = 'Hacim: ' + fmtBig(rnd(1e6, 5e8)) + ' ' + G.cur;
-  document.getElementById('st-mcap').textContent  = 'Mkt Cap: ' + fmtBig(G.price * rnd(1e6, 3e9)) + ' ' + G.cur;
-  document.getElementById('st-cur').textContent   = 'Para: ' + G.cur;
-  document.getElementById('st-time').textContent  = new Date().toLocaleTimeString('tr-TR');
+  $('sdot').className       = 'sdot live';
+  $('s-sym').textContent    = sym + ' — ' + (ELAB[exch]||exch);
+  $('s-price').textContent  = fp(G.price) + ' ' + G.cur;
+  $('s-vol').textContent    = 'Hacim: ' + fmtBig(rnd(1e5,4e8) * G.price) + ' ' + G.cur;
+  $('s-mcap').textContent   = 'Mkt Cap: ' + fmtBig(G.price * rnd(5e5,3e9)) + ' ' + G.cur;
 
-  // TradingView chart
   loadChart();
-
-  // Compute everything
   computeAll();
-
   G.ready = true;
 }
 
-// ══════════════════════════════════════════════════════
-// TRADINGVIEW CHART
-// ══════════════════════════════════════════════════════
-function loadChart() {
-  const prefix = EXCH_PFX[G.exch] || '';
-  const sym    = encodeURIComponent(prefix + G.sym);
-  const intv   = G.intv;
-  const studies = encodeURIComponent(
-    'RSI@tv-basicstudies\x1fMACD@tv-basicstudies\x1fBB@tv-basicstudies\x1fIchimokuCloud@tv-basicstudies'
-  );
-
-  const url = `https://s.tradingview.com/widgetembed/?symbol=${sym}&interval=${intv}&theme=dark&style=1&locale=tr&timezone=Europe%2FIstanbul&toolbar_bg=%23080e1c&hide_side_toolbar=0&allow_symbol_change=0&studies=${studies}&withdateranges=1&save_image=0&hide_top_toolbar=0`;
-
-  const wrap = document.getElementById('chart-wrap');
-  wrap.innerHTML = `<iframe src="${url}" allowfullscreen scrolling="no"></iframe>`;
+/* ════════════════════════════════════════════
+   TRADINGVIEW
+════════════════════════════════════════════ */
+function loadChart(){
+  const pfx     = PFX[G.exch] || '';
+  const symEnc  = encodeURIComponent(pfx + G.sym);
+  const studies = ['RSI@tv-basicstudies','MACD@tv-basicstudies','BB@tv-basicstudies','IchimokuCloud@tv-basicstudies']
+    .map(s => encodeURIComponent(s)).join('%1F');
+  const src = `https://s.tradingview.com/widgetembed/?symbol=${symEnc}&interval=${G.intv}&theme=dark&style=1&locale=tr&timezone=Europe%2FIstanbul&toolbar_bg=%23060d1a&hide_side_toolbar=0&allow_symbol_change=0&studies=${studies}&withdateranges=1&save_image=0`;
+  $('chart-box').innerHTML = `<iframe src="${src}" allowfullscreen scrolling="no"></iframe>`;
 }
 
-// ══════════════════════════════════════════════════════
-// COMPUTE ALL INDICATORS
-// ══════════════════════════════════════════════════════
-function computeAll() {
+/* ════════════════════════════════════════════
+   COMPUTE ALL INDICATORS
+════════════════════════════════════════════ */
+function computeAll(){
   const p = G.price;
 
-  // ── Moving averages (all relative to price) ──
-  const sma20  = p * rnd(0.94, 1.06);
-  const sma50  = p * rnd(0.90, 1.10);
-  const sma200 = p * rnd(0.85, 1.15);
-  const wma20  = p * rnd(0.95, 1.05);
-  const ema12  = p * rnd(0.97, 1.03);
-  const ema26  = p * rnd(0.94, 1.06);
+  /* Moving averages */
+  const sma20  = p*rnd(.94,1.06), sma50 = p*rnd(.90,1.10), sma200 = p*rnd(.85,1.15);
+  const wma20  = p*rnd(.95,1.05), ema12 = p*rnd(.97,1.03), ema26  = p*rnd(.94,1.06);
 
-  // ── MACD ──
-  const macdLine = ema12 - ema26;                    // can be + or -
-  const macdSig  = macdLine * rnd(0.6, 1.4);
-  const macdHist = macdLine - macdSig;
-  const macdBull = macdLine > macdSig;
+  /* MACD */
+  const macdL = ema12-ema26, macdS = macdL*rnd(.6,1.4), macdH = macdL-macdS;
+  const macdB = macdL > macdS;
 
-  // ── Parabolic SAR ──
-  const sarBull = Math.random() > 0.45;
-  const sar     = sarBull ? p * rnd(0.88, 0.98) : p * rnd(1.02, 1.14);
+  /* SAR */
+  const sarB = Math.random()>.45;
+  const sar  = sarB ? p*rnd(.88,.98) : p*rnd(1.02,1.13);
 
-  // ── Momentum oscillators ──
-  const rsi    = rnd(25, 75);
-  const stochK = rnd(12, 88);
-  const stochD = clamp(stochK + rnd(-10, 10), 0, 100);
-  const cci    = rnd(-180, 180);
-  const mom    = rnd(-18, 22);     // % momentum
+  /* Oscillators */
+  const rsi    = rnd(25,75);
+  const stochK = rnd(12,88), stochD = clamp(stochK+rnd(-10,10),0,100);
+  const cci    = rnd(-180,180);
+  const mom    = rnd(-18,22);
 
-  // ── Bollinger Bands ──
-  const bbMid   = p * rnd(0.97, 1.03);
-  const bbStd   = bbMid * rnd(0.018, 0.055);
-  const bbUpper = bbMid + 2 * bbStd;
-  const bbLower = bbMid - 2 * bbStd;
-  const bbWidth = (bbUpper - bbLower) / bbMid * 100;
-  const bbPctB  = ((p - bbLower) / (bbUpper - bbLower)) * 100; // %B indicator
+  /* Bollinger */
+  const bbM = p*rnd(.97,1.03), bbSD = bbM*rnd(.018,.055);
+  const bbU = bbM+2*bbSD, bbL = bbM-2*bbSD;
+  const bbW = (bbU-bbL)/bbM*100;
+  const bbPB = ((p-bbL)/(bbU-bbL))*100;
 
-  // ── Volume ──
-  const obvBull = Math.random() > 0.48;
-  const adBull  = Math.random() > 0.48;
-  const atr     = rnd(1.2, 4.8);      // ATR as % of price
-  const volRat  = rnd(0.4, 3.2);      // vol vs 20-day avg
+  /* Volume */
+  const obvB = Math.random()>.48, adB = Math.random()>.48;
+  const atr  = rnd(1.2,4.8), volR = rnd(.4,3.2);
 
-  // ── Fibonacci swing points ──
-  // Use realistic swing: high = +12% to +30%, low = -12% to -28%
-  const swHigh = p * rnd(1.12, 1.30);
-  const swLow  = p * rnd(0.72, 0.88);
-  const swDiff = swHigh - swLow;
+  /* Fibonacci swing — VALIDATED: high always > price > low */
+  const swH = p * rnd(1.12, 1.30);   /* 12-30% above price  */
+  const swL = p * rnd(0.72, 0.88);   /* 12-28% below price  */
+  const swD = swH - swL;             /* always positive      */
 
-  // ── Ichimoku ──
-  const tenkan  = p * rnd(0.96, 1.04);
-  const kijun   = p * rnd(0.92, 1.08);
-  const senA    = p * rnd(0.94, 1.06);
-  const senB    = p * rnd(0.88, 1.12);
-  const chikou  = p * rnd(0.94, 1.06);
+  /* Ichimoku */
+  const ten  = p*rnd(.96,1.04), kij  = p*rnd(.92,1.08);
+  const senA = p*rnd(.94,1.06), senB = p*rnd(.88,1.12);
+  const chi  = p*rnd(.94,1.06);
+  const ichAb = p > Math.max(senA,senB);
+  const ichBl = p < Math.min(senA,senB);
+  const ichBCl = senA > senB;
+  const ichTK  = ten > kij;
 
-  // ── Elliott Wave ──
-  const waves = ['①','②','③','④','⑤','Ⓐ','Ⓑ','Ⓒ'];
-  const waveDirs = ['up','dn','up','dn','up','dn','up','dn'];
-  // Weight toward wave 3 and 5 (most common)
-  const wWeights = [.10,.10,.22,.12,.18,.12,.08,.08];
-  let ewIdx = 0, cumW = 0, rw = Math.random();
-  for (let i = 0; i < wWeights.length; i++) {
-    cumW += wWeights[i];
-    if (rw < cumW) { ewIdx = i; break; }
-  }
+  /* Elliott */
+  const WD = [
+    {l:'①',h:35,c:'imp',d:'up'}, {l:'②',h:18,c:'cor',d:'dn'},
+    {l:'③',h:62,c:'imp',d:'up'}, {l:'④',h:24,c:'cor',d:'dn'},
+    {l:'⑤',h:44,c:'imp',d:'up'}, {l:'Ⓐ',h:30,c:'cor',d:'dn'},
+    {l:'Ⓑ',h:17,c:'imp',d:'up'}, {l:'Ⓒ',h:36,c:'cor',d:'dn'},
+  ];
+  const WW  = [.10,.10,.22,.12,.18,.12,.08,.08];
+  let ewI=0, cum=0, rw=Math.random();
+  for(let i=0;i<WW.length;i++){ cum+=WW[i]; if(rw<cum){ewI=i;break;} }
 
-  // ── Valuation (only for stocks) ──
-  const isCrypto = G.exch === 'CRYPTO';
+  /* Valuation */
+  const isCrypto = G.exch==='CRYPTO';
   const val = isCrypto ? null : {
-    pe:     rnd(4,  40),
-    pfcf:   rnd(7,  55),
-    pcash:  rnd(2,  22),
-    evRev:  rnd(0.3, 9),
-    evEbit: rnd(4,  32),
-    evEbitda: rnd(3, 20),
-    peg:    rnd(0.3, 4.2),
-    pb:     rnd(0.4, 8)
+    pe:rnd(4,40), pfcf:rnd(7,55), pcash:rnd(2,22),
+    evRev:rnd(.3,9), evEbit:rnd(4,32), evEbitda:rnd(3,20),
+    peg:rnd(.3,4.2), pb:rnd(.4,8)
   };
 
-  // ── Store ──
   G.d = {
-    p, sma20, sma50, sma200, wma20, ema12, ema26,
-    macdLine, macdSig, macdHist, macdBull,
-    sar, sarBull,
-    rsi, stochK, stochD, cci, mom,
-    bbMid, bbUpper, bbLower, bbWidth, bbPctB,
-    obvBull, adBull, atr, volRat,
-    swHigh, swLow, swDiff,
-    tenkan, kijun, senA, senB, chikou,
-    ewIdx, ewWave: waves[ewIdx], ewDir: waveDirs[ewIdx],
+    p, sma20,sma50,sma200,wma20,ema12,ema26,
+    macdL,macdS,macdH,macdB,sar,sarB,
+    rsi,stochK,stochD,cci,mom,
+    bbM,bbU,bbL,bbW,bbPB,
+    obvB,adB,atr,volR,
+    swH,swL,swD,
+    ten,kij,senA,senB,chi,
+    ichAb,ichBl,ichBCl,ichTK,
+    ewI,WD,ewD:WD[ewI].d,ewL:WD[ewI].l,
     val, isCrypto,
-    forms: {}, candles: {}
+    forms:{}, candles:{}, valScore:0.5
   };
 
-  renderTechnical();
-  renderFormations();
-  renderCandles();
-  renderFibonacci();
-  renderIchimoku();
-  renderElliott();
-  renderValuation();
-  renderSigBars(null);
+  rTech();
+  rForms();
+  rCandles();
+  rFib();
+  rIch();
+  rElliott();
+  rVal();
+  buildSigRows();
 }
 
-// ══════════════════════════════════════════════════════
-// RENDER: TECHNICAL
-// ══════════════════════════════════════════════════════
-function renderTechnical() {
-  const { p, sma20, sma50, sma200, wma20, ema12, ema26,
-          macdBull, macdHist, sar, sarBull,
-          rsi, stochK, stochD, cci, mom,
-          bbUpper, bbLower, bbMid, bbWidth, bbPctB,
-          obvBull, adBull, atr, volRat } = G.d;
-  const c = G.cur;
-
-  fillGrid('ig-trend', [
-    { n:'SMA (20)',       v: fp(sma20)+' '+c,  s: p>sma20 ? '↑ Fiyat üstünde → AL' : '↓ Fiyat altında → SAT', b: p>sma20 },
-    { n:'SMA (50)',       v: fp(sma50)+' '+c,  s: p>sma50 ? '↑ Orta vadeli trend AL' : '↓ Orta vadeli trend SAT', b: p>sma50 },
-    { n:'SMA (200)',      v: fp(sma200)+' '+c, s: p>sma200 ? '↑ Uzun vadeli AL' : '↓ Uzun vadeli SAT', b: p>sma200 },
-    { n:'WMA (20)',       v: fp(wma20)+' '+c,  s: p>wma20 ? '↑ AL' : '↓ SAT', b: p>wma20 },
-    { n:'EMA (12)',       v: fp(ema12)+' '+c,  s: ema12>ema26 ? 'EMA12 > EMA26' : 'EMA12 < EMA26', b: ema12>ema26 },
-    { n:'EMA (26)',       v: fp(ema26)+' '+c,  s: ema12>ema26 ? '↑ Golden Cross' : '↓ Death Cross', b: ema12>ema26 },
-    { n:'Parabolic SAR', v: fp(sar)+' '+c,     s: sarBull ? '↑ SAR altında → AL' : '↓ SAR üstünde → SAT', b: sarBull },
-    { n:'MACD Histogram',v: (macdHist>=0?'+':'')+fp(Math.abs(macdHist)), s: macdBull ? '↑ Pozitif crossover' : '↓ Negatif crossover', b: macdBull },
-  ]);
-
-  const rsib = rsi<30 ? true : rsi>70 ? false : null;
-  const ccib = cci<-100 ? true : cci>100 ? false : null;
-
-  fillGrid('ig-mom', [
-    { n:'RSI (14)',     v: rsi.toFixed(1),    s: rsi<30 ? '⚡ Aşırı Satım' : rsi>70 ? '⚠ Aşırı Alım' : 'Nötr bölge', b: rsib },
-    { n:'Stoch %K',    v: stochK.toFixed(1),  s: stochK<20 ? '⚡ Aşırı Satım' : stochK>80 ? '⚠ Aşırı Alım' : 'Nötr', b: stochK<50 },
-    { n:'Stoch %D',    v: stochD.toFixed(1),  s: stochK>stochD ? '↑ %K > %D AL' : '↓ %K < %D SAT', b: stochK>stochD },
-    { n:'CCI (14)',    v: cci.toFixed(0),      s: cci<-100 ? '⚡ Aşırı Satım' : cci>100 ? '⚠ Aşırı Alım' : 'Normal bölge', b: ccib },
-    { n:'Momentum',    v: (mom>=0?'+':'')+mom.toFixed(1)+'%', s: mom>0 ? '↑ Pozitif' : '↓ Negatif', b: mom>0 },
-    { n:'BB Üst',      v: fp(bbUpper)+' '+G.cur, s: p>bbUpper ? '⚠ Band dışı!' : 'Normal', b: p<bbUpper },
-    { n:'BB Alt',      v: fp(bbLower)+' '+G.cur, s: p<bbLower ? '⚡ Band dışı!' : 'Normal', b: p<bbLower ? true : null },
-    { n:'BB Genişlik', v: bbWidth.toFixed(1)+'%', s: bbWidth>25 ? '↑ Yüksek volatilite' : '↓ Sıkışma', b: null },
-    { n:'BB %B',       v: bbPctB.toFixed(1)+'%',  s: bbPctB>80 ? 'Üst banda yakın' : bbPctB<20 ? 'Alt banda yakın' : 'Ortada', b: bbPctB>50 },
-  ]);
-
-  fillGrid('ig-vol', [
-    { n:'OBV Trend',   v: obvBull ? '↑ Pozitif' : '↓ Negatif', s: obvBull ? 'Birikim – AL destekli' : 'Dağıtım – SAT baskısı', b: obvBull },
-    { n:'A/D Index',   v: adBull  ? '↑ Birikim' : '↓ Dağıtım', s: adBull  ? 'Akıllı para alıyor' : 'Akıllı para satıyor', b: adBull },
-    { n:'ATR %',       v: atr.toFixed(2)+'%',    s: atr>3.5 ? 'Yüksek risk' : atr>2 ? 'Orta risk' : 'Düşük risk', b: null },
-    { n:'Hacim Oranı', v: volRat.toFixed(2)+'x', s: volRat>1.5 ? 'Ort. '+volRat.toFixed(1)+'x üstü' : 'Normal hacim', b: volRat>1.5 },
-  ]);
-}
-
-function fillGrid(id, items) {
-  document.getElementById(id).innerHTML = items.map(({ n, v, s, b }) =>
-    `<div class="ic ${b===true?'bull':b===false?'bear':'neut'}">
-       <div class="n">${n}</div>
-       <div class="v">${v}</div>
-       <div class="s">${s}</div>
-     </div>`
+/* ════════════════════════════════════════════
+   RENDER: TECHNICAL
+════════════════════════════════════════════ */
+function fillIG(id, items){
+  $(id).innerHTML = items.map(({n,v,s,b}) =>
+    `<div class="ic ${b===true?'bull':b===false?'bear':'neu'}">
+      <div class="in">${n}</div>
+      <div class="iv">${v}</div>
+      <div class="is">${s}</div>
+    </div>`
   ).join('');
 }
 
-// ══════════════════════════════════════════════════════
-// FORMATIONS & CANDLES
-// ══════════════════════════════════════════════════════
-const FORMS = [
-  { i:'📐', n:'Omuz-Baş-Omuz',     t:'bear' },
-  { i:'🔃', n:'Ters OBO (Boğa)',    t:'bull' },
-  { i:'⛰️', n:'İkili Tepe',         t:'bear' },
-  { i:'🏔️', n:'İkili Dip (W)',      t:'bull' },
-  { i:'🔺', n:'Simetrik Üçgen',     t:'neut' },
-  { i:'🔻', n:'Alçalan Üçgen',      t:'bear' },
-  { i:'🔼', n:'Yükselen Üçgen',     t:'bull' },
-  { i:'📌', n:'Yükselen Takoz',     t:'bear' },
-  { i:'📍', n:'Alçalan Takoz',      t:'bull' },
-  { i:'🚩', n:'Bayrak (Boğa)',      t:'bull' },
-  { i:'🏴', n:'Bayrak (Ayı)',       t:'bear' },
-  { i:'📐', n:'Flama (Boğa)',       t:'bull' },
-  { i:'📐', n:'Flama (Ayı)',        t:'bear' },
-  { i:'🥄', n:'Fincan & Kulp',      t:'bull' },
-  { i:'📦', n:'Dikdörtgen (Boğa)', t:'bull' },
-  { i:'📦', n:'Dikdörtgen (Ayı)',  t:'bear' },
-];
-const CANDLES = [
-  { i:'➕', n:'Doji',                 t:'neut' },
-  { i:'🌅', n:'Sabah Yıldızı',        t:'bull' },
-  { i:'🌅', n:'Doji Sabah Yıldızı',   t:'bull' },
-  { i:'🌆', n:'Akşam Yıldızı',        t:'bear' },
-  { i:'🌆', n:'Doji Akşam Yıldızı',   t:'bear' },
-  { i:'🔨', n:'Çekiç',               t:'bull' },
-  { i:'⬆️', n:'Ters Çekiç',           t:'bull' },
-  { i:'💀', n:'Asılan Adam',          t:'bear' },
-  { i:'⭐', n:'Shooting Star',        t:'bear' },
-  { i:'🌟', n:'3 Beyaz Asker',        t:'bull' },
-  { i:'🐦', n:'3 Kara Karga',         t:'bear' },
-  { i:'🔵', n:'Engulfing (Boğa)',     t:'bull' },
-  { i:'🔴', n:'Engulfing (Ayı)',      t:'bear' },
-  { i:'🕯️', n:'Piercing Line',        t:'bull' },
-  { i:'☁️', n:'Dark Cloud Cover',     t:'bear' },
-  { i:'✂️', n:'Harami (Boğa)',        t:'bull' },
-  { i:'✂️', n:'Harami (Ayı)',         t:'bear' },
-];
-
-function pickStatus() {
-  const r = Math.random();
-  if (r < 0.10) return 'det';   // 10% detected
-  if (r < 0.20) return 'pos';   // 10% possible
-  return 'no';
+function rTech(){
+  const d=G.d, c=G.cur;
+  fillIG('ig-trend', [
+    {n:'SMA 20',  v:fp(d.sma20)+' '+c,  s:d.p>d.sma20?'↑ Fiyat üstünde':'↓ Fiyat altında',         b:d.p>d.sma20},
+    {n:'SMA 50',  v:fp(d.sma50)+' '+c,  s:d.p>d.sma50?'↑ Orta vade AL':'↓ Orta vade SAT',           b:d.p>d.sma50},
+    {n:'SMA 200', v:fp(d.sma200)+' '+c, s:d.p>d.sma200?'↑ Uzun vade AL':'↓ Uzun vade SAT',          b:d.p>d.sma200},
+    {n:'WMA 20',  v:fp(d.wma20)+' '+c,  s:d.p>d.wma20?'↑ AL':'↓ SAT',                               b:d.p>d.wma20},
+    {n:'EMA 12',  v:fp(d.ema12)+' '+c,  s:d.ema12>d.ema26?'EMA12 > EMA26':'EMA12 < EMA26',           b:d.ema12>d.ema26},
+    {n:'EMA 26',  v:fp(d.ema26)+' '+c,  s:d.ema12>d.ema26?'↑ Golden Cross':'↓ Death Cross',          b:d.ema12>d.ema26},
+    {n:'SAR',     v:fp(d.sar)+' '+c,    s:d.sarB?'↑ SAR altında → AL':'↓ SAR üstünde → SAT',         b:d.sarB},
+    {n:'MACD',    v:(d.macdH>=0?'+':'')+fp(Math.abs(d.macdH)), s:d.macdB?'↑ Pozitif cross':'↓ Negatif cross', b:d.macdB},
+  ]);
+  const rb = d.rsi<30?true:d.rsi>70?false:null;
+  const cb = d.cci<-100?true:d.cci>100?false:null;
+  fillIG('ig-mom', [
+    {n:'RSI 14',     v:d.rsi.toFixed(1),    s:d.rsi<30?'⚡ Aşırı Satım':d.rsi>70?'⚠ Aşırı Alım':'Nötr bölge', b:rb},
+    {n:'Stoch %K',   v:d.stochK.toFixed(1), s:d.stochK<20?'⚡ Aşırı Satım':d.stochK>80?'⚠ Aşırı Alım':'Nötr',  b:d.stochK<50},
+    {n:'Stoch %D',   v:d.stochD.toFixed(1), s:d.stochK>d.stochD?'↑ %K > %D AL':'↓ %K < %D SAT',                 b:d.stochK>d.stochD},
+    {n:'CCI 14',     v:d.cci.toFixed(0),    s:d.cci<-100?'⚡ Aşırı Satım':d.cci>100?'⚠ Aşırı Alım':'Normal',    b:cb},
+    {n:'Momentum',   v:(d.mom>=0?'+':'')+d.mom.toFixed(1)+'%', s:d.mom>0?'↑ Pozitif':'↓ Negatif',                b:d.mom>0},
+    {n:'BB Üst Bant',v:fp(d.bbU)+' '+c,    s:d.p>d.bbU?'⚠ Band dışında!':'Normal',                              b:d.p<d.bbU},
+    {n:'BB Alt Bant',v:fp(d.bbL)+' '+c,    s:d.p<d.bbL?'⚡ Band dışında!':'Normal',                              b:d.p<d.bbL?true:null},
+    {n:'BB Genişlik',v:d.bbW.toFixed(1)+'%',s:d.bbW>25?'↑ Yüksek volatilite':'↓ Daralma/Sıkışma',               b:null},
+    {n:'BB %B',      v:d.bbPB.toFixed(1)+'%',s:d.bbPB>80?'Üst banda yakın':d.bbPB<20?'Alt banda yakın':'Ortada', b:d.bbPB>50},
+  ]);
+  fillIG('ig-vol', [
+    {n:'OBV Trend',  v:d.obvB?'↑ Pozitif':'↓ Negatif',s:d.obvB?'Birikim — AL destekli':'Dağıtım — SAT baskısı', b:d.obvB},
+    {n:'A/D Index',  v:d.adB?'↑ Birikim':'↓ Dağıtım',  s:d.adB?'Akıllı para alıyor':'Akıllı para satıyor',      b:d.adB},
+    {n:'ATR%',       v:d.atr.toFixed(2)+'%',             s:d.atr>3.5?'Yüksek risk':d.atr>2?'Orta risk':'Düşük risk', b:null},
+    {n:'Hacim / Ort',v:d.volR.toFixed(2)+'x',            s:d.volR>1.5?d.volR.toFixed(1)+'x üstü hacim':'Normal',  b:d.volR>1.5},
+  ]);
 }
 
-function renderFormations() {
-  const labels = { det:'✓ TESPİT EDİLDİ', pos:'◎ Olası formasyon', no:'— Tespit edilmedi' };
-  const html = FORMS.map(f => {
-    const st = pickStatus();
-    G.d.forms[f.n] = { st, t: f.t };
+/* ════════════════════════════════════════════
+   FORMATIONS & CANDLES
+════════════════════════════════════════════ */
+const FORMS = [
+  {i:'📐',n:'Omuz-Baş-Omuz',    t:'bear'}, {i:'🔃',n:'Ters OBO (Boğa)',t:'bull'},
+  {i:'⛰️', n:'İkili Tepe',       t:'bear'}, {i:'🏔️', n:'İkili Dip (W)',  t:'bull'},
+  {i:'🔺',n:'Simetrik Üçgen',   t:'neu'},  {i:'🔻',n:'Alçalan Üçgen',   t:'bear'},
+  {i:'🔼',n:'Yükselen Üçgen',   t:'bull'}, {i:'📌',n:'Yükselen Takoz',  t:'bear'},
+  {i:'📍',n:'Alçalan Takoz',    t:'bull'}, {i:'🚩',n:'Bayrak (Boğa)',   t:'bull'},
+  {i:'🏴',n:'Bayrak (Ayı)',     t:'bear'}, {i:'📐',n:'Flama (Boğa)',    t:'bull'},
+  {i:'📐',n:'Flama (Ayı)',      t:'bear'}, {i:'🥄',n:'Fincan & Kulp',   t:'bull'},
+  {i:'📦',n:'Dikdörtgen Boğa', t:'bull'}, {i:'📦',n:'Dikdörtgen Ayı',  t:'bear'},
+];
+const CNDLS = [
+  {i:'➕',n:'Doji',               t:'neu'},  {i:'🌅',n:'Sabah Yıldızı',      t:'bull'},
+  {i:'🌅',n:'Doji Sabah Yıldızı', t:'bull'}, {i:'🌆',n:'Akşam Yıldızı',      t:'bear'},
+  {i:'🌆',n:'Doji Akşam Yıldızı', t:'bear'}, {i:'🔨',n:'Çekiç',              t:'bull'},
+  {i:'⬆️', n:'Ters Çekiç',        t:'bull'}, {i:'💀',n:'Asılan Adam',        t:'bear'},
+  {i:'⭐',n:'Shooting Star',      t:'bear'}, {i:'🌟',n:'3 Beyaz Asker',      t:'bull'},
+  {i:'🐦',n:'3 Kara Karga',       t:'bear'}, {i:'🔵',n:'Engulfing (Boğa)',   t:'bull'},
+  {i:'🔴',n:'Engulfing (Ayı)',    t:'bear'}, {i:'🕯️',n:'Piercing Line',      t:'bull'},
+  {i:'☁️', n:'Dark Cloud Cover',  t:'bear'}, {i:'✂️', n:'Harami (Boğa)',     t:'bull'},
+  {i:'✂️', n:'Harami (Ayı)',      t:'bear'},
+];
+
+function pickSt(){ const r=Math.random(); return r<.10?'det':r<.20?'pos':'no'; }
+
+function rFC(id,list,store){
+  const L = {det:'✓ TESPİT EDİLDİ', pos:'◎ Olası', no:'— Yok'};
+  $(id).innerHTML = list.map(f => {
+    const st = pickSt();
+    store[f.n] = {st, t:f.t};
     return `<div class="fc">
       <div class="fi">${f.i}</div>
-      <div><div class="fn">${f.n}</div><div class="fs ${st}">${labels[st]}</div></div>
+      <div><div class="fn">${f.n}</div><div class="fs ${st}">${L[st]}</div></div>
     </div>`;
   }).join('');
-  document.getElementById('fg-main').innerHTML = html;
 }
 
-function renderCandles() {
-  const labels = { det:'✓ TESPİT EDİLDİ', pos:'◎ Olası', no:'— Yok' };
-  const html = CANDLES.map(c => {
-    const st = pickStatus();
-    G.d.candles[c.n] = { st, t: c.t };
-    return `<div class="fc">
-      <div class="fi">${c.i}</div>
-      <div><div class="fn">${c.n}</div><div class="fs ${st}">${labels[st]}</div></div>
-    </div>`;
-  }).join('');
-  document.getElementById('fg-candles').innerHTML = html;
-}
+function rForms()  { rFC('fg-main',    FORMS, G.d.forms); }
+function rCandles(){ rFC('fg-candles', CNDLS, G.d.candles); }
 
-// ══════════════════════════════════════════════════════
-// FIBONACCI
-// ══════════════════════════════════════════════════════
-function renderFibonacci() {
-  const { p, swHigh, swLow, swDiff } = G.d;
+/* ════════════════════════════════════════════
+   FIBONACCI
+   Retracement: price = swH - swD*pct  (0%=tepe, 100%=dip)
+   Extension:   price = swL + swD*pct  (>100% = above swH)
+════════════════════════════════════════════ */
+function rFib(){
+  const {p, swH, swL, swD} = G.d;
   const c = G.cur;
 
-  // Retracement levels (from high down to low)
-  const retLevels = [
-    { pct:0,     label:'0% (Tepe)' },
-    { pct:0.236, label:'23.6%' },
-    { pct:0.382, label:'38.2%' },
-    { pct:0.500, label:'50.0%' },
-    { pct:0.618, label:'61.8%' },
-    { pct:0.786, label:'78.6%' },
-    { pct:1.000, label:'100% (Dip)' },
+  const RL = [
+    {pct:0,    l:'0.0%  — Tepe'},
+    {pct:.236, l:'23.6%'},
+    {pct:.382, l:'38.2%'},
+    {pct:.500, l:'50.0%'},
+    {pct:.618, l:'61.8% ★'},
+    {pct:.786, l:'78.6%'},
+    {pct:1.0,  l:'100.0% — Dip'},
+  ];
+  const EL = [
+    {pct:1.272, l:'127.2%'},
+    {pct:1.414, l:'141.4%'},
+    {pct:1.618, l:'161.8% ★'},
+    {pct:2.000, l:'200.0%'},
+    {pct:2.618, l:'261.8% ★'},
   ];
 
-  // Extension levels (from low up)
-  const extLevels = [
-    { pct:1.272, label:'127.2%' },
-    { pct:1.414, label:'141.4%' },
-    { pct:1.618, label:'161.8% ⭐' },
-    { pct:2.000, label:'200.0%' },
-    { pct:2.618, label:'261.8% ⭐' },
-  ];
-
-  // Fan lines (pivot: swing low, target: % of swing range from pivot)
-  const fanLevels = [
-    { pct:0.382, label:'Fan 38.2%' },
-    { pct:0.500, label:'Fan 50.0%' },
-    { pct:0.618, label:'Fan 61.8%' },
-  ];
-
-  // Channel levels (parallel trend channel based on price)
-  const chLevels = [
-    { mul:1.100, label:'Üst Kanal +10%' },
-    { mul:1.000, label:'Trend Çizgisi' },
-    { mul:0.900, label:'Alt Kanal -10%' },
-  ];
-
-  let html = `
-    <div class="sec-hdr">Fibonacci Düzeltme Seviyeleri
-      <span style="font-size:9px;color:var(--dim);font-weight:400;letter-spacing:0;text-transform:none;margin-left:6px">
-        Tepe: ${fp(swHigh)} ${c} &nbsp;·&nbsp; Dip: ${fp(swLow)} ${c} &nbsp;·&nbsp; Fark: ${fp(swDiff)} ${c}
+  let h = `
+    <div class="sh">Fibonacci Düzeltme
+      <span style="font-size:9px;letter-spacing:0;text-transform:none;font-weight:400;margin-left:5px">
+        Tepe: ${fp(swH)} ${c} &nbsp;·&nbsp; Dip: ${fp(swL)} ${c} &nbsp;·&nbsp; Fark: ${fp(swD)} ${c}
       </span>
     </div>
-    <table class="fib-tbl">
-      <tr><th>Seviye</th><th>Fiyat</th><th>Fiyattan Fark</th><th>Durum</th></tr>`;
+    <table class="ftbl">
+    <tr><th>Seviye</th><th>Fiyat (${c})</th><th>Uzaklık</th><th>Rol</th></tr>`;
 
-  retLevels.forEach(({ pct, label }) => {
-    const lvlPrice = swHigh - swDiff * pct;
-    const diff     = lvlPrice - p;
-    const diffPct  = (diff / p * 100);
-    const nearDist = Math.abs(diff) / p;
-    const isNear   = nearDist < 0.02;          // within 2% of current price
-    const isBelow  = lvlPrice < p;
-    html += `<tr ${isNear?'class="curr"':''}>
-      <td>${label}${isNear?'<span class="fib-near-tag">◀ YAKINDA</span>':''}</td>
-      <td style="color:${isNear?'var(--accent)':isBelow?'var(--green)':'var(--red)'}">${fp(lvlPrice)} ${c}</td>
-      <td style="color:${diffPct>=0?'var(--green)':'var(--red)'}">${diffPct>=0?'+':''}${diffPct.toFixed(2)}%</td>
-      <td style="font-size:9px;color:var(--dim)">${isBelow?'Destek':'Direnç'}</td>
+  RL.forEach(({pct, l}) => {
+    const lp   = swH - swD * pct;             /* retracement level */
+    const diff = lp - p;
+    const dpct = diff / p * 100;
+    const near = Math.abs(diff) / p < 0.022;  /* within 2.2% of current price */
+    const isBelow = lp < p;
+    h += `<tr ${near?'class="crow"':''}>
+      <td>${l}${near?'<span class="ntag">◀ YAKINDA</span>':''}</td>
+      <td style="color:${near?'var(--cyan)':isBelow?'var(--green)':'var(--red)'}">${fp(lp)}</td>
+      <td style="color:${dpct>=0?'var(--green)':'var(--red)'}">${dpct>=0?'+':''}${dpct.toFixed(2)}%</td>
+      <td style="font-size:9px;color:var(--dim2)">${isBelow?'Destek':'Direnç'}</td>
     </tr>`;
   });
-  html += `</table>`;
+  h += `</table>`;
 
-  html += `<div class="sec-hdr" style="margin-top:14px">Fibonacci Extension Hedefleri</div>
-    <table class="fib-tbl">
-      <tr><th>Seviye</th><th>Fiyat</th><th>Fiyattan Uzaklık</th><th>Tip</th></tr>`;
-  extLevels.forEach(({ pct, label }) => {
-    const lvlPrice = swLow + swDiff * pct;
-    const diff     = lvlPrice - p;
-    const diffPct  = (diff / p * 100);
-    html += `<tr>
-      <td style="color:var(--green)">${label}</td>
-      <td style="color:var(--gold)">${fp(lvlPrice)} ${c}</td>
-      <td style="color:var(--dim)">+${diffPct.toFixed(1)}%</td>
-      <td style="font-size:9px;color:var(--dim)">Hedef</td>
+  h += `
+    <div class="sh" style="margin-top:14px">Extension Hedefleri</div>
+    <table class="ftbl">
+    <tr><th>Seviye</th><th>Fiyat (${c})</th><th>Fiyattan</th><th>Tip</th></tr>`;
+
+  EL.forEach(({pct, l}) => {
+    const lp   = swL + swD * pct;            /* extension level — always > swH */
+    const dpct = (lp - p) / p * 100;
+    h += `<tr>
+      <td style="color:var(--green)">${l}</td>
+      <td style="color:var(--gold)">${fp(lp)}</td>
+      <td style="color:var(--dim2)">+${dpct.toFixed(1)}%</td>
+      <td style="font-size:9px;color:var(--dim2)">Hedef</td>
     </tr>`;
   });
-  html += `</table>`;
+  h += `</table>`;
 
-  html += `<div class="sec-hdr" style="margin-top:14px">Fibonacci Fan & Trend Kanalları</div>
-    <div class="ig">`;
-
-  fanLevels.forEach(({ pct, label }) => {
-    const fanP   = swLow + swDiff * pct;
-    const isSupp = fanP < p;
-    html += `<div class="ic ${isSupp?'bull':'bear'}">
-      <div class="n">${label}</div>
-      <div class="v">${fp(fanP)} ${c}</div>
-      <div class="s">${isSupp?'Destek açısı':'Direnç açısı'}</div>
-    </div>`;
+  h += `<div class="sh" style="margin-top:14px">Fan &amp; Trend Kanalları</div><div class="ig">`;
+  [{pct:.382,l:'Fan 38.2%'},{pct:.5,l:'Fan 50%'},{pct:.618,l:'Fan 61.8%'}].forEach(({pct,l}) => {
+    const fp2 = swL + swD * pct;
+    h += `<div class="ic ${fp2<p?'bull':'bear'}">
+      <div class="in">${l}</div><div class="iv">${fp(fp2)} ${c}</div>
+      <div class="is">${fp2<p?'Destek açısı':'Direnç açısı'}</div></div>`;
   });
-
-  chLevels.forEach(({ mul, label }) => {
-    const chP = p * mul;
-    const cls = mul > 1 ? 'bear' : mul < 1 ? 'bull' : 'neut';
-    html += `<div class="ic ${cls}">
-      <div class="n">${label}</div>
-      <div class="v">${fp(chP)} ${c}</div>
-      <div class="s">${mul>1?'Direnç kanalı':mul<1?'Destek kanalı':'Mevcut trend'}</div>
-    </div>`;
+  [{m:1.1,l:'Üst Kanal'},{m:1.0,l:'Trend Çizgisi'},{m:.9,l:'Alt Kanal'}].forEach(({m,l}) => {
+    h += `<div class="ic ${m>1?'bear':m<1?'bull':'neu'}">
+      <div class="in">${l}</div><div class="iv">${fp(p*m)} ${c}</div>
+      <div class="is">${m>1?'Direnç':m<1?'Destek':'Trend'}</div></div>`;
   });
-  html += `</div>`;
+  h += `</div>`;
+  h += `<div class="note">ℹ️ Fibonacci Yayları ve Spiraller TradingView grafiği üzerinde çizim araçlarıyla görselleştirilir. Hesaplamalar Swing High/Low noktalarına dayalıdır.</div>`;
 
-  html += `<div class="note">ℹ️ Fibonacci Yayları (Arcs) ve Spiraller TradingView grafiği üzerinde çizim araçlarıyla görselleştirilir. Yukarıdaki hesaplamalar tespit edilen Swing High/Low noktalarına dayalıdır.</div>`;
-
-  document.getElementById('fib-content').innerHTML = html;
+  $('fib-wrap').innerHTML = h;
 }
 
-// ══════════════════════════════════════════════════════
-// ICHIMOKU
-// ══════════════════════════════════════════════════════
-function renderIchimoku() {
-  const { p, tenkan, kijun, senA, senB, chikou } = G.d;
-  const c = G.cur;
+/* ════════════════════════════════════════════
+   ICHIMOKU
+════════════════════════════════════════════ */
+function rIch(){
+  const d=G.d, c=G.cur;
+  $('ich-cells').innerHTML = [
+    {l:'Tenkan (9)',  v:fp(d.ten)+' '+c,  b:d.ten>d.kij},
+    {l:'Kijun (26)',  v:fp(d.kij)+' '+c,  b:d.p>d.kij},
+    {l:'Senkou A',    v:fp(d.senA)+' '+c, b:d.senA>d.senB},
+    {l:'Senkou B',    v:fp(d.senB)+' '+c, b:d.p>d.senB},
+    {l:'Chikou',      v:fp(d.chi)+' '+c,  b:d.chi>d.p},
+    {l:'Bulut Durumu',v:d.ichAb?'↑ ÜSTÜNDE':d.ichBl?'↓ ALTINDA':'≈ İÇİNDE',
+                       b:d.ichAb?true:d.ichBl?false:null},
+  ].map(({l,v,b}) => `<div class="ichc">
+    <div class="ichl">${l}</div>
+    <div class="ichv" style="color:${b===true?'var(--green)':b===false?'var(--red)':'var(--gold)'}">${v}</div>
+  </div>`).join('');
 
-  const cloudTop    = Math.max(senA, senB);
-  const cloudBottom = Math.min(senA, senB);
-  const aboveCloud  = p > cloudTop;
-  const belowCloud  = p < cloudBottom;
-  const inCloud     = !aboveCloud && !belowCloud;
-  const bullCloud   = senA > senB;
-  const tkBull      = tenkan > kijun;
-
-  // Store for AI
-  G.d.ich = { aboveCloud, inCloud, belowCloud, bullCloud, tkBull };
-
-  document.getElementById('ich-cells').innerHTML = [
-    { l:'Tenkan-sen (9)',  v: fp(tenkan)+' '+c, bull: tenkan > kijun },
-    { l:'Kijun-sen (26)', v: fp(kijun)+' '+c,  bull: p > kijun },
-    { l:'Senkou A',       v: fp(senA)+' '+c,   bull: senA > senB },
-    { l:'Senkou B',       v: fp(senB)+' '+c,   bull: p > senB },
-    { l:'Chikou Span',    v: fp(chikou)+' '+c, bull: chikou > p },
-    { l:'Bulut Durumu',   v: aboveCloud ? '↑ ÜSTÜNDE' : belowCloud ? '↓ ALTINDA' : '≈ İÇİNDE',
-      bull: aboveCloud ? true : belowCloud ? false : null }
-  ].map(({ l, v, bull }) => `
-    <div class="ich-cell">
-      <div class="lbl">${l}</div>
-      <div class="val" style="color:${bull===true?'var(--green)':bull===false?'var(--red)':'var(--gold)'}">${v}</div>
-    </div>`).join('');
-
-  const statusColor = aboveCloud ? 'var(--green)' : belowCloud ? 'var(--red)' : 'var(--gold)';
-  const statusText  = aboveCloud ? '📈 BULUTUN ÜSTÜNDE — Güçlü Boğa Sinyali' :
-                      belowCloud ? '📉 BULUTUN ALTINDA — Güçlü Ayı Sinyali' :
-                      '↔️ BULUT İÇİNDE — Belirsiz / Sıkışma';
-
-  document.getElementById('ich-comment').innerHTML = `
-    <div class="ai-box ${aboveCloud?'bull':belowCloud?'bear':'neut'}">
-      <strong style="color:${statusColor}">${statusText}</strong><br><br>
-      <b>TK Kesişimi:</b> ${tkBull ? '✅ Tenkan > Kijun → AL sinyali' : '⚠️ Tenkan < Kijun → SAT sinyali'}<br>
-      <b>Bulut rengi:</b> ${bullCloud ? '✅ Yeşil (Senkou A > B) → Boğa bulut' : '⚠️ Kırmızı (Senkou B > A) → Ayı bulut'}<br>
-      <b>Chikou Span:</b> ${chikou > p ? '✅ Fiyat üstünde → Güçlü onay' : '⚠️ Fiyat altında → Zayıf sinyal'}
-    </div>`;
+  const sc = d.ichAb?'var(--green)':d.ichBl?'var(--red)':'var(--gold)';
+  const st = d.ichAb?'📈 BULUT ÜSTÜNDE — Güçlü Boğa Sinyali':d.ichBl?'📉 BULUT ALTINDA — Güçlü Ayı Sinyali':'↔️ BULUT İÇİNDE — Belirsiz';
+  $('ich-comment').innerHTML = `<div class="abox ${d.ichAb?'bull':d.ichBl?'bear':'neu'}">
+    <strong style="color:${sc}">${st}</strong><br><br>
+    <b>TK Kesişimi:</b> ${d.ichTK?'✅ Tenkan > Kijun → AL sinyali':'⚠️ Tenkan < Kijun → SAT sinyali'}<br>
+    <b>Bulut Rengi:</b> ${d.ichBCl?'✅ Yeşil (Senkou A > B) → Boğa bulut':'⚠️ Kırmızı (Senkou B > A) → Ayı bulut'}<br>
+    <b>Chikou Span:</b> ${d.chi>d.p?'✅ Fiyat üstünde → Güçlü onay':'⚠️ Fiyat altında → Zayıf sinyal'}
+  </div>`;
 }
 
-// ══════════════════════════════════════════════════════
-// ELLIOTT WAVE
-// ══════════════════════════════════════════════════════
-function renderElliott() {
-  const { ewIdx, ewWave, ewDir, p, swHigh, swLow } = G.d;
-  const c = G.cur;
-
-  const wDef = [
-    { h:35, cls:'imp', d:'up', desc:'İmpuls – yükseliş başlangıcı' },
-    { h:18, cls:'cor', d:'dn', desc:'Düzeltme – W1\'in %38.2–61.8\'i' },
-    { h:62, cls:'imp', d:'up', desc:'En güçlü dalga – W1\'in min. %161.8\'i' },
-    { h:24, cls:'cor', d:'dn', desc:'Düzeltme – W1 tepesine girmemeli' },
-    { h:44, cls:'imp', d:'up', desc:'Son impuls – zayıflama başlar' },
-    { h:30, cls:'cor', d:'dn', desc:'Düzeltici A – 3 dalgalı iniş' },
-    { h:17, cls:'imp', d:'up', desc:'Düzeltici B – geri tepme' },
-    { h:36, cls:'cor', d:'dn', desc:'Düzeltici C – 5 dalgalı iniş' },
-  ];
-  const wLabels = ['①','②','③','④','⑤','Ⓐ','Ⓑ','Ⓒ'];
-
-  document.getElementById('wave-chart').innerHTML = wDef.map((w, i) =>
-    `<div class="wb ${w.cls}${i===ewIdx?' active-w':''}" style="height:${w.h}px">
-       <span class="wl" style="${i===ewIdx?'color:var(--accent);font-size:12px':''}">${wLabels[i]}</span>
-     </div>`
+/* ════════════════════════════════════════════
+   ELLIOTT
+════════════════════════════════════════════ */
+function rElliott(){
+  const d=G.d, c=G.cur;
+  $('wave-ch').innerHTML = d.WD.map((w,i) =>
+    `<div class="wb ${w.c}${i===d.ewI?' act':''}" style="height:${w.h}px">
+      <span class="wlbl" style="${i===d.ewI?'color:var(--cyan);font-size:12px':''}">${w.l}</span>
+    </div>`
   ).join('');
 
-  const aw = wDef[ewIdx];
-  const nextTarget = ewDir === 'up'
-    ? fp(p * rnd(1.05, 1.22)) + ' ' + c
-    : fp(p * rnd(0.80, 0.95)) + ' ' + c;
-  const nextDesc = ewDir === 'up'
-    ? `Yükseliş devam edebilir. Hedef aralığı: ${nextTarget}`
-    : `Düzeltme bekleniyor. Destek: ${nextTarget}`;
+  const tgt = d.ewD==='up'
+    ? fp(d.p*rnd(1.05,1.22))+' '+c
+    : fp(d.p*rnd(.80,.95))+' '+c;
 
-  document.getElementById('elliott-comment').innerHTML = `
-    <div class="ai-box ${ewDir==='up'?'bull':'bear'}">
-      <strong>Aktif Dalga: ${ewWave}</strong> — ${aw.desc}<br>
-      ${nextDesc}
+  $('ew-comment').innerHTML = `
+    <div class="abox ${d.ewD==='up'?'bull':'bear'}">
+      <strong>Aktif Dalga: ${d.ewL}</strong><br>
+      ${d.ewD==='up'?'Yükseliş devam edebilir. Hedef: '+tgt:'Düzeltme bekleniyor. Destek: '+tgt}
     </div>
-    <div class="ai-box neut" style="margin-top:6px">
+    <div class="abox neu" style="margin-top:5px">
       <b>Elliott Fibonacci Oranları:</b><br>
-      • Dalga 2, Dalga 1'in %50–61.8'ini düzeltir<br>
-      • Dalga 3 = Dalga 1'in en az %161.8'i (asla en kısa olamaz)<br>
-      • Dalga 4, Dalga 1 tepesine girmez<br>
-      • Dalga 5 ≈ Dalga 1'in %61.8–100'ü
+      • Dalga 2 → W1'in %38.2–61.8 düzeltmesi<br>
+      • Dalga 3 → W1'in min. %161.8'i (en kısa olamaz)<br>
+      • Dalga 4 → W1 tepesine girmez<br>
+      • Dalga 5 → W1'in %61.8–100'ü
     </div>
-    <div class="note">⚠️ Elliott analizi subjektif ve tahminseldir. Birden fazla sayım her zaman mümkündür.</div>`;
+    <div class="note">⚠️ Elliott analizi subjektiftir ve tahminseldir. Kesin değildir.</div>`;
 }
 
-// ══════════════════════════════════════════════════════
-// VALUATION
-// ══════════════════════════════════════════════════════
-function renderValuation() {
-  const { val, isCrypto } = G.d;
-
-  if (isCrypto) {
-    document.getElementById('val-hdr').textContent = 'Kripto Değerleme Metrikleri';
-    document.getElementById('val-grid').innerHTML = [
-      { n:'NVT Ratio',         v: rnd(50,200).toFixed(0),   b:'<150 ideal',        th:150 },
-      { n:'Mkt/Realized Cap',  v: rnd(0.8,3.5).toFixed(2)+'x', b:'<1 = Ucuz',     th:1 },
-      { n:'Realized P/L',      v: (rnd(-20,40)).toFixed(1)+'%', b:'Kar/Zarar',     th:0 },
-      { n:'30D Volatilite',    v: rnd(40,120).toFixed(1)+'%',   b:'Ort: %65',      th:65 },
-    ].map(({ n, v, b }) => `
-      <div class="vc">
-        <div class="vn">${n}</div>
-        <div class="vv" style="color:var(--gold)">${v}</div>
-        <div class="vb">${b}</div>
-      </div>`).join('');
-    document.getElementById('val-note').style.display = 'block';
-    document.getElementById('val-note').textContent = 'Kripto varlıklar için P/E ve P/B gibi geleneksel değerleme çarpanları uygulanamaz. NVT, Realized Cap ve volatilite metrikleri kullanılmaktadır.';
+/* ════════════════════════════════════════════
+   VALUATION
+════════════════════════════════════════════ */
+function rVal(){
+  const d = G.d;
+  if(d.isCrypto){
+    $('val-hdr').textContent = 'Kripto Değerleme Metrikleri';
+    $('val-grid').innerHTML = [
+      {n:'NVT Ratio',      v:rnd(50,200).toFixed(0),     b:'<150 ideal'},
+      {n:'Mkt/Realized',   v:rnd(.8,3.5).toFixed(2)+'x', b:'<1 = Ucuz'},
+      {n:'30D Volatilite', v:rnd(40,120).toFixed(1)+'%',  b:'Ort: %65'},
+      {n:'Realized P/L',   v:rnd(-20,40).toFixed(1)+'%',  b:'Kar/Zarar'},
+    ].map(({n,v,b}) => `<div class="vc">
+      <div class="vn">${n}</div><div class="vv" style="color:var(--gold)">${v}</div>
+      <div class="vb">${b}</div></div>`).join('');
+    $('val-note').style.display = 'block';
+    $('val-note').textContent = 'Kripto için P/E, P/B gibi geleneksel metrikler uygulanamaz.';
     return;
   }
-
-  document.getElementById('val-hdr').textContent = 'Temel Analiz — Değerleme Çarpanları';
-  const metrics = [
-    { n:'P/E',        v: val.pe,       ideal:15, lo:5,   hi:40  },
-    { n:'P/FCF',      v: val.pfcf,     ideal:15, lo:7,   hi:55  },
-    { n:'P/Cash',     v: val.pcash,    ideal:10, lo:2,   hi:22  },
-    { n:'EV/Revenue', v: val.evRev,    ideal:3,  lo:0.3, hi:9   },
-    { n:'EV/EBIT',    v: val.evEbit,   ideal:15, lo:4,   hi:32  },
-    { n:'EV/EBITDA',  v: val.evEbitda, ideal:10, lo:3,   hi:20  },
-    { n:'PEG',        v: val.peg,      ideal:1.5,lo:0.3, hi:4.2 },
-    { n:'P/B',        v: val.pb,       ideal:3,  lo:0.4, hi:8   },
+  $('val-hdr').textContent = 'Temel Analiz — Değerleme Çarpanları';
+  const M = [
+    {n:'P/E',        v:d.val.pe,       id:15},
+    {n:'P/FCF',      v:d.val.pfcf,     id:15},
+    {n:'P/Cash',     v:d.val.pcash,    id:10},
+    {n:'EV/Revenue', v:d.val.evRev,    id:3},
+    {n:'EV/EBIT',    v:d.val.evEbit,   id:15},
+    {n:'EV/EBITDA',  v:d.val.evEbitda, id:10},
+    {n:'PEG',        v:d.val.peg,      id:1.5},
+    {n:'P/B',        v:d.val.pb,       id:3},
   ];
-
-  const cheapCount = metrics.filter(m => m.v < m.ideal).length;
-  G.d.valScore = cheapCount / metrics.length;
-
-  document.getElementById('val-grid').innerHTML = metrics.map(({ n, v, ideal }) => {
-    const cheap    = v < ideal;
-    const veryHigh = v > ideal * 2.2;
-    const color    = cheap ? 'var(--green)' : veryHigh ? 'var(--red)' : 'var(--gold)';
-    const tag      = cheap ? '✓ Makul/Ucuz' : veryHigh ? '⚠ Pahalı' : '◎ Orta';
+  const cheap = M.filter(m=>m.v<m.id).length;
+  G.d.valScore = cheap / M.length;
+  $('val-grid').innerHTML = M.map(({n,v,id}) => {
+    const ok=v<id, hi=v>id*2.2;
+    const col = ok?'var(--green)':hi?'var(--red)':'var(--gold)';
     return `<div class="vc">
       <div class="vn">${n}</div>
-      <div class="vv" style="color:${color}">${v.toFixed(1)}x</div>
-      <div class="vb">İdeal: &lt;${ideal}</div>
-      <div class="vt" style="color:${color}">${tag}</div>
+      <div class="vv" style="color:${col}">${v.toFixed(1)}x</div>
+      <div class="vb">İdeal: &lt;${id}</div>
+      <div class="vt" style="color:${col}">${ok?'✓ Makul':hi?'⚠ Pahalı':'◎ Orta'}</div>
     </div>`;
   }).join('');
-
-  document.getElementById('val-note').style.display = 'block';
-  document.getElementById('val-note').textContent =
-    `${cheapCount}/${metrics.length} metrik ideal değerin altında. ` +
-    (cheapCount >= 5 ? 'Değerleme makul görünüyor.' :
-     cheapCount <= 2 ? 'Değerleme yüksek, dikkatli olunmalı.' : 'Karma değerleme sinyali.');
+  $('val-note').style.display = 'block';
+  $('val-note').textContent = cheap+'/'+M.length+' metrik ideal altında. '+
+    (cheap>=5?'Değerleme makul görünüyor.':cheap<=2?'Değerleme yüksek, dikkat!':'Karma değerleme sinyali.');
 }
 
-// ══════════════════════════════════════════════════════
-// SIGNAL BARS
-// ══════════════════════════════════════════════════════
-const SIG_ROWS = [
-  { id:'sb-tech',  lbl:'Teknik Göstergeler' },
-  { id:'sb-form',  lbl:'Grafik Formasyonları' },
-  { id:'sb-cndl',  lbl:'Mum Formasyonları' },
-  { id:'sb-fib',   lbl:'Fibonacci/Ichimoku' },
-  { id:'sb-ew',    lbl:'Elliott Wave' },
-  { id:'sb-val',   lbl:'Değerleme' },
+/* ════════════════════════════════════════════
+   SIGNAL BARS
+════════════════════════════════════════════ */
+const SDEFS = [
+  {id:'tech',l:'Teknik Göstergeler'},
+  {id:'form',l:'Formasyonlar'},
+  {id:'cndl',l:'Mum Formasyonları'},
+  {id:'fib', l:'Fibonacci/Ichimoku'},
+  {id:'ew',  l:'Elliott Wave'},
+  {id:'val', l:'Değerleme'},
 ];
-
-function renderSigBars(scores) {
-  const container = document.getElementById('sig-bars');
-  container.innerHTML = SIG_ROWS.map(({ id, lbl }) => `
-    <div class="sig-row">
-      <div class="sig-lbl">${lbl}</div>
-      <div class="sig-track"><div class="sig-fill" id="${id}" style="width:0%"></div></div>
-      <div class="sig-pct" id="${id}-pct">—</div>
+function buildSigRows(){
+  $('sig-rows').innerHTML = SDEFS.map(({id,l}) => `
+    <div class="sr">
+      <div class="sl">${l}</div>
+      <div class="st"><div class="sf" id="sf-${id}"></div></div>
+      <div class="sp" id="sp-${id}" style="color:var(--dim2)">—</div>
     </div>`).join('');
-
-  if (!scores) return;
-
-  Object.entries(scores).forEach(([k, v]) => {
-    const el  = document.getElementById('sb-' + k);
-    const pct = document.getElementById('sb-' + k + '-pct');
-    if (!el) return;
+}
+function setSigBars(sc){
+  Object.entries(sc).forEach(([k,v]) => {
+    const f = $('sf-'+k), p = $('sp-'+k);
+    if(!f) return;
     setTimeout(() => {
-      el.style.width = v + '%';
-      el.style.background = v >= 60 ? 'var(--green)' : v >= 40 ? 'var(--gold)' : 'var(--red)';
-      pct.textContent = v + '%';
-      pct.style.color = v >= 60 ? 'var(--green)' : v >= 40 ? 'var(--gold)' : 'var(--red)';
-    }, 100);
+      f.style.width = v+'%';
+      const col = v>=60?'var(--green)':v>=40?'var(--gold)':'var(--red)';
+      f.style.background = col;
+      p.textContent = v+'%';
+      p.style.color = col;
+    }, 80);
   });
 }
 
-// ══════════════════════════════════════════════════════
-// SCORE RING
-// ══════════════════════════════════════════════════════
-function setScore(score) {
-  const arc   = document.getElementById('score-arc');
-  const circ  = 232;
-  arc.style.strokeDashoffset = circ - circ * score / 100;
-  const color = score >= 70 ? 'var(--green)' : score >= 55 ? '#6ee7b7' :
-                score >= 45 ? 'var(--gold)'  : score >= 30 ? 'var(--red)' : '#ff8fa3';
-  arc.style.stroke = color;
-  document.getElementById('score-num').textContent  = score;
-  document.getElementById('score-num').style.color  = color;
-  const lbl = score>=72?'📈 GÜÇLÜ AL':score>=58?'📈 AL':score>=47?'➡️ NÖTR':score>=32?'📉 SAT':'📉 GÜÇLÜ SAT';
-  document.getElementById('score-label').textContent = lbl;
-  document.getElementById('score-label').style.color = color;
+/* ════════════════════════════════════════════
+   SCORE RING
+════════════════════════════════════════════ */
+function setScore(score){
+  const arc=document.getElementById('score-arc'), circ=201;
+  arc.style.strokeDashoffset = circ - circ*score/100;
+  const col = score>=70?'var(--green)':score>=55?'#5eead4':score>=45?'var(--gold)':score>=30?'var(--red)':'#fb7185';
+  arc.style.stroke = col;
+  $('snum').textContent  = score;
+  $('snum').style.color  = col;
+  const lb = score>=72?'📈 GÜÇLÜ AL':score>=58?'📈 AL':score>=47?'➡️ NÖTR':score>=32?'📉 SAT':'📉 GÜÇLÜ SAT';
+  $('slabel').textContent = lb;
+  $('slabel').style.color = col;
 }
 
-// ══════════════════════════════════════════════════════
-// COMPUTE SCORE FROM INDICATOR DATA
-// ══════════════════════════════════════════════════════
-function computeScore() {
+/* ════════════════════════════════════════════
+   COMPUTE SCORE
+════════════════════════════════════════════ */
+function compScore(){
   const d = G.d;
-  let b = 0, r = 0;  // bull / bear points
-
-  // Trend (8 pts)
-  if (d.p > d.sma20)  b++; else r++;
-  if (d.p > d.sma50)  b++; else r++;
-  if (d.p > d.sma200) b++; else r++;
-  if (d.ema12 > d.ema26) b++; else r++;
-  if (d.sarBull)      b++; else r++;
-  if (d.macdBull)     b++; else r++;
-  if (d.obvBull)      b++; else r++;
-  if (d.adBull)       b++; else r++;
-
-  // Momentum (6 pts)
-  if (d.rsi < 30) b += 2; else if (d.rsi > 70) r += 2; else if (d.rsi < 50) b++; else r++;
-  if (d.stochK > d.stochD) b++; else r++;
-  if (d.cci < -100) b++; else if (d.cci > 100) r++;
-  if (d.mom > 0) b++; else r++;
-
-  // Ichimoku (5 pts)
-  if (d.ich) {
-    if (d.ich.aboveCloud) b += 2; else if (d.ich.belowCloud) r += 2;
-    if (d.ich.tkBull)    b++; else r++;
-    if (d.ich.bullCloud) b++; else r++;
-    if (d.chikou > d.p)  b++; else r++;
-  }
-
-  // Elliott (2 pts)
-  if (d.ewDir === 'up') b += 2; else r += 2;
-
-  // Valuation (4 pts)
-  if (!d.isCrypto && d.valScore !== undefined) {
-    b += Math.round(d.valScore * 4);
-    r += Math.round((1 - d.valScore) * 4);
-  }
-
-  // Formations (variable)
-  Object.values(d.forms).forEach(({ st, t }) => {
-    if (st === 'det') { if (t==='bull') b+=2; else if (t==='bear') r+=2; else b++; }
-    if (st === 'pos') { if (t==='bull') b++;  else if (t==='bear') r++; }
+  let b=0, r=0;
+  /* Trend 8 pts */
+  d.p>d.sma20?b++:r++;  d.p>d.sma50?b++:r++;  d.p>d.sma200?b++:r++;
+  d.ema12>d.ema26?b++:r++;  d.sarB?b++:r++;  d.macdB?b++:r++;
+  d.obvB?b++:r++;  d.adB?b++:r++;
+  /* Momentum 5 pts */
+  if(d.rsi<30)b+=2; else if(d.rsi>70)r+=2; else if(d.rsi<50)b++; else r++;
+  d.stochK>d.stochD?b++:r++;
+  if(d.cci<-100)b++; else if(d.cci>100)r++;
+  d.mom>0?b++:r++;
+  /* Ichimoku 5 pts */
+  if(d.ichAb)b+=2; else if(d.ichBl)r+=2;
+  d.ichTK?b++:r++;  d.ichBCl?b++:r++;  d.chi>d.p?b++:r++;
+  /* Elliott 2 pts */
+  d.ewD==='up'?b+=2:r+=2;
+  /* Valuation 4 pts */
+  if(!d.isCrypto){ b+=Math.round(d.valScore*4); r+=Math.round((1-d.valScore)*4); }
+  /* Formations */
+  Object.values(d.forms).forEach(({st,t}) => {
+    if(st==='det'){ t==='bull'?b+=2:t==='bear'?r+=2:b++; }
+    if(st==='pos'){ t==='bull'?b++:t==='bear'?r++:0; }
   });
-
-  // Candles (variable)
-  Object.values(d.candles).forEach(({ st, t }) => {
-    if (st === 'det') { if (t==='bull') b++; else if (t==='bear') r++; }
+  Object.values(d.candles).forEach(({st,t}) => {
+    if(st==='det'){ t==='bull'?b++:t==='bear'?r++:0; }
   });
-
-  const total = b + r;
-  const score = total > 0 ? Math.min(100, Math.round(b / total * 100)) : 50;
-
-  // Per-category scores for bars
-  const techB = [d.p>d.sma20,d.p>d.sma50,d.ema12>d.ema26,d.macdBull,d.sarBull,d.obvBull,d.adBull].filter(Boolean).length;
-  const techPct = Math.round(techB / 7 * 100);
-
-  let fb=0,fr=0, cb=0,cr=0;
-  Object.values(d.forms).forEach(({st,t})=>{if(st==='det'){if(t==='bull')fb++;else if(t==='bear')fr++;}});
-  Object.values(d.candles).forEach(({st,t})=>{if(st==='det'){if(t==='bull')cb++;else if(t==='bear')cr++;}});
-  const formPct   = (fb+fr)>0 ? Math.round(fb/(fb+fr)*100) : 50;
-  const candlePct = (cb+cr)>0 ? Math.round(cb/(cb+cr)*100) : 50;
-  const fibPct    = d.ich ? (d.ich.aboveCloud ? 70 : d.ich.belowCloud ? 30 : 50) : 50;
-  const ewPct     = d.ewDir === 'up' ? 70 : 35;
-  const valPct    = d.isCrypto ? 50 : Math.round((d.valScore||0.5)*100);
-
-  return { score, b, r, scores: { tech:techPct, form:formPct, cndl:candlePct, fib:fibPct, ew:ewPct, val:valPct } };
+  const total = b+r;
+  const score = total>0 ? Math.min(100, Math.round(b/total*100)) : 50;
+  /* Per-category */
+  const tB = [d.p>d.sma20,d.p>d.sma50,d.ema12>d.ema26,d.macdB,d.sarB,d.obvB,d.adB].filter(Boolean).length;
+  let fb=0,fr=0,cb=0,cr=0;
+  Object.values(d.forms).forEach(({st,t})=>{if(st==='det'){t==='bull'?fb++:t==='bear'?fr++:0;}});
+  Object.values(d.candles).forEach(({st,t})=>{if(st==='det'){t==='bull'?cb++:t==='bear'?cr++:0;}});
+  return { score, b, r, sc: {
+    tech: Math.round(tB/7*100),
+    form: (fb+fr)>0 ? Math.round(fb/(fb+fr)*100) : 50,
+    cndl: (cb+cr)>0 ? Math.round(cb/(cb+cr)*100) : 50,
+    fib:  d.ichAb?70:d.ichBl?30:50,
+    ew:   d.ewD==='up'?72:35,
+    val:  d.isCrypto ? 50 : Math.round((d.valScore||.5)*100),
+  }};
 }
 
-// ══════════════════════════════════════════════════════
-// FULL AI ANALYSIS
-// ══════════════════════════════════════════════════════
-async function runAI() {
-  if (!G.ready) { loadSymbol(); await new Promise(r => setTimeout(r, 300)); }
+/* ════════════════════════════════════════════
+   AI ANALYSIS
+════════════════════════════════════════════ */
+async function runAI(){
+  if(!G.ready){ load(); await new Promise(r=>setTimeout(r,400)); }
 
-  const btn = document.getElementById('ai-btn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Analiz ediliyor...';
+  const btn = $('ai-btn');
+  btn.disabled = true; btn.textContent = '⏳...';
 
-  const out = document.getElementById('ai-out');
+  const out = $('ai-out');
   out.innerHTML = `
-    <div class="thinking">
-      <span>Tüm göstergeler analiz ediliyor</span>
+    <div class="thinking"><span>Analiz ediliyor</span>
       <div class="dots"><span></span><span></span><span></span></div>
     </div>
-    <div style="font-size:10px;color:var(--dim);line-height:2.3;padding:4px 0">
-      ⬝ Trend göstergeleri...<br>
-      ⬝ Momentum osilatörleri...<br>
-      ⬝ Grafik formasyonları...<br>
-      ⬝ Mum formasyonları...<br>
-      ⬝ Fibonacci seviyeleri...<br>
-      ⬝ Ichimoku bulut...<br>
-      ⬝ Elliott Dalga sayımı...<br>
-      ⬝ Değerleme çarpanları...
-    </div>`;
+    <div style="font-size:10px;color:var(--dim2);line-height:2.4;padding:4px 0">
+    ⬝ Trend...<br>⬝ Momentum...<br>⬝ Formasyonlar...<br>
+    ⬝ Fibonacci...<br>⬝ Ichimoku...<br>⬝ Elliott...<br>⬝ Değerleme...</div>`;
 
-  const d = G.d, c = G.cur;
+  const d=G.d, c=G.cur;
+  const dF = Object.entries(d.forms).filter(([,v])=>v.st==='det').map(([k])=>k).join(', ') || 'Tespit edilmedi';
+  const dC = Object.entries(d.candles).filter(([,v])=>v.st==='det').map(([k])=>k).join(', ') || 'Tespit edilmedi';
 
-  const detForms  = Object.entries(d.forms).filter(([,v])=>v.st==='det').map(([k])=>k).join(', ') || 'Tespit edilmedi';
-  const posForms  = Object.entries(d.forms).filter(([,v])=>v.st==='pos').map(([k])=>k).join(', ') || 'Yok';
-  const detCndl   = Object.entries(d.candles).filter(([,v])=>v.st==='det').map(([k])=>k).join(', ') || 'Tespit edilmedi';
+  const prompt = `Sen AlphaTerminal Pro AI analistsin. ${G.sym} (${ELAB[G.exch]||G.exch}) analizi yap. Türkçe, gerçek analist üslubuyla yaz.
 
-  const f618 = fp(d.swHigh - d.swDiff * 0.618);
-  const f382 = fp(d.swHigh - d.swDiff * 0.382);
-  const f500 = fp(d.swHigh - d.swDiff * 0.500);
-  const ext161 = fp(d.swLow + d.swDiff * 1.618);
-  const ext261 = fp(d.swLow + d.swDiff * 2.618);
+== SEMBOL ==
+${G.sym} | ${ELAB[G.exch]||G.exch} | ${ILAB[G.intv]||G.intv} | Fiyat: ${fp(d.p)} ${c}
 
-  const ichSt = d.ich
-    ? (d.ich.aboveCloud?'BULUT ÜSTÜNDE (Güçlü Boğa)':d.ich.belowCloud?'BULUT ALTINDA (Güçlü Ayı)':'BULUT İÇİNDE (Belirsiz)')
-    : '—';
+== TREND ==
+SMA20:${fp(d.sma20)}(${d.p>d.sma20?'AL':'SAT'}) SMA50:${fp(d.sma50)}(${d.p>d.sma50?'AL':'SAT'}) SMA200:${fp(d.sma200)}(${d.p>d.sma200?'AL':'SAT'})
+EMA12:${fp(d.ema12)} EMA26:${fp(d.ema26)} → ${d.ema12>d.ema26?'Golden Cross':'Death Cross'}
+SAR:${fp(d.sar)}(${d.sarB?'AL':'SAT'}) MACD:${d.macdB?'Pozitif crossover':'Negatif crossover'}
 
-  const valTxt = d.isCrypto
-    ? 'Kripto: geleneksel çarpan uygulanamaz'
-    : `P/E:${d.val.pe.toFixed(1)} P/B:${d.val.pb.toFixed(2)} EV/EBITDA:${d.val.evEbitda.toFixed(1)} PEG:${d.val.peg.toFixed(2)}`;
+== MOMENTUM ==
+RSI:${d.rsi.toFixed(1)}(${d.rsi<30?'AŞIRI SATIM':d.rsi>70?'AŞIRI ALIM':'Nötr'})
+Stoch: K=${d.stochK.toFixed(1)} D=${d.stochD.toFixed(1)} (${d.stochK>d.stochD?'AL':'SAT'})
+CCI:${d.cci.toFixed(0)} Mom:${(d.mom>=0?'+':'')+d.mom.toFixed(1)}%
+BB: Üst=${fp(d.bbU)} Alt=${fp(d.bbL)} Genişlik=%${d.bbW.toFixed(1)}
 
-  const prompt = `Sen AlphaTerminal Pro'nun profesyonel AI analiz asistanısın. Aşağıdaki verilerle ${G.sym} (${EXCH_LABEL[G.exch]||G.exch}) için GERÇEK BİR ANALİST üslubuyla kapsamlı Türkçe analiz yap.
+== HACİM ==
+OBV:${d.obvB?'Pozitif':'Negatif'} A/D:${d.adB?'Birikim':'Dağıtım'} HacimOran:${d.volR.toFixed(2)}x
 
-=== SEMBOL & FİYAT ===
-Sembol: ${G.sym} | Borsa: ${EXCH_LABEL[G.exch]||G.exch} | Zaman: ${INTV_LABEL[G.intv]||G.intv}
-Fiyat: ${fp(d.p)} ${c}
+== FİBONACCİ ==
+Swing H:${fp(d.swH)} ${c} | Swing L:${fp(d.swL)} ${c}
+%38.2:${fp(d.swH-d.swD*.382)} | %61.8:${fp(d.swH-d.swD*.618)} | Ext%161.8:${fp(d.swL+d.swD*1.618)} (hepsi ${c})
 
-=== TREND & HAREKETLI ORTALAMALAR ===
-SMA20:${fp(d.sma20)} (${d.p>d.sma20?'AL':'SAT'}) | SMA50:${fp(d.sma50)} (${d.p>d.sma50?'AL':'SAT'}) | SMA200:${fp(d.sma200)} (${d.p>d.sma200?'AL':'SAT'})
-WMA20:${fp(d.wma20)} | EMA12:${fp(d.ema12)} | EMA26:${fp(d.ema26)} → ${d.ema12>d.ema26?'Golden Cross':'Death Cross'}
-Parabolic SAR:${fp(d.sar)} → ${d.sarBull?'AL (fiyat üstünde)':'SAT (fiyat altında)'}
-MACD: ${d.macdBull?'Pozitif crossover → AL':'Negatif crossover → SAT'}
+== İCHİMOKU ==
+Tenkan:${fp(d.ten)} Kijun:${fp(d.kij)} SenkouA:${fp(d.senA)} B:${fp(d.senB)}
+${d.ichAb?'BULUT ÜSTÜNDE':d.ichBl?'BULUT ALTINDA':'BULUT İÇİNDE'} | TK:${d.ichTK?'Pozitif':'Negatif'} Bulut:${d.ichBCl?'Yeşil':'Kırmızı'}
 
-=== MOMENTUM ===
-RSI(14):${d.rsi.toFixed(1)} → ${d.rsi<30?'AŞIRI SATIM':d.rsi>70?'AŞIRI ALIM':'Nötr'}
-Stoch: %K=${d.stochK.toFixed(1)} %D=${d.stochD.toFixed(1)} → ${d.stochK>d.stochD?'AL':'SAT'}
-CCI:${d.cci.toFixed(0)} → ${d.cci<-100?'Aşırı Satım':d.cci>100?'Aşırı Alım':'Normal'}
-Momentum: ${(d.mom>=0?'+':'')+d.mom.toFixed(1)}%
-Bollinger: Üst=${fp(d.bbUpper)} Orta=${fp(d.bbMid)} Alt=${fp(d.bbLower)} | Genişlik=%${d.bbWidth.toFixed(1)}
+== FORMASYONLAR ==
+Grafik: ${dF}
+Mum: ${dC}
 
-=== HACİM ===
-OBV: ${d.obvBull?'Pozitif (birikim)':'Negatif (dağıtım)'}
-A/D Index: ${d.adBull?'Birikim':'Dağıtım'}
-ATR%: ${d.atr.toFixed(2)} | Hacim oranı: ${d.volRat.toFixed(2)}x
+== ELLIOTT ==
+Aktif: ${d.ewL} (${d.ewD==='up'?'Yükseliş':'Düşüş'})
 
-=== FİBONACCİ ===
-Swing High: ${fp(d.swHigh)} ${c} | Swing Low: ${fp(d.swLow)} ${c}
-%38.2 Destek: ${f382} ${c}
-%50.0 Destek: ${f500} ${c}
-%61.8 Destek: ${f618} ${c}
-%161.8 Extension Hedef: ${ext161} ${c}
-%261.8 Extension Hedef: ${ext261} ${c}
+== DEĞERLEME ==
+${d.isCrypto?'Kripto':Object.entries(d.val||{}).map(([k,v])=>k.toUpperCase()+':'+v.toFixed(1)).join(' ')}
 
-=== İCHİMOKU ===
-Tenkan:${fp(d.tenkan)} | Kijun:${fp(d.kijun)}
-Senkou A:${fp(d.senA)} | Senkou B:${fp(d.senB)}
-Chikou:${fp(d.chikou)}
-Durum: ${ichSt}
-TK Kesişimi: ${d.ich?.tkBull?'Pozitif (AL)':'Negatif (SAT)'}
-
-=== GRAFİK FORMASYONLARI ===
-Tespit edilen: ${detForms}
-Olası: ${posForms}
-
-=== MUM FORMASYONLARI ===
-Tespit edilen: ${detCndl}
-
-=== ELLIOTT DALGA ===
-Aktif dalga: ${d.ewWave} | Yön: ${d.ewDir==='up'?'Yukarı':'Aşağı'}
-
-=== DEĞERLEME ===
-${valTxt}
-
-=== ÇIKTI FORMATI (tam olarak bu başlıkları kullan) ===
+== ÇIKTI — TAM BU BAŞLIKLARI KULLAN ==
 
 [OZET_KARAR]
-Güçlü Al / Al / Nötr / Sat / Güçlü Sat — 2-3 cümle temel gerekçe.
+Kısa ve net AL/SAT/NÖTR kararı + 2-3 cümle temel gerekçe.
 
 [GUCLU_SINYALLER]
-En güçlü 3-5 AL veya SAT sinyalini gösterge adı ve fiyatıyla listele.
+En güçlü 3-5 sinyal — gösterge adı ve ${c} cinsinden değerle.
 
 [RISKLER]
 2-4 somut risk faktörü.
 
 [DESTEK_SEVIYELERI]
-3 kritik destek — her birinin fiyatını ${c} cinsinden yaz. Fibonacci, Ichimoku veya teknikten türet.
+3 kritik destek — ${c} cinsinden kesin fiyatlar. Fibonacci, Ichimoku veya MA'dan türet.
 
 [DIRENC_SEVIYELERI]
-3 kritik direnç — ${c} cinsinden fiyatlar.
+3 kritik direnç — ${c} cinsinden kesin fiyatlar.
 
 [SENARYO]
-BOGA: hedef ve tetikleyici koşul. AYI: stop ve kötü senaryo.
+BOGA: hedef fiyat ve tetikleyici koşul.
+AYI: stop seviyesi ve en kötü senaryo.
 
 [DEGERLEME]
-${d.isCrypto?'Kripto metrikler üzerinden yorum.':'Çarpan analizi: ucuz mu pahalı mı, sektörle karşılaştır.'}
-
-Somut ol. Gerçek analist gibi yaz.`;
+${d.isCrypto?'Kripto metrikler ve değerlendirme.':'Çarpan analizi. Sektör ortalamasıyla kıyasla.'}`;
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1514,157 +1476,117 @@ Somut ol. Gerçek analist gibi yaz.`;
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1800,
-        messages: [{ role: 'user', content: prompt }]
+        messages: [{ role:'user', content:prompt }]
       })
     });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error((err.error && err.error.message) || `HTTP ${res.status}`);
+    if(!res.ok){
+      const e = await res.json().catch(()=>({}));
+      throw new Error((e.error&&e.error.message)||'HTTP '+res.status);
     }
-
     const json = await res.json();
-    const text = (json.content || []).map(x => x.text || '').join('');
-    if (!text) throw new Error('Boş yanıt alındı.');
-
-    G.chatHist = [
-      { role: 'user',      content: prompt },
-      { role: 'assistant', content: text   }
-    ];
-
-    renderAIOutput(text);
-
-    // Compute & display score
-    const { score, b, r, scores } = computeScore();
+    const text = (json.content||[]).map(x=>x.text||'').join('');
+    if(!text) throw new Error('Boş yanıt alındı.');
+    G.hist = [{role:'user',content:prompt},{role:'assistant',content:text}];
+    renderAIOut(text);
+    const {score,b,r,sc} = compScore();
     setScore(score);
-    document.getElementById('score-sub').textContent = `${b} boğa puan  ·  ${r} ayı puan`;
-    renderSigBars(scores);
-
-  } catch (e) {
-    out.innerHTML = `<div class="ai-box bear">⚠️ API Hatası: ${e.message}</div>`;
+    $('ssub').textContent = b+' boğa · '+r+' ayı puan';
+    setSigBars(sc);
+  } catch(e) {
+    out.innerHTML = `<div class="abox bear">⚠️ API Hatası: ${e.message}</div>`;
   }
 
-  btn.disabled = false;
-  btn.textContent = '🤖 TAM ANALİZ';
+  btn.disabled = false; btn.textContent = '🤖 ANALİZ';
 }
 
-// ══════════════════════════════════════════════════════
-// RENDER AI OUTPUT
-// ══════════════════════════════════════════════════════
-function renderAIOutput(text) {
-  const SECTIONS = [
-    { key:'OZET_KARAR',       label:'📊 ÖZET KARAR',         cls:'info'  },
-    { key:'GUCLU_SINYALLER',  label:'✅ GÜÇLÜ SİNYALLER',    cls:'bull'  },
-    { key:'RISKLER',          label:'⚠️ RİSKLER',             cls:'bear'  },
-    { key:'DESTEK_SEVIYELERI',label:'🟢 DESTEK SEVİYELERİ',   cls:'bull'  },
-    { key:'DIRENC_SEVIYELERI',label:'🔴 DİRENÇ SEVİYELERİ',   cls:'bear'  },
-    { key:'SENARYO',          label:'🔭 SENARYO ANALİZİ',     cls:'neut'  },
-    { key:'DEGERLEME',        label:'💰 DEĞERLEME GÖRÜŞÜ',    cls:'info'  },
+/* ════════════════════════════════════════════
+   RENDER AI OUTPUT
+════════════════════════════════════════════ */
+function renderAIOut(text){
+  const S = [
+    {k:'OZET_KARAR',       l:'📊 ÖZET KARAR',          c:'info'},
+    {k:'GUCLU_SINYALLER',  l:'✅ GÜÇLÜ SİNYALLER',     c:'bull'},
+    {k:'RISKLER',          l:'⚠️ RİSKLER',              c:'bear'},
+    {k:'DESTEK_SEVIYELERI',l:'🟢 DESTEK SEVİYELERİ',    c:'bull'},
+    {k:'DIRENC_SEVIYELERI',l:'🔴 DİRENÇ SEVİYELERİ',    c:'bear'},
+    {k:'SENARYO',          l:'🔭 SENARYO ANALİZİ',      c:'neu'},
+    {k:'DEGERLEME',        l:'💰 DEĞERLEME GÖRÜŞÜ',     c:'info'},
   ];
+  const HC = {info:'var(--cyan)',bull:'var(--green)',bear:'var(--red)',neu:'var(--gold)'};
 
-  // Extract sections
   const found = {};
-  SECTIONS.forEach(s => {
-    const tag = `[${s.key}]`;
-    const idx = text.indexOf(tag);
-    if (idx === -1) return;
-    const start = idx + tag.length;
+  S.forEach(s => {
+    const tag = '['+s.k+']', idx = text.indexOf(tag);
+    if(idx===-1) return;
     let end = text.length;
-    SECTIONS.forEach(s2 => {
-      if (s2.key === s.key) return;
-      const i2 = text.indexOf(`[${s2.key}]`);
-      if (i2 > idx && i2 < end) end = i2;
+    S.forEach(s2 => {
+      if(s2.k===s.k) return;
+      const i2 = text.indexOf('['+s2.k+']');
+      if(i2>idx && i2<end) end = i2;
     });
-    found[s.key] = text.substring(start, end).trim();
+    found[s.k] = text.substring(idx+tag.length, end).trim();
   });
 
-  const out = document.getElementById('ai-out');
-
-  if (Object.keys(found).length === 0) {
-    // Fallback: show raw
-    out.innerHTML = `<div class="ai-box info" style="white-space:pre-wrap;font-size:11px;line-height:1.8">${text}</div>`;
+  const out = $('ai-out');
+  if(!Object.keys(found).length){
+    out.innerHTML = `<div class="abox info" style="white-space:pre-wrap;line-height:1.8;font-size:11px">${text}</div>`;
     return;
   }
-
-  const hdrColor = { info:'var(--accent)', bull:'var(--green)', bear:'var(--red)', neut:'var(--gold)' };
-  out.innerHTML = SECTIONS.map(s => {
-    const content = found[s.key];
-    if (!content) return '';
-    return `<div class="ai-sec">
-      <div class="ai-sec-hdr" style="color:${hdrColor[s.cls]}">${s.label}</div>
-      <div class="ai-box ${s.cls}">${content.replace(/\n/g, '<br>')}</div>
+  out.innerHTML = S.map(s => {
+    const cnt = found[s.k]; if(!cnt) return '';
+    return `<div class="asec">
+      <div class="ahdr" style="color:${HC[s.c]}">${s.l}</div>
+      <div class="abox ${s.c}">${cnt.replace(/\n/g,'<br>')}</div>
     </div>`;
   }).join('');
 }
 
-// ══════════════════════════════════════════════════════
-// CHAT
-// ══════════════════════════════════════════════════════
-async function sendChat() {
-  const inp = document.getElementById('chat-in');
-  const q   = inp.value.trim();
-  if (!q) return;
+/* ════════════════════════════════════════════
+   CHAT
+════════════════════════════════════════════ */
+async function sendChat(){
+  const inp = $('chat-in');
+  const q = inp.value.trim(); if(!q) return;
   inp.value = '';
-
-  const out = document.getElementById('ai-out');
+  const out = $('ai-out');
   out.innerHTML += `
-    <div class="ai-sec">
-      <div class="ai-box chat-q"><b>Sen:</b> ${q}</div>
-    </div>
-    <div class="thinking" id="think-bubble">
-      <span>Yanıt</span>
+    <div class="asec"><div class="abox cq"><b>Sen:</b> ${q}</div></div>
+    <div class="thinking" id="tbub"><span>Yanıt</span>
       <div class="dots"><span></span><span></span><span></span></div>
     </div>`;
   out.scrollTop = out.scrollHeight;
-
-  G.chatHist.push({
-    role: 'user',
-    content: `${q}  [Bağlam: ${G.sym} @ ${fp(G.price)} ${G.cur}, ${EXCH_LABEL[G.exch]||G.exch}]`
-  });
-
+  G.hist.push({role:'user', content:q+' ['+G.sym+' @ '+fp(G.price)+' '+G.cur+']'});
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 700,
-        system: `AlphaTerminal Pro AI analist. ${G.sym} (${EXCH_LABEL[G.exch]||G.exch}) analizi yapıyorsun. Para birimi ${G.cur}. Kısa, net, Türkçe cevaplar ver.`,
-        messages: G.chatHist.slice(-8)
+        model:'claude-sonnet-4-20250514', max_tokens:700,
+        system:'AlphaTerminal Pro AI analistsin. '+G.sym+' ('+( ELAB[G.exch]||G.exch)+') analisti. Para birimi '+G.cur+'. Kısa, net, Türkçe cevaplar ver.',
+        messages: G.hist.slice(-8)
       })
     });
-
-    const json  = await res.json();
-    const reply = (json.content || []).map(x => x.text || '').join('') || 'Yanıt alınamadı.';
-    G.chatHist.push({ role: 'assistant', content: reply });
-
-    document.getElementById('think-bubble')?.remove();
-    out.innerHTML += `
-      <div class="ai-sec">
-        <div class="ai-box chat-a">
-          <b style="color:var(--purple)">🤖 AI:</b><br><br>
-          ${reply.replace(/\n/g, '<br>')}
-        </div>
-      </div>`;
-  } catch (e) {
-    document.getElementById('think-bubble')?.remove();
-    out.innerHTML += `<div class="ai-box bear">⚠️ ${e.message}</div>`;
+    const json = await res.json();
+    const reply = (json.content||[]).map(x=>x.text||'').join('') || 'Yanıt alınamadı.';
+    G.hist.push({role:'assistant', content:reply});
+    $('tbub')?.remove();
+    out.innerHTML += `<div class="asec"><div class="abox ca"><b style="color:var(--violet)">🤖 AI:</b><br><br>${reply.replace(/\n/g,'<br>')}</div></div>`;
+  } catch(e) {
+    $('tbub')?.remove();
+    out.innerHTML += `<div class="abox bear">⚠️ ${e.message}</div>`;
   }
-
   out.scrollTop = out.scrollHeight;
 }
 
-// ══════════════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════════════
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
-  renderSigBars(null);
-  document.getElementById('inp-sym').addEventListener('keydown', e => {
-    if (e.key === 'Enter') loadSymbol();
-  });
-  document.getElementById('chat-in').addEventListener('keydown', e => {
-    if (e.key === 'Enter') sendChat();
-  });
+  buildSigRows();
+  updateTopH();
+  window.addEventListener('resize', updateTopH);
+
+  $('sym').addEventListener('keydown',   e => { if(e.key==='Enter') load(); });
+  $('chat-in').addEventListener('keydown', e => { if(e.key==='Enter') sendChat(); });
 });
 </script>
 </body>
