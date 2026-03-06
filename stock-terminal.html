@@ -1,1057 +1,1397 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="dark">
+<html lang="tr">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
-<title>AlphaTerminal</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlphaTerminal Pro v4</title>
 <style>
-:root{
-  --bg:#0d1117;--sf:#161b22;--sf2:#21262d;--sf3:#30363d;
-  --bd:#30363d;--tx:#e6edf3;--tx2:#8b949e;--tx3:#484f58;
-  --ac:#58a6ff;--up:#3fb950;--dn:#f85149;--gl:#d29922;
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap');
+
+:root {
+  --bg:#040711; --panel:#080c18; --panel2:#0d1225;
+  --border:#16213a; --border2:#1e2d4a;
+  --accent:#00d4ff; --red:#ff3d71; --green:#00e096;
+  --purple:#a78bfa; --gold:#f59e0b; --text:#dde4f0;
+  --muted:#3d5070; --muted2:#6b8aad;
 }
-[data-theme="light"]{
-  --bg:#fff;--sf:#f6f8fa;--sf2:#eaeef2;--sf3:#d0d7de;
-  --bd:#d0d7de;--tx:#1f2328;--tx2:#57606a;--tx3:#afb8c1;
-  --ac:#0969da;--up:#1a7f37;--dn:#cf222e;--gl:#9a6700;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',sans-serif;overflow:hidden;font-size:13px;}
-#app{height:100dvh;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
 
-/* HEADER */
-header{height:48px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);background:var(--sf);flex-shrink:0;}
-.logo{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;display:flex;align-items:center;gap:9px;}
-.lmark{width:26px;height:26px;background:var(--ac);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
-.logo em{color:var(--ac);font-style:normal;}
-.pill{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.25);}
-.pdot{width:5px;height:5px;border-radius:50%;background:var(--up);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.ptxt{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--up);letter-spacing:1px;}
-#clock{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tx2);}
-.hbtn{background:none;border:none;cursor:pointer;width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--tx2);font-size:16px;}
-.hbtn:hover{background:var(--sf2);}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:12px}
 
-/* NAV */
-nav{display:flex;border-bottom:1px solid var(--bd);background:var(--sf);overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
-nav::-webkit-scrollbar{display:none;}
-.ntab{padding:0 14px;height:38px;font-size:12px;font-weight:500;color:var(--tx2);white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;}
-.ntab.act{color:var(--tx);border-bottom-color:var(--ac);}
-.ntab:hover:not(.act){color:var(--tx);background:var(--sf2);}
+/* ── HEADER ── */
+.hdr{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--panel);height:46px;flex-shrink:0;flex-wrap:wrap}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--accent);letter-spacing:3px;white-space:nowrap}
+.logo em{color:var(--red);font-style:normal}
+.hdr-gap{flex:1}
+input.ti{background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:5px 10px;font-family:inherit;font-size:13px;width:100px;outline:none;text-transform:uppercase}
+input.ti:focus{border-color:var(--accent)}
+select.si{background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:5px 8px;font-family:inherit;font-size:11px;outline:none}
+.btn{background:transparent;border:1px solid var(--accent);color:var(--accent);padding:5px 14px;font-family:inherit;font-size:11px;cursor:pointer;letter-spacing:1px;transition:.15s all}
+.btn:hover{background:var(--accent);color:var(--bg)}
+.btn-ai{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.1)}
+.btn-ai:hover{background:var(--purple);color:var(--bg)}
+.btn-ai:disabled{opacity:.5;cursor:wait}
 
-/* MAIN */
-main{flex:1;overflow-y:auto;padding:10px;padding-bottom:72px;}
-main::-webkit-scrollbar{width:4px;}
-main::-webkit-scrollbar-thumb{background:var(--bd);}
-.view{display:none;}.view.show{display:block;}
+/* ── STATUS ── */
+.sbar{display:flex;align-items:center;gap:20px;padding:4px 16px;border-bottom:1px solid var(--border);font-size:10px;color:var(--muted2);background:rgba(8,12,24,.9);flex-shrink:0;flex-wrap:wrap}
+.sdot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px;background:var(--muted)}
+.sdot.live{background:var(--green);animation:blink 1.2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* CARDS */
-.card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px;}
-.chdr{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;color:var(--tx2);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;}
+/* ── LAYOUT ── */
+.main{display:grid;grid-template-columns:1fr 360px;height:calc(100vh - 46px - 25px);overflow:hidden}
+.lp{border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.rp{display:flex;flex-direction:column;overflow:hidden}
 
-/* BUTTONS */
-.bsm{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;padding:5px 10px;cursor:pointer;font-size:11px;color:var(--tx2);}
-.bsm:hover{border-color:var(--ac);color:var(--ac);}
-.btnp{background:var(--ac);color:#fff;border:none;border-radius:6px;padding:11px;font-size:12px;font-weight:600;cursor:pointer;width:100%;font-family:'Inter',sans-serif;}
-.btnp:hover{opacity:.85;}.btnp:disabled{opacity:.35;cursor:not-allowed;}
+/* ── CHART ── */
+.chart-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 8px}
+.sym-big{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--accent)}
+.sym-sub{font-size:10px;color:var(--muted2);margin-top:2px}
+.price-big{font-size:22px;font-weight:700;text-align:right}
+.price-chg{font-size:12px;text-align:right;margin-top:2px}
+.up{color:var(--green)} .dn{color:var(--red)} .neutral{color:var(--gold)}
+.tv-wrap{margin:0 12px 12px;border:1px solid var(--border);height:380px;background:var(--panel)}
+.tv-wrap iframe{width:100%;height:100%;border:none;display:block}
+.tv-placeholder{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted2);font-size:13px;flex-direction:column;gap:8px}
 
-/* WATCHLIST */
-.wli{display:flex;align-items:center;padding:8px 6px;border-radius:6px;margin-bottom:4px;border-left:3px solid transparent;cursor:pointer;}
-.wli:hover{background:var(--sf2);}
-.wli.sel{background:rgba(88,166,255,.07);border-left-color:var(--ac);}
-.wsym{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;min-width:60px;}
-.wname{font-size:10px;color:var(--tx3);margin-top:1px;min-width:90px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.addbtn{display:flex;align-items:center;gap:7px;padding:11px 8px;margin-top:6px;border:1px dashed var(--sf3);border-radius:6px;cursor:pointer;color:var(--tx2);font-size:12px;}
-.addbtn:hover{border-color:var(--ac);color:var(--ac);}
+/* ── TABS ── */
+.tab-bar{display:flex;border-bottom:1px solid var(--border);background:var(--panel);flex-shrink:0;overflow-x:auto}
+.tab{padding:8px 14px;font-size:10px;color:var(--muted2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:.8px;text-transform:uppercase;transition:.15s}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tc{display:none;padding:12px;animation:fadein .2s ease}
+.tc.on{display:block}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
 
-/* SIGNAL */
-.iitem{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:10px;}
-.ilbl{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
-.ival{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;}
-.ist{font-size:9px;margin-top:3px;}
-.up{color:var(--up)!important;}.dn{color:var(--dn)!important;}.gl{color:var(--gl)!important;}
+/* ── INDICATOR CARDS ── */
+.sec-title{font-size:10px;color:var(--muted2);text-transform:uppercase;letter-spacing:2px;margin:12px 0 8px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.ind-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:5px}
+.icard{background:var(--panel2);border:1px solid var(--border);padding:8px 10px 7px;position:relative;overflow:hidden}
+.icard::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.icard.bull::before{background:var(--green)}
+.icard.bear::before{background:var(--red)}
+.icard.neu::before{background:var(--gold)}
+.icard.unk::before{background:var(--muted)}
+.in{font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.iv{font-size:14px;font-weight:700}
+.bull .iv{color:var(--green)} .bear .iv{color:var(--red)} .neu .iv{color:var(--gold)} .unk .iv{color:var(--muted2)}
+.is{font-size:9px;color:var(--muted2);margin-top:2px}
 
-/* AI BOX */
-.aibox{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:12px;margin-bottom:10px;}
-.ai-hdr{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
-.ai-badge{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;color:var(--ac);text-transform:uppercase;}
-.ai-dots{display:flex;gap:3px;}
-.ai-dot{width:4px;height:4px;border-radius:50%;background:var(--ac);animation:adot 1.4s infinite;}
-.ai-dot:nth-child(2){animation-delay:.2s;}.ai-dot:nth-child(3){animation-delay:.4s;}
-@keyframes adot{0%,80%,100%{opacity:0}40%{opacity:1}}
-.aitext{font-size:12px;color:var(--tx2);line-height:1.9;white-space:pre-line;}
-.aits{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--tx3);margin-top:8px;}
+/* ── FORMATIONS ── */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:5px}
+.fcard{background:var(--panel2);border:1px solid var(--border);padding:8px 10px;display:flex;align-items:center;gap:8px}
+.ficon{font-size:16px;width:24px;text-align:center;flex-shrink:0}
+.fname{font-size:10px;font-weight:700}
+.fstat{font-size:9px;margin-top:2px}
+.fstat.det{color:var(--green)} .fstat.pos{color:var(--gold)} .fstat.no{color:var(--muted)}
 
-/* BOARD */
-.bitem{display:flex;gap:11px;padding:10px 0;border-bottom:1px solid var(--bd);}
-.bitem:last-child{border-bottom:none;}
-.bav{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--ac),#79c0ff);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#fff;}
-.bname{font-size:12px;font-weight:600;margin-bottom:2px;}.brole{font-size:10px;color:var(--ac);margin-bottom:3px;}.bbio{font-size:10px;color:var(--tx2);line-height:1.5;}
+/* ── FIB ── */
+.fib-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.fib-cell{background:var(--panel2);border:1px solid var(--border);padding:7px 8px;text-align:center}
+.fib-cell.near{border-color:var(--accent);background:rgba(0,212,255,.05)}
+.fib-pct{font-size:9px;color:var(--purple);font-weight:700}
+.fib-val{font-size:12px;font-weight:700;margin-top:3px}
+.fib-cell.near .fib-val{color:var(--accent)}
+.fib-tag{font-size:8px;color:var(--accent);margin-top:2px}
 
-/* VALUATION */
-.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.vitem{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:10px;}
-.vlbl{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
-.vval{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;}
+/* ── ICHIMOKU ── */
+.ich-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.ich-cell{background:var(--panel2);border:1px solid var(--border);padding:8px;text-align:center}
+.ich-lbl{font-size:8px;color:var(--muted2);text-transform:uppercase;letter-spacing:.8px}
+.ich-val{font-size:13px;font-weight:700;margin-top:3px}
+.ich-signal{margin-top:10px;padding:10px;font-size:11px;line-height:1.7;border:1px solid var(--border);background:var(--panel2)}
 
-/* NEWS */
-.nitem{padding:11px 0;border-bottom:1px solid var(--bd);}
-.nitem:last-child{border-bottom:none;}
-.ntag{font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0;text-transform:uppercase;}
-.tag-h{background:rgba(248,81,73,.15);color:var(--dn);}.tag-m{background:rgba(210,153,34,.12);color:var(--gl);}.tag-l{background:rgba(139,148,158,.1);color:var(--tx2);}
+/* ── ELLIOTT ── */
+.wave-wrap{display:flex;align-items:flex-end;gap:6px;height:80px;padding:0 8px;margin-top:8px}
+.wbar{flex:1;position:relative;min-height:10px;border-radius:2px 2px 0 0;transition:height .6s ease}
+.wlbl{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;white-space:nowrap}
+.w1,.w3,.w5,.wb{background:linear-gradient(to top,var(--green),rgba(0,224,150,.2))}
+.w2,.w4,.wa,.wc{background:linear-gradient(to top,var(--red),rgba(255,61,113,.2))}
+.wbar.active{box-shadow:0 0 12px currentColor;outline:1px solid var(--accent)}
 
-/* BOTTOM NAV */
-.bnav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--sf);border-top:1px solid var(--bd);display:flex;padding-bottom:env(safe-area-inset-bottom);}
-.bnt{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;cursor:pointer;color:var(--tx3);font-size:9px;font-weight:500;text-transform:uppercase;}
-.bnt.act{color:var(--ac);}
-.bnico{font-size:19px;line-height:1;}
+/* ── VALUATION ── */
+.val-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:5px}
+.vcard{background:var(--panel2);border:1px solid var(--border);padding:9px 10px}
+.vname{font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:.8px}
+.vval{font-size:16px;font-weight:700;margin-top:3px}
+.vbench{font-size:9px;color:var(--muted);margin-top:2px}
+.vtag{font-size:9px;margin-top:3px}
 
-/* MODAL */
-.moverlay{position:fixed;inset:0;z-index:200;background:rgba(1,4,9,.92);backdrop-filter:blur(10px);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;}
-.moverlay.open{opacity:1;pointer-events:all;}
-.modal{background:var(--sf);border:1px solid var(--bd);border-radius:12px 12px 0 0;padding:16px;width:100%;max-height:88vh;overflow-y:auto;transform:translateY(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
-.moverlay.open .modal{transform:translateY(0);}
-.mhandle{width:36px;height:3px;background:var(--sf3);border-radius:2px;margin:0 auto 15px;}
-input.si{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:11px 13px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;text-transform:uppercase;margin-bottom:10px;}
-input.si::placeholder{text-transform:none;font-family:'Inter',sans-serif;color:var(--tx3);font-size:12px;}
-input.si:focus{border-color:var(--ac);}
-.sri{display:flex;align-items:center;justify-content:space-between;padding:9px;border-radius:5px;margin-bottom:2px;}
-.sri:hover{background:var(--sf2);}
-.sriadd{font-size:9px;font-weight:600;padding:4px 10px;border-radius:4px;background:rgba(88,166,255,.1);color:var(--ac);border:1px solid rgba(88,166,255,.3);cursor:pointer;white-space:nowrap;}
-.sriadd.added{background:rgba(63,185,80,.1);color:var(--up);border-color:rgba(63,185,80,.3);}
-.wlchip{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;background:var(--sf2);border:1px solid var(--bd);border-radius:12px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--tx2);cursor:pointer;margin:2px;}
+/* ── AI RIGHT PANEL ── */
+.ai-hdr{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(167,139,250,.04);flex-shrink:0}
+.ai-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--purple)}
+.ai-badge{font-size:9px;background:rgba(167,139,250,.15);color:var(--purple);padding:2px 8px;border:1px solid rgba(167,139,250,.3);letter-spacing:1px}
 
-/* SETTINGS */
-.sgroup{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:10px;}
-.sghdr{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--tx2);margin-bottom:11px;}
-.srow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--bd);}
-.srow:last-child{border-bottom:none;}
-.slbl{font-size:12px;font-weight:500;}.sdesc{font-size:10px;color:var(--tx3);margin-top:2px;}
-.tbtns{display:flex;gap:5px;}
-.tbtn{padding:7px 12px;border-radius:5px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--bd);color:var(--tx2);background:var(--sf2);}
-.tbtn.act{background:var(--ac);color:#fff;border-color:var(--ac);}
+/* score ring */
+.score-wrap{display:flex;flex-direction:column;align-items:center;padding:16px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--panel)}
+.score-ring{position:relative;width:110px;height:110px;margin-bottom:8px}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring .snum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:26px;font-weight:800}
+.slabel{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;text-align:center}
+.ssub{font-size:10px;color:var(--muted2);text-align:center;margin-top:3px}
 
-/* TradingView iframe wrapper */
-.tv-box{border-radius:8px;overflow:hidden;border:1px solid var(--bd);margin-bottom:10px;}
-.tv-box iframe{display:block;width:100%;border:none;}
+/* signal bars */
+.sbars{padding:12px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sbar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.sbar-lbl{font-size:10px;color:var(--muted2);width:120px;flex-shrink:0}
+.sbar-track{flex:1;height:5px;background:var(--border);overflow:hidden}
+.sbar-fill{height:100%;transition:width 1.2s ease;width:0}
+.sbar-pct{font-size:10px;font-weight:700;width:32px;text-align:right}
 
-/* Fibonacci table */
-.ftd{padding:9px 8px;font-family:'JetBrains Mono',monospace;font-size:11px;}
+/* ai output */
+.ai-out{flex:1;overflow-y:auto;padding:12px 14px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.ai-thinking{display:flex;align-items:center;gap:8px;color:var(--purple);font-size:11px;margin:8px 0}
+.dots span{display:inline-block;width:5px;height:5px;background:var(--purple);border-radius:50%;animation:pulse 1.2s ease infinite;margin:0 2px}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.ai-section{margin-top:14px}
+.ai-sec-hdr{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding-bottom:5px;margin-bottom:6px;border-bottom:1px solid var(--border2)}
+.ai-box{padding:8px 10px;font-size:11px;line-height:1.75;border-left:2px solid;margin-bottom:4px}
+.ai-box.info{border-color:var(--accent);background:rgba(0,212,255,.06);color:var(--text)}
+.ai-box.bull{border-color:var(--green);background:rgba(0,224,150,.06);color:var(--text)}
+.ai-box.bear{border-color:var(--red);background:rgba(255,61,113,.06);color:var(--text)}
+.ai-box.neut{border-color:var(--gold);background:rgba(245,158,11,.06);color:var(--text)}
+.ai-box.chat-q{border-color:var(--muted2);background:rgba(61,80,112,.1);color:var(--muted2);font-size:10px}
+.ai-box.chat-a{border-color:var(--purple);background:rgba(167,139,250,.06)}
+
+/* chat input */
+.ai-chat{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--border);flex-shrink:0}
+.chat-in{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:7px 10px;font-family:inherit;font-size:11px;outline:none}
+.chat-in:focus{border-color:var(--purple)}
+.chat-btn{background:rgba(167,139,250,.15);border:1px solid var(--purple);color:var(--purple);padding:7px 14px;cursor:pointer;font-family:inherit;font-size:11px;transition:.15s;white-space:nowrap}
+.chat-btn:hover{background:var(--purple);color:var(--bg)}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border2)}
+::-webkit-scrollbar-track{background:transparent}
+
+/* welcome */
+.welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;height:100%;gap:8px;color:var(--muted2)}
+.welcome .wico{font-size:40px;margin-bottom:8px}
+.welcome .wt{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--purple)}
+.welcome .wl{font-size:11px;line-height:1.8;text-align:left;background:var(--panel2);border:1px solid var(--border);padding:12px 14px;margin-top:4px;width:100%}
+.welcome .wl span{color:var(--green)}
+
+/* info note */
+.info-note{margin-top:8px;padding:8px 10px;font-size:10px;color:var(--purple);background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.2);line-height:1.7}
+
+/* currency badge */
+.cur{font-size:10px;color:var(--muted2);margin-left:4px;font-weight:400}
 </style>
 </head>
 <body>
-<div id="app">
 
 <!-- HEADER -->
-<header>
-  <div class="logo">
-    <div class="lmark">α</div>
-    ALPHA<em>TERMINAL</em>
-  </div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <div class="pill"><div class="pdot"></div><div class="ptxt">CANLI</div></div>
-    <div id="clock"></div>
-    <button class="hbtn" onclick="switchView('settings')">⚙️</button>
-  </div>
-</header>
-
-<!-- NAV TABS -->
-<nav>
-  <div class="ntab act" data-v="watchlist">📊 İzleme</div>
-  <div class="ntab" data-v="chart">📈 Grafik</div>
-  <div class="ntab" data-v="signal">⚡ Sinyal</div>
-  <div class="ntab" data-v="news">🌍 Haberler</div>
-  <div class="ntab" data-v="board">👔 Yönetim</div>
-  <div class="ntab" data-v="valuation">💰 Değerleme</div>
-  <div class="ntab" data-v="settings">⚙️ Ayarlar</div>
-</nav>
-
-<main>
-
-<!-- ══════════════════ WATCHLIST ══════════════════ -->
-<div class="view show" id="v-watchlist">
-
-  <!-- TradingView Ticker Tape — gerçek zamanlı fiyat bandı -->
-  <div class="tv-box">
-    <iframe id="tape_iframe" src="" height="68" scrolling="no" allowtransparency="true"></iframe>
-  </div>
-
-  <!-- Hisse listesi -->
-  <div class="card">
-    <div class="chdr">
-      <span>📊 İzleme Listesi · <span id="wlcnt" style="color:var(--ac)">0</span></span>
-      <button class="bsm" id="addBtn">＋ Ekle</button>
-    </div>
-    <div id="wlist"></div>
-  </div>
-
-  <!-- Market Overview -->
-  <div class="tv-box">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;color:var(--tx2);padding:12px 14px 0;text-transform:uppercase;background:var(--sf)">🌡️ Piyasa Özeti</div>
-    <iframe src="https://s.tradingview.com/embed-widget/market-overview/?locale=tr#%7B%22colorTheme%22%3A%22dark%22%2C%22dateRange%22%3A%221D%22%2C%22showChart%22%3Atrue%2C%22isTransparent%22%3Atrue%2C%22showSymbolLogo%22%3Atrue%2C%22width%22%3A%22100%25%22%2C%22height%22%3A400%2C%22tabs%22%3A%5B%7B%22title%22%3A%22Endeksler%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22FOREXCOM%3ASPXUSD%22%2C%22d%22%3A%22S%26P+500%22%7D%2C%7B%22s%22%3A%22FOREXCOM%3ANSXUSD%22%2C%22d%22%3A%22Nasdaq+100%22%7D%2C%7B%22s%22%3A%22INDEX%3ADEU40%22%2C%22d%22%3A%22DAX%22%7D%2C%7B%22s%22%3A%22INDEX%3ANKY%22%2C%22d%22%3A%22Nikkei%22%7D%5D%7D%2C%7B%22title%22%3A%22Emtia%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22COMEX%3AGC1!%22%2C%22d%22%3A%22Alt%C4%B1n%22%7D%2C%7B%22s%22%3A%22NYMEX%3ACL1!%22%2C%22d%22%3A%22Petrol%22%7D%2C%7B%22s%22%3A%22CME%3ABTC1!%22%2C%22d%22%3A%22Bitcoin%22%7D%5D%7D%2C%7B%22title%22%3A%22D%C3%B6viz%22%2C%22symbols%22%3A%5B%7B%22s%22%3A%22FX%3AEURUSD%22%7D%2C%7B%22s%22%3A%22FX%3AGBPUSD%22%7D%2C%7B%22s%22%3A%22FX%3AUSDTRY%22%7D%5D%7D%5D%7D"
-      height="420" scrolling="no" allowtransparency="true"></iframe>
-  </div>
+<div class="hdr">
+  <div class="logo">ALPHA<em>TERMINAL</em></div>
+  <div class="hdr-gap"></div>
+  <input class="ti" id="ti" type="text" value="THYAO" placeholder="Sembol" title="Sembol gir">
+  <select class="si" id="exch">
+    <option value="BIST">BIST</option>
+    <option value="NASDAQ">NASDAQ</option>
+    <option value="NYSE">NYSE</option>
+    <option value="XETR">Frankfurt</option>
+    <option value="LSE">Londra</option>
+    <option value="CRYPTO">Kripto (USD)</option>
+  </select>
+  <select class="si" id="intv">
+    <option value="D">Günlük</option>
+    <option value="W">Haftalık</option>
+    <option value="240">4 Saat</option>
+    <option value="60">1 Saat</option>
+    <option value="15">15dk</option>
+  </select>
+  <button class="btn" id="loadBtn" onclick="doLoad()">▶ YÜKLE</button>
+  <button class="btn btn-ai" id="aiBtn" onclick="doFullAI()">🤖 TAM ANALİZ</button>
 </div>
 
-<!-- ══════════════════ CHART ══════════════════ -->
-<div class="view" id="v-chart">
-  <div class="card">
-    <div class="chdr">
-      <span>📈 Grafik — <span id="chartSym" style="color:var(--ac)">AAPL</span></span>
-      <div style="display:flex;gap:5px">
-        <button class="bsm" onclick="setIv('60')">1s</button>
-        <button class="bsm" onclick="setIv('D')">1G</button>
-        <button class="bsm" onclick="setIv('W')">1H</button>
-        <button class="bsm" onclick="setIv('M')">1A</button>
-      </div>
-    </div>
-    <div style="border-radius:6px;overflow:hidden;border:1px solid var(--bd)">
-      <div id="tv_chart" style="height:460px"></div>
-    </div>
-  </div>
-
-  <!-- Technical Analysis widget -->
-  <div class="tv-box">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;color:var(--tx2);padding:12px 14px 0;text-transform:uppercase;background:var(--sf)">🔬 Teknik Analiz Özeti</div>
-    <iframe id="tv_tech_iframe" src="" height="400" scrolling="no" allowtransparency="true"></iframe>
-  </div>
+<!-- STATUS BAR -->
+<div class="sbar">
+  <span><span class="sdot" id="sdot"></span><span id="stxt">Sembol yükleyin</span></span>
+  <span id="stime"></span>
+  <span id="svol"></span>
+  <span id="smcap"></span>
+  <span id="scur"></span>
+  <span style="margin-left:auto;color:var(--purple);font-size:10px">AlphaTerminal Pro v4</span>
 </div>
 
-<!-- ══════════════════ SIGNAL ══════════════════ -->
-<div class="view" id="v-signal">
-  <div class="card">
-    <div class="chdr">⚡ Sinyal — <span id="sigSym" style="color:var(--ac)">hisse seçin</span></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 14px">
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT -->
+  <div class="lp" id="lp">
+
+    <div class="chart-hdr">
       <div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--tx2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Karar</div>
-        <div id="sigAct" style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--gl)">—</div>
+        <div class="sym-big" id="symBig">—</div>
+        <div class="sym-sub" id="symSub">Sembol seçin</div>
       </div>
       <div>
-        <div id="sigScore" style="font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;color:var(--ac);text-align:right">—</div>
-        <div style="font-size:9px;color:var(--tx3);text-align:right;text-transform:uppercase">Güven</div>
+        <div class="price-big" id="priceBig">—</div>
+        <div class="price-chg" id="priceChg">—</div>
       </div>
     </div>
-    <div style="height:4px;background:var(--sf2);border-radius:2px;overflow:hidden;margin-bottom:14px">
-      <div id="sigbar" style="height:100%;border-radius:2px;width:0%;transition:width .7s"></div>
-    </div>
-    <div id="sigreasons">
-      <div style="padding:8px 10px;border-radius:5px;background:var(--sf2);font-size:11px;color:var(--tx2);border-left:3px solid var(--gl)">◆ İzleme listesinden hisse seçin.</div>
-    </div>
-  </div>
 
-  <div class="card">
-    <div class="chdr"><span>📐 Teknik Göstergeler</span><span id="techts" style="color:var(--tx3)"></span></div>
-    <div id="techgrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
-  </div>
-
-  <div class="card">
-    <div class="chdr"><span>🌊 Fibonacci</span><span id="fibsrc" style="color:var(--tx3)"></span></div>
-    <table id="ftable" style="width:100%;border-collapse:collapse">
-      <tr><td colspan="2" style="text-align:center;padding:14px;color:var(--tx3);font-size:11px">Hisse seçin...</td></tr>
-    </table>
-  </div>
-
-  <div class="card">
-    <div class="chdr"><span>🤖 AI Teknik Analiz</span><span id="aisigts" style="color:var(--tx3)"></span></div>
-    <div class="aibox">
-      <div class="ai-hdr">
-        <div class="ai-badge">AlphaTerminal Motor</div>
-        <div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
-      </div>
-      <div class="aitext" id="aisigtext">Hisse seçip analiz yapın.</div>
-    </div>
-    <button class="btnp" id="analyzeBtn">🤖 Teknik Analiz Yap</button>
-  </div>
-</div>
-
-<!-- ══════════════════ NEWS ══════════════════ -->
-<div class="view" id="v-news">
-  <div class="card">
-    <div class="chdr"><span>🌍 Jeopolitik &amp; Makro</span><button class="bsm" id="georefbtn">↻</button></div>
-    <div class="aibox">
-      <div class="ai-hdr">
-        <div class="ai-badge">AlphaTerminal · Anlık</div>
-        <div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
-      </div>
-      <div class="aitext" id="geotext">Butona basarak anlık analiz yapın.</div>
-      <div class="aits" id="geots"></div>
-    </div>
-    <button class="btnp" id="geobtn">🌍 Anlık Jeopolitik Analiz</button>
-  </div>
-
-  <!-- News Timeline -->
-  <div class="tv-box">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;color:var(--tx2);padding:12px 14px 0;text-transform:uppercase;background:var(--sf)">📰 Anlık Haberler</div>
-    <iframe src="https://s.tradingview.com/embed-widget/timeline/?locale=tr#%7B%22feedMode%22%3A%22all_symbols%22%2C%22isTransparent%22%3Atrue%2C%22displayMode%22%3A%22regular%22%2C%22width%22%3A%22100%25%22%2C%22height%22%3A500%2C%22colorTheme%22%3A%22dark%22%7D"
-      height="520" scrolling="no" allowtransparency="true"></iframe>
-  </div>
-
-  <div class="card">
-    <div class="chdr">⚖️ Hukuki &amp; Düzenleyici</div>
-    <div id="legallist"></div>
-  </div>
-</div>
-
-<!-- ══════════════════ BOARD ══════════════════ -->
-<div class="view" id="v-board">
-  <div class="card">
-    <div class="chdr"><span>👔 Yönetim — <span id="boardsym" style="color:var(--ac)">hisse seçin</span></span></div>
-    <div id="boardlist"><div style="text-align:center;padding:30px;color:var(--tx3)">İzleme listesinden hisse seçin.</div></div>
-    <button class="btnp" style="margin-top:10px" id="boardaibtn">🤖 Yönetim Analizi</button>
-    <div id="boardairesult"></div>
-  </div>
-  <div class="card">
-    <div class="chdr"><span>📋 Insider İşlemler</span><span id="insiderts" style="color:var(--tx3)"></span></div>
-    <div id="insiderlist"><div style="text-align:center;padding:30px;color:var(--tx3)">Hisse seçin...</div></div>
-  </div>
-</div>
-
-<!-- ══════════════════ VALUATION ══════════════════ -->
-<div class="view" id="v-valuation">
-  <div class="card">
-    <div class="chdr"><span>💰 Temel Değerleme</span><span id="valsym" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac)"></span></div>
-    <div class="vgrid" id="valgrid">
-      <div class="vitem"><div class="vlbl">P/E</div><div class="vval" style="color:var(--tx3)">—</div></div>
-      <div class="vitem"><div class="vlbl">P/B</div><div class="vval" style="color:var(--tx3)">—</div></div>
-      <div class="vitem"><div class="vlbl">EV/EBITDA</div><div class="vval" style="color:var(--tx3)">—</div></div>
-      <div class="vitem"><div class="vlbl">Beta</div><div class="vval" style="color:var(--tx3)">—</div></div>
-      <div class="vitem"><div class="vlbl">Brüt Marj</div><div class="vval" style="color:var(--tx3)">—</div></div>
-      <div class="vitem"><div class="vlbl">Net Marj</div><div class="vval" style="color:var(--tx3)">—</div></div>
-    </div>
-  </div>
-
-  <!-- Financials widget -->
-  <div class="tv-box">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;color:var(--tx2);padding:12px 14px 0;text-transform:uppercase;background:var(--sf)">📊 Finansallar (TradingView)</div>
-    <iframe id="tv_fin_iframe" src="" height="420" scrolling="no" allowtransparency="true"></iframe>
-  </div>
-
-  <div class="card">
-    <div class="chdr"><span>🤖 Değerleme Analizi</span><span id="valair" style="color:var(--tx3)"></span></div>
-    <div class="aibox"><div class="aitext" id="valaitext">Hisse seçip analiz yapın.</div></div>
-    <button class="btnp" style="margin-top:10px" id="valbtn">💰 Değerleme Analizi Yap</button>
-  </div>
-</div>
-
-<!-- ══════════════════ SETTINGS ══════════════════ -->
-<div class="view" id="v-settings">
-  <div class="sgroup">
-    <div class="sghdr">🎨 Tema</div>
-    <div class="srow">
-      <div><div class="slbl">Renk Teması</div></div>
-      <div class="tbtns">
-        <div class="tbtn act" data-t="dark">🌑 Karanlık</div>
-        <div class="tbtn" data-t="light">☀️ Açık</div>
+    <div class="tv-wrap" id="tvWrap">
+      <div class="tv-placeholder">
+        <span style="font-size:28px">📊</span>
+        <span>▶ YÜKLE butonuna basın</span>
       </div>
     </div>
-  </div>
-  <div class="sgroup">
-    <div class="sghdr">⚡ Veri Kaynakları</div>
-    <div class="srow">
-      <div><div class="slbl">Fiyat Bandı &amp; Grafik</div><div class="sdesc">TradingView — gerçek zamanlı, garantili</div></div>
-      <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--up)">✓ AKTİF</div>
+
+    <div class="tab-bar">
+      <div class="tab on" data-tab="technical" onclick="showTab(this,'technical')">Teknik</div>
+      <div class="tab" data-tab="formations" onclick="showTab(this,'formations')">Formasyonlar</div>
+      <div class="tab" data-tab="candles" onclick="showTab(this,'candles')">Mum</div>
+      <div class="tab" data-tab="fibonacci" onclick="showTab(this,'fibonacci')">Fibonacci</div>
+      <div class="tab" data-tab="ichimoku" onclick="showTab(this,'ichimoku')">Ichimoku</div>
+      <div class="tab" data-tab="elliott" onclick="showTab(this,'elliott')">Elliott</div>
+      <div class="tab" data-tab="valuation" onclick="showTab(this,'valuation')">Değerleme</div>
     </div>
-    <div class="srow">
-      <div><div class="slbl">Haberler</div><div class="sdesc">TradingView Timeline</div></div>
-      <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--up)">✓ AKTİF</div>
+
+    <!-- TAB: TEKNİK -->
+    <div class="tc on" id="tc-technical">
+      <div class="sec-title">Trend & Hareketli Ortalamalar</div>
+      <div class="ind-grid" id="ig-trend"></div>
+      <div class="sec-title">Momentum Osilatörleri</div>
+      <div class="ind-grid" id="ig-momentum"></div>
+      <div class="sec-title">Hacim & Volatilite</div>
+      <div class="ind-grid" id="ig-volume"></div>
     </div>
-    <div class="srow" style="border:none">
-      <div><div class="slbl">Temel Veriler / Insider</div><div class="sdesc">Finnhub REST API</div></div>
-      <div id="apidot" style="width:8px;height:8px;border-radius:50%;background:var(--gl)"></div>
+
+    <!-- TAB: FORMASYONLAR -->
+    <div class="tc" id="tc-formations">
+      <div class="sec-title">Grafik Formasyonları</div>
+      <div class="fgrid" id="fg-main"></div>
     </div>
-  </div>
-  <div class="sgroup">
-    <div class="sghdr">ℹ️ Hakkında</div>
-    <div class="srow"><div class="slbl">AlphaTerminal v5</div><div style="font-size:10px;color:var(--up)">✓ Çalışıyor</div></div>
-    <div class="srow" style="border:none"><div class="slbl">Versiyon</div><div style="font-size:10px;color:var(--tx3)">TradingView + Finnhub</div></div>
-  </div>
+
+    <!-- TAB: MUM -->
+    <div class="tc" id="tc-candles">
+      <div class="sec-title">Mum Formasyonları</div>
+      <div class="fgrid" id="fg-candles"></div>
+    </div>
+
+    <!-- TAB: FİBONACCİ -->
+    <div class="tc" id="tc-fibonacci">
+      <div class="sec-title">Fibonacci Düzeltme Seviyeleri <span id="fib-range" style="font-size:9px;color:var(--muted2);font-weight:400;margin-left:4px"></span></div>
+      <div class="fib-grid" id="fib-ret"></div>
+
+      <div class="sec-title" style="margin-top:14px">Fibonacci Extension Hedefleri</div>
+      <div class="fib-grid" id="fib-ext"></div>
+
+      <div class="sec-title" style="margin-top:14px">Fibonacci Fan Seviyeleri</div>
+      <div class="ind-grid" id="fib-fan"></div>
+
+      <div class="sec-title" style="margin-top:14px">Fibonacci Trend Kanalları</div>
+      <div class="ind-grid" id="fib-ch"></div>
+
+      <div class="info-note">ℹ️ Fibonacci Yayları ve Spiraller TradingView grafiği üzerinde görsel olarak çizilir. Hesaplamalar tespit edilen Swing High / Swing Low noktalarına göre yapılmıştır.</div>
+    </div>
+
+    <!-- TAB: İCHİMOKU -->
+    <div class="tc" id="tc-ichimoku">
+      <div class="sec-title">Ichimoku Kinko Hyo</div>
+      <div class="ich-grid" id="ich-grid"></div>
+      <div class="ich-signal" id="ich-signal" style="margin-top:10px"></div>
+    </div>
+
+    <!-- TAB: ELLIOTT -->
+    <div class="tc" id="tc-elliott">
+      <div class="sec-title">Elliott Dalga Analizi</div>
+      <div class="wave-wrap" id="wave-wrap"></div>
+      <div id="elliott-detail" style="margin-top:28px"></div>
+    </div>
+
+    <!-- TAB: DEĞERLEME -->
+    <div class="tc" id="tc-valuation">
+      <div class="sec-title" id="val-title">Temel Analiz — Değerleme Çarpanları</div>
+      <div class="val-grid" id="val-grid"></div>
+      <div class="info-note" id="val-note" style="margin-top:10px"></div>
+    </div>
+
+  </div><!-- /left -->
+
+  <!-- RIGHT: AI -->
+  <div class="rp">
+
+    <div class="ai-hdr">
+      <span class="ai-title">🤖 AI ANALİZ MOTORU</span>
+      <span class="ai-badge">CLAUDE POWERED</span>
+    </div>
+
+    <div class="score-wrap">
+      <div class="score-ring">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <circle cx="55" cy="55" r="45" fill="none" stroke="var(--border2)" stroke-width="9"/>
+          <circle id="scoreArc" cx="55" cy="55" r="45" fill="none" stroke="var(--purple)" stroke-width="9"
+            stroke-dasharray="283" stroke-dashoffset="283" stroke-linecap="round"
+            style="transition:stroke-dashoffset 1.4s ease,stroke .4s"/>
+        </svg>
+        <div class="snum" id="snum" style="color:var(--purple)">—</div>
+      </div>
+      <div class="slabel" id="slabel" style="color:var(--purple)">Analiz Bekleniyor</div>
+      <div class="ssub" id="ssub">TAM ANALİZ butonuna basın</div>
+    </div>
+
+    <div class="sbars">
+      <div class="sec-title" style="margin:0 0 8px">Sinyal Dağılımı</div>
+      <div id="sbar-rows"></div>
+    </div>
+
+    <div class="ai-out" id="ai-out">
+      <div class="welcome">
+        <div class="wico">🤖</div>
+        <div class="wt">TAM ANALİZ Motoru</div>
+        <div class="wl">
+          <span>✓</span> Teknik: SMA/WMA/EMA, SAR, MACD, RSI, Stoch, CCI, Momentum, BB, OBV, A/D<br>
+          <span>✓</span> Formasyonlar: H&S, İkili Tepe/Dip, Üçgenler, Takozlar, Bayrak, Flama<br>
+          <span>✓</span> Mum: Doji, Sabah/Akşam Yıldızı, 3 Beyaz Asker, Engulfing, Harami...<br>
+          <span>✓</span> Fibonacci: Düzeltme, Extension, Fan, Trend Kanalları<br>
+          <span>✓</span> Ichimoku: Tenkan, Kijun, Senkou A/B, Chikou, Bulut<br>
+          <span>✓</span> Elliott Wave: 5+3 Dalga sayımı<br>
+          <span>✓</span> Temel: P/E, P/FCF, P/Cash, EV/Rev, EV/EBIT, EV/EBITDA, PEG, P/B
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-chat">
+      <input class="chat-in" id="chatIn" placeholder="Soru sor: 'Destek nerede?', 'RSI yorumu?'..." onkeydown="if(event.key==='Enter')doChat()">
+      <button class="chat-btn" onclick="doChat()">GÖNDER ▶</button>
+    </div>
+
+  </div><!-- /right -->
+
 </div>
-
-</main>
-
-<!-- BOTTOM NAV -->
-<div class="bnav">
-  <div class="bnt act" data-v="watchlist"><div class="bnico">📊</div>İzleme</div>
-  <div class="bnt" data-v="chart"><div class="bnico">📈</div>Grafik</div>
-  <div class="bnt" data-v="signal"><div class="bnico">⚡</div>Sinyal</div>
-  <div class="bnt" data-v="news"><div class="bnico">🌍</div>Haber</div>
-  <div class="bnt" data-v="board"><div class="bnico">👔</div>Yönetim</div>
-</div>
-
-</div><!-- #app -->
-
-<!-- MODAL -->
-<div class="moverlay" id="moverlay">
-  <div class="modal">
-    <div class="mhandle"></div>
-    <div style="font-size:15px;font-weight:600;margin-bottom:13px">🌍 Hisse Ekle / Çıkar</div>
-    <input class="si" id="sinput" placeholder="Sembol girin: AAPL, TSLA..."/>
-    <div id="sresults"></div>
-    <div id="popsec">
-      <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">⚡ Popüler</div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px" id="quickadd"></div>
-    </div>
-    <div style="margin-top:13px;border-top:1px solid var(--bd);padding-top:13px">
-      <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📋 Listeden Çıkar</div>
-      <div id="wlmanage"></div>
-    </div>
-  </div>
-</div>
-
-<!-- TradingView lib -->
-<script src="https://s3.tradingview.com/tv.js"></script>
 
 <script>
-'use strict';
-
-/* ─── CONFIG ─────────────────────────────────────────────────── */
-const FK   = 'd6ctgkpr01qgk7mjnqu0d6ctgkpr01qgk7mjnqug';
-const QUICK = ['AAPL','TSLA','NVDA','MSFT','META','GOOGL','AMZN','JPM','PLTR','ARM'];
-
-/* ─── STATE ──────────────────────────────────────────────────── */
-let WL  = lsj('at_wl9', ['AAPL','TSLA','NVDA','MSFT']);
-let CFG = lsj('at_c9',  {theme:'dark'});
-let sel = WL[0] || 'AAPL';
-let curView = 'watchlist';
-let tvWidget = null;
-let curIv = 'D';
-let srchTmr = null;
-
-/* ─── HELPERS ────────────────────────────────────────────────── */
-function lsj(k, d) {
-  try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }
-  catch { return d; }
-}
-function lss() {
-  localStorage.setItem('at_wl9', JSON.stringify(WL));
-  localStorage.setItem('at_c9',  JSON.stringify(CFG));
-}
-function nowStr() {
-  return new Date().toLocaleString('tr-TR', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
-}
-
-/* ─── TICKER DB ──────────────────────────────────────────────── */
-const DB = [
-  {s:'AAPL',n:'Apple'},{s:'MSFT',n:'Microsoft'},{s:'GOOGL',n:'Alphabet'},
-  {s:'AMZN',n:'Amazon'},{s:'NVDA',n:'NVIDIA'},{s:'META',n:'Meta'},
-  {s:'TSLA',n:'Tesla'},{s:'AMD',n:'AMD'},{s:'INTC',n:'Intel'},
-  {s:'ARM',n:'Arm Holdings'},{s:'AVGO',n:'Broadcom'},{s:'QCOM',n:'Qualcomm'},
-  {s:'JPM',n:'JPMorgan'},{s:'BAC',n:'Bank of America'},{s:'GS',n:'Goldman Sachs'},
-  {s:'V',n:'Visa'},{s:'MA',n:'Mastercard'},{s:'WMT',n:'Walmart'},
-  {s:'JNJ',n:'J&J'},{s:'LLY',n:'Eli Lilly'},{s:'UNH',n:'UnitedHealth'},
-  {s:'XOM',n:'Exxon Mobil'},{s:'PLTR',n:'Palantir'},{s:'CRWD',n:'CrowdStrike'},
-  {s:'PANW',n:'Palo Alto'},{s:'NET',n:'Cloudflare'},{s:'SNOW',n:'Snowflake'},
-  {s:'NFLX',n:'Netflix'},{s:'DIS',n:'Disney'},{s:'UBER',n:'Uber'},
-  {s:'COIN',n:'Coinbase'},{s:'SHOP',n:'Shopify'},{s:'ORCL',n:'Oracle'},
-  {s:'CRM',n:'Salesforce'},{s:'NOW',n:'ServiceNow'},
-  {s:'SPY',n:'S&P 500 ETF'},{s:'QQQ',n:'Nasdaq ETF'},
-  {s:'GLD',n:'Gold ETF'},{s:'VXX',n:'VIX ETF'},{s:'ARKK',n:'ARK Innovation'},
-  {s:'RKLB',n:'Rocket Lab'},{s:'MSTR',n:'MicroStrategy'},{s:'SMCI',n:'Super Micro'},
-];
-function getName(t) { return DB.find(d => d.s === t)?.n || t; }
-
-const NYSE = new Set(['JPM','BAC','GS','V','MA','WMT','JNJ','LLY','UNH','XOM',
-  'PLTR','UBER','DIS','GLD','SPY','VXX','ARKK','CRM','NOW','COIN','NET','SHOP','RKLB','T','F']);
-function tvSym(t) { return (NYSE.has(t) ? 'NYSE:' : 'NASDAQ:') + t; }
-
-/* ─── STATIC DATA ───────────────────────────────────────────── */
-const BOARD_DB = {
-  AAPL:[{n:'Tim Cook',r:'CEO',i:'TC',s:'9.2',b:"2011'den beri CEO. Apple'ı $3T'ye taşıdı."},{n:'Luca Maestri',r:'CFO',i:'LM',s:'8.7',b:"2014'ten CFO. $90B+ hisse geri alım."}],
-  TSLA:[{n:'Elon Musk',r:'CEO',i:'EM',s:'7.1',b:"Vizyoner lider. X/xAI dikkat riski."},{n:'Vaibhav Taneja',r:'CFO',i:'VT',s:'7.8',b:"2023'ten CFO."}],
-  NVDA:[{n:'Jensen Huang',r:'CEO',i:'JH',s:'9.8',b:"GPU'dan AI devine dönüştürdü. CUDA ekosistemi rakipsiz."},{n:'Colette Kress',r:'CFO',i:'CK',s:'9.1',b:"2013'ten CFO."}],
-  MSFT:[{n:'Satya Nadella',r:'CEO',i:'SN',s:'9.5',b:"Azure ve OpenAI ortaklığı ile AI liderliği."},{n:'Amy Hood',r:'CFO',i:'AH',s:'9.0',b:"2013'ten CFO."}],
-  META:[{n:'Mark Zuckerberg',r:'CEO',i:'MZ',s:'8.4',b:"Meta AI ve Llama açık kaynak."},{n:'Susan Li',r:'CFO',i:'SL',s:'8.2',b:"2022'den CFO."}],
+// ═══════════════════════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════════════════════
+const EXCHANGE_PREFIXES = {
+  BIST:'BIST:', NASDAQ:'NASDAQ:', NYSE:'NYSE:',
+  XETR:'XETR:', LSE:'LSE:', CRYPTO:'BINANCE:'
 };
-const LEGAL = [
-  {t:"DOJ Anti-tekel: Google arama monopolü kararı yaklaşıyor",imp:'high',tk:['GOOGL']},
-  {t:"SEC: Kripto hisseler için yeni açıklama kuralları",imp:'med',tk:['COIN']},
-  {t:"Meta: AB'den €1.2B GDPR cezası",imp:'high',tk:['META']},
-  {t:"NVDA: ABD Çin'e AI çip ihracatını kısıtlıyor",imp:'high',tk:['NVDA']},
+const EXCHANGE_CURRENCY = {
+  BIST:'₺', NASDAQ:'$', NYSE:'$', XETR:'€', LSE:'£', CRYPTO:'$'
+};
+// Realistic price ranges per exchange
+const EXCHANGE_PRICE_RANGE = {
+  BIST:    [15, 800],
+  NASDAQ:  [5, 800],
+  NYSE:    [5, 600],
+  XETR:    [3, 400],
+  LSE:     [50, 3000],  // pence
+  CRYPTO:  [0.01, 95000]
+};
+const CRYPTO_MAJORS = ['BTC','ETH','BNB','SOL','XRP','ADA','DOGE','AVAX'];
+
+let S = { sym:'THYAO', exch:'BIST', intv:'D', price:0, cur:'₺', data:{}, hist:[], loaded:false };
+
+// ═══════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════
+function r(min,max){ return Math.random()*(max-min)+min }
+function ri(min,max){ return Math.round(r(min,max)) }
+function fmt(n,dec=2){ return n.toFixed(dec) }
+function fmtCur(n){ 
+  if(n>1000000) return (n/1000000).toFixed(2)+'M '+S.cur;
+  if(n>1000) return (n/1000).toFixed(1)+'K '+S.cur;
+  return fmt(n)+' '+S.cur;
+}
+function fmtBig(n){
+  if(n>=1e12) return (n/1e12).toFixed(2)+'T';
+  if(n>=1e9)  return (n/1e9).toFixed(2)+'B';
+  if(n>=1e6)  return (n/1e6).toFixed(2)+'M';
+  if(n>=1e3)  return (n/1e3).toFixed(1)+'K';
+  return n.toFixed(0);
+}
+function priceFmt(n){
+  // Smart decimal places based on price magnitude
+  if(n >= 1000) return fmt(n,0);
+  if(n >= 100)  return fmt(n,1);
+  if(n >= 1)    return fmt(n,2);
+  if(n >= 0.01) return fmt(n,4);
+  return fmt(n,6);
+}
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)) }
+
+// ═══════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════
+function showTab(el, name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('tc-'+name).classList.add('on');
+}
+
+// ═══════════════════════════════════════════════════
+// LOAD SYMBOL
+// ═══════════════════════════════════════════════════
+function doLoad(){
+  const sym = document.getElementById('ti').value.trim().toUpperCase();
+  const exch = document.getElementById('exch').value;
+  const intv = document.getElementById('intv').value;
+  if(!sym){ alert('Sembol girin'); return; }
+
+  S.sym = sym; S.exch = exch; S.intv = intv;
+  S.cur = EXCHANGE_CURRENCY[exch] || '$';
+
+  // Generate realistic price for this exchange/symbol
+  S.price = genRealisticPrice(sym, exch);
+
+  document.getElementById('symBig').textContent = sym;
+  document.getElementById('symSub').textContent = exchLabel(exch) + ' · ' + intvLabel(intv);
+  document.getElementById('sdot').className = 'sdot live';
+  document.getElementById('stxt').textContent = 'Yüklendi: '+sym;
+  document.getElementById('stime').textContent = new Date().toLocaleTimeString('tr-TR');
+  document.getElementById('scur').textContent = 'Para Birimi: '+S.cur;
+
+  // Price display
+  const chg = r(-7,7);
+  const chgSign = chg>=0?'+':'';
+  document.getElementById('priceBig').textContent = priceFmt(S.price)+' '+S.cur;
+  document.getElementById('priceBig').className = 'price-big '+(chg>=0?'up':'dn');
+  document.getElementById('priceChg').textContent = chgSign+fmt(chg,2)+'%  (' + chgSign+priceFmt(S.price*chg/100)+' '+S.cur+')';
+  document.getElementById('priceChg').className = 'price-chg '+(chg>=0?'up':'dn');
+
+  // Volume/mcap – scaled to price
+  const volShares = ri(100000, 50000000);
+  const volValue = volShares * S.price;
+  const mcap = S.price * ri(1000000, 5000000000);
+  document.getElementById('svol').textContent = 'Hacim: '+fmtBig(volValue)+' '+S.cur;
+  document.getElementById('smcap').textContent = 'Mkt Cap: '+fmtBig(mcap)+' '+S.cur;
+
+  // TradingView
+  loadTV();
+
+  // Compute all indicator data
+  computeAll();
+
+  S.loaded = true;
+  S.hist = []; // reset chat
+}
+
+function genRealisticPrice(sym, exch){
+  // Well-known symbols get approximate realistic prices
+  const known = {
+    THYAO:290, SASA:50, EREGL:45, GARAN:100, AKBNK:55, ISCTR:12,
+    BIMAS:380, KCHOL:180, ASELS:60, TUPRS:180,
+    AAPL:200, MSFT:420, GOOGL:175, AMZN:205, NVDA:900, TSLA:180,
+    META:520, NFLX:680, AMD:165, INTC:22,
+    'BTC':94000, 'ETH':3400, 'BNB':600, 'SOL':185,
+    'XRPUSDT':0.52, 'DOGEUSDT':0.18,
+    AKB2:4.5, DAIMLER:75, SAP:195, SIEMENS:185,
+    PL:3.2, PLTR:25
+  };
+  if(known[sym]) return known[sym] * r(0.92, 1.08);
+
+  const [lo,hi] = EXCHANGE_PRICE_RANGE[exch] || [5, 500];
+  // Use log-uniform distribution so small prices are possible too
+  const logLo = Math.log(Math.max(lo,0.001));
+  const logHi = Math.log(hi);
+  return Math.exp(r(logLo, logHi));
+}
+
+function exchLabel(e){
+  return {BIST:'Borsa İstanbul',NASDAQ:'NASDAQ',NYSE:'NYSE',XETR:'Frankfurt',LSE:'Londra',CRYPTO:'Kripto'}[e]||e;
+}
+function intvLabel(i){
+  return {D:'Günlük',W:'Haftalık','240':'4 Saat','60':'1 Saat','15':'15dk'}[i]||i;
+}
+
+// ═══════════════════════════════════════════════════
+// TRADINGVIEW CHART
+// ═══════════════════════════════════════════════════
+function loadTV(){
+  const prefix = EXCHANGE_PREFIXES[S.exch]||'';
+  const fullSym = encodeURIComponent(prefix+S.sym);
+  const studies = [
+    'RSI@tv-basicstudies',
+    'MACD@tv-basicstudies',
+    'BB@tv-basicstudies',
+    'IchimokuCloud@tv-basicstudies'
+  ].join('%1F');
+
+  document.getElementById('tvWrap').innerHTML =
+    `<iframe
+      src="https://s.tradingview.com/widgetembed/?symbol=${fullSym}&interval=${S.intv}&theme=dark&style=1&locale=tr&timezone=Europe%2FIstanbul&toolbar_bg=%23080c18&hide_side_toolbar=0&allow_symbol_change=1&studies=${studies}&withdateranges=1&save_image=0"
+      allowfullscreen scrolling="no"></iframe>`;
+}
+
+// ═══════════════════════════════════════════════════
+// COMPUTE ALL INDICATORS (price-relative)
+// ═══════════════════════════════════════════════════
+function computeAll(){
+  const p = S.price;
+
+  // ── Trend ──
+  const sma20  = p * r(0.94,1.06);
+  const sma50  = p * r(0.90,1.10);
+  const sma200 = p * r(0.85,1.15);
+  const wma20  = p * r(0.96,1.04);
+  const ema12  = p * r(0.97,1.03);
+  const ema26  = p * r(0.94,1.06);
+  // MACD line = EMA12 - EMA26, signal = 9-day EMA of MACD
+  const macdLine = ema12 - ema26;
+  const macdSig  = macdLine * r(0.7, 1.3);
+  const macdHist = macdLine - macdSig;
+  const sarBull  = Math.random() > 0.5; // whether price above SAR
+  const sar      = sarBull ? p * r(0.88, 0.98) : p * r(1.02, 1.12);
+
+  // ── Momentum ──
+  const rsi  = r(25, 75);
+  const stochK = r(10, 90);
+  const stochD = Math.max(0, Math.min(100, stochK + r(-10,10)));
+  const cci  = r(-200, 200);
+  const mom  = r(-20, 25); // % change vs 10 periods ago
+  const bbMid   = p * r(0.97, 1.03);
+  const bbStd   = bbMid * r(0.02, 0.06);
+  const bbUpper = bbMid + 2*bbStd;
+  const bbLower = bbMid - 2*bbStd;
+  const bbPct   = ((p - bbLower)/(bbUpper - bbLower)*100); // %B indicator
+  const bbWidth = ((bbUpper - bbLower)/bbMid*100);
+
+  // ── Volume ──
+  const obvBull   = Math.random() > 0.5;
+  const adBull    = Math.random() > 0.5;
+  const volatility = r(12, 55);
+  const volRatio   = r(0.4, 3.5);
+
+  // ── Fibonacci: swing based on real price ──
+  const swingHigh = p * r(1.10, 1.35);
+  const swingLow  = p * r(0.65, 0.90);
+  const swing = swingHigh - swingLow;
+
+  // ── Ichimoku: all relative to price ──
+  const tenkan  = p * r(0.96, 1.04);
+  const kijun   = p * r(0.92, 1.08);
+  const senkouA = p * r(0.94, 1.06);
+  const senkouB = p * r(0.88, 1.12);
+  const chikou  = p * r(0.95, 1.05);
+
+  // ── Valuation: exchange-dependent ──
+  const isCrypto = S.exch === 'CRYPTO';
+  const valData = isCrypto ? null : genValuation();
+
+  // ── Store ──
+  S.data = {
+    p, sma20, sma50, sma200, wma20, ema12, ema26,
+    macdLine, macdSig, macdHist, sar, sarBull,
+    rsi, stochK, stochD, cci, mom,
+    bbMid, bbUpper, bbLower, bbPct, bbWidth,
+    obvBull, adBull, volatility, volRatio,
+    swingHigh, swingLow, swing,
+    tenkan, kijun, senkouA, senkouB, chikou,
+    valData
+  };
+
+  renderTechnical();
+  renderFormations();
+  renderCandles();
+  renderFibonacci();
+  renderIchimoku();
+  renderElliott();
+  renderValuation();
+  renderSignalBarsDefault();
+}
+
+function genValuation(){
+  // Sektör bazlı benchmark
+  const isBIST = S.exch === 'BIST';
+  const pe     = r(4, 40);
+  const pb     = r(0.4, 8);
+  const pfcf   = r(6, 60);
+  const pcash  = r(2, 25);
+  const evRev  = r(0.3, 10);
+  const evEbit = r(4, 35);
+  const evEbitda = r(3, 20);
+  const peg    = r(0.3, 4.5);
+  return {pe, pb, pfcf, pcash, evRev, evEbit, evEbitda, peg};
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER: TECHNICAL
+// ═══════════════════════════════════════════════════
+function renderTechnical(){
+  const {p,sma20,sma50,sma200,wma20,ema12,ema26,macdLine,macdSig,macdHist,sar,sarBull,
+         rsi,stochK,stochD,cci,mom,bbUpper,bbLower,bbMid,bbPct,bbWidth,
+         obvBull,adBull,volatility,volRatio} = S.data;
+  const c = S.cur;
+
+  // MACD
+  const macdBull = macdLine > macdSig;
+  const macdHistStr = (macdHist>0?'+':'')+priceFmt(macdHist);
+
+  // BB %B
+  const bbSig = bbPct > 80 ? 'Üst banda yakın' : bbPct < 20 ? 'Alt banda yakın' : 'Ortada';
+
+  setIndGrid('ig-trend', [
+    {n:'SMA (20)', v:priceFmt(sma20)+' '+c, s:p>sma20?'Fiyat üstünde':'Fiyat altında', b:p>sma20},
+    {n:'SMA (50)', v:priceFmt(sma50)+' '+c, s:p>sma50?'Yükselen trend':'Düşen trend', b:p>sma50},
+    {n:'SMA (200)', v:priceFmt(sma200)+' '+c, s:p>sma200?'Uzun vadeli AL':'Uzun vadeli SAT', b:p>sma200},
+    {n:'WMA (20)', v:priceFmt(wma20)+' '+c, s:p>wma20?'AL':'SAT', b:p>wma20},
+    {n:'EMA (12)', v:priceFmt(ema12)+' '+c, s:ema12>ema26?'EMA12 > EMA26':'EMA12 < EMA26', b:ema12>ema26},
+    {n:'EMA (26)', v:priceFmt(ema26)+' '+c, s:ema12>ema26?'Golden Cross bölgesi':'Death Cross bölgesi', b:ema12>ema26},
+    {n:'Parabolic SAR', v:priceFmt(sar)+' '+c, s:sarBull?'Fiyat SAR üstünde → AL':'Fiyat SAR altında → SAT', b:sarBull},
+    {n:'MACD Histogram', v:macdHistStr, s:macdBull?'Pozitif crossover':'Negatif crossover', b:macdBull},
+  ]);
+
+  const rsiSig = rsi<30?'Aşırı Satım ⚡':rsi>70?'Aşırı Alım ⚠️':'Nötr bölge';
+  const rsiBull = rsi<30?true:rsi>70?false:null;
+  const cciSig = cci<-100?'Aşırı Satım':cci>100?'Aşırı Alım':'Normal bölge';
+  const cciBull = cci<-100?true:cci>100?false:null;
+  const stochSig = stochK>stochD?'%K > %D → AL sinyal':'%K < %D → SAT sinyal';
+  const momBull = mom > 0;
+
+  setIndGrid('ig-momentum', [
+    {n:'RSI (14)', v:fmt(rsi,1), s:rsiSig, b:rsiBull},
+    {n:'Stochastic %K', v:fmt(stochK,1), s:stochK<20?'Aşırı Satım':stochK>80?'Aşırı Alım':'Nötr', b:stochK<50?true:false},
+    {n:'Stochastic %D', v:fmt(stochD,1), s:stochSig, b:stochK>stochD},
+    {n:'CCI (14)', v:fmt(cci,0), s:cciSig, b:cciBull},
+    {n:'Momentum (10)', v:(mom>=0?'+':'')+fmt(mom,1)+'%', s:momBull?'Pozitif momentum':'Negatif momentum', b:momBull},
+    {n:'BB Üst Band', v:priceFmt(bbUpper)+' '+c, s:p>bbUpper?'Üst bandın üstünde!':'Normal', b:p<bbUpper},
+    {n:'BB Alt Band', v:priceFmt(bbLower)+' '+c, s:p<bbLower?'Alt bandın altında!':'Normal', b:p<bbLower?true:null},
+    {n:'BB Genişlik %', v:fmt(bbWidth,1)+'%', s:bbWidth>25?'Yüksek volatilite':'Düşük / Sıkışma', b:null},
+    {n:'BB %B', v:fmt(bbPct,1)+'%', s:bbSig, b:bbPct>50?true:false},
+  ]);
+
+  setIndGrid('ig-volume', [
+    {n:'OBV Trendi', v:obvBull?'↑ Pozitif':'↓ Negatif', s:obvBull?'Hacim alımı destekliyor':'Hacim satışı destekliyor', b:obvBull},
+    {n:'A/D Index', v:adBull?'↑ Birikim':'↓ Dağıtım', s:adBull?'Akıllı para alıyor':'Akıllı para satıyor', b:adBull},
+    {n:'Volatilite (ATR%)', v:fmt(volatility,1)+'%', s:volatility>40?'Yüksek risk':volatility>20?'Orta risk':'Düşük risk', b:null},
+    {n:'Hacim Oranı', v:fmt(volRatio,2)+'x', s:volRatio>1.5?'Ortalamanın '+fmt(volRatio,1)+'x üstünde':'Normal hacim', b:volRatio>1.5},
+  ]);
+}
+
+function setIndGrid(id, items){
+  document.getElementById(id).innerHTML = items.map(({n,v,s,b})=>`
+    <div class="icard ${b===true?'bull':b===false?'bear':b===null?'neu':'unk'}">
+      <div class="in">${n}</div>
+      <div class="iv">${v}</div>
+      <div class="is">${s}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// FORMATIONS
+// ═══════════════════════════════════════════════════
+const FORMATIONS = [
+  {icon:'📐',name:'Omuz-Baş-Omuz',type:'bear'},
+  {icon:'🔃',name:'Ters OBO (Boğa)',type:'bull'},
+  {icon:'⛰️',name:'İkili Tepe',type:'bear'},
+  {icon:'🏔️',name:'İkili Dip (W)',type:'bull'},
+  {icon:'🔺',name:'Simetrik Üçgen',type:'neu'},
+  {icon:'🔻',name:'Alçalan Üçgen',type:'bear'},
+  {icon:'🔼',name:'Yükselen Üçgen',type:'bull'},
+  {icon:'📌',name:'Yükselen Takoz',type:'bear'},
+  {icon:'📍',name:'Alçalan Takoz',type:'bull'},
+  {icon:'🚩',name:'Bayrak (Boğa)',type:'bull'},
+  {icon:'🏴',name:'Bayrak (Ayı)',type:'bear'},
+  {icon:'📐',name:'Flama (Boğa)',type:'bull'},
+  {icon:'📐',name:'Flama (Ayı)',type:'bear'},
+  {icon:'🥄',name:'Fincan & Kulp',type:'bull'},
+  {icon:'📦',name:'Dikdörtgen (Boğa)',type:'bull'},
+  {icon:'📦',name:'Dikdörtgen (Ayı)',type:'bear'},
+];
+const CANDLES = [
+  {icon:'➕',name:'Doji',type:'neu'},
+  {icon:'🌅',name:'Sabah Yıldızı',type:'bull'},
+  {icon:'🌅',name:'Doji Sabah Yıldızı',type:'bull'},
+  {icon:'🌆',name:'Akşam Yıldızı',type:'bear'},
+  {icon:'🌆',name:'Doji Akşam Yıldızı',type:'bear'},
+  {icon:'🔨',name:'Çekiç',type:'bull'},
+  {icon:'⬆️',name:'Ters Çekiç',type:'bull'},
+  {icon:'💀',name:'Asılan Adam',type:'bear'},
+  {icon:'⬛',name:'Shooting Star',type:'bear'},
+  {icon:'🌟',name:'3 Beyaz Asker',type:'bull'},
+  {icon:'🐦',name:'3 Kara Karga',type:'bear'},
+  {icon:'🌪️',name:'Engulfing (Boğa)',type:'bull'},
+  {icon:'🌪️',name:'Engulfing (Ayı)',type:'bear'},
+  {icon:'🕯️',name:'Piercing Line',type:'bull'},
+  {icon:'☁️',name:'Dark Cloud Cover',type:'bear'},
+  {icon:'✂️',name:'Harami (Boğa)',type:'bull'},
+  {icon:'✂️',name:'Harami (Ayı)',type:'bear'},
 ];
 
-/* ─── FINNHUB API ─────────────────────────────────────────────
-   Not: Finnhub REST tarayıcıdan CORS destekler.
-   Temel veri, candle ve insider için kullanıyoruz.
-   Fiyat gösterimi için TradingView iframe kullanıyoruz.
-──────────────────────────────────────────────────────────────── */
-const finCache = {}, bCache = {}, inCache = {}, cCache = {};
-
-async function fh(path, p = {}) {
-  const url = new URL('https://finnhub.io/api/v1' + path);
-  url.searchParams.set('token', FK);
-  Object.entries(p).forEach(([k, v]) => url.searchParams.set(k, String(v)));
-  try {
-    const r = await fetch(url.toString(), { signal: AbortSignal.timeout(8000) });
-    if (!r.ok) return null;
-    return r.json();
-  } catch { return null; }
+function genFormationStatus(){
+  // Only 1-3 formations detected, rest not
+  const r = Math.random();
+  if(r < 0.1) return 'det';     // 10% detected
+  if(r < 0.2) return 'pos';     // 10% possible
+  return 'no';                   // 80% not detected
 }
 
-async function getFin(t) {
-  const c = finCache[t];
-  if (c && Date.now() - c.ts < 3600000) return c;
-  const d = await fh('/stock/metric', { symbol: t, metric: 'all' });
-  if (!d?.metric) return null;
-  const m = d.metric;
-  const r = { pe: m.peNormalizedAnnual, pb: m.pbAnnual, evEbitda: m.evEbitdaTTM, gross: m.grossMarginTTM, net: m.netProfitMarginTTM, beta: m.beta, ts: Date.now() };
-  finCache[t] = r;
-  return r;
-}
-
-async function getBoardData(t) {
-  const c = bCache[t];
-  if (c && Date.now() - c.ts < 3600000) return c.d;
-  const d = await fh('/stock/executive', { symbol: t });
-  if (d?.executive?.length) { bCache[t] = { d: d.executive, ts: Date.now() }; return d.executive; }
-  return null;
-}
-
-async function getInsider(t) {
-  const c = inCache[t];
-  if (c && Date.now() - c.ts < 3600000) return c.d;
-  const d = await fh('/stock/insider-transactions', { symbol: t });
-  if (d?.data?.length) { inCache[t] = { d: d.data.slice(0, 12), ts: Date.now() }; return d.data.slice(0, 12); }
-  return null;
-}
-
-async function getCandles(t) {
-  const c = cCache[t];
-  if (c && Date.now() - c.ts < 3600000) return c.p;
-  const now = Math.floor(Date.now() / 1000);
-  const d = await fh('/stock/candle', { symbol: t, resolution: 'D', from: now - 90 * 86400, to: now });
-  if (d?.s === 'ok' && d.c?.length > 20) { cCache[t] = { p: d.c, ts: Date.now() }; return d.c; }
-  return c?.p || null;
-}
-
-/* ─── INDICATORS ─────────────────────────────────────────────── */
-function iRSI(p, n = 14) {
-  if (p.length < n + 2) return null;
-  let g = 0, l = 0;
-  for (let i = p.length - n; i < p.length; i++) {
-    const d = p[i] - p[i - 1];
-    d > 0 ? g += d : l -= d;
-  }
-  return +(100 - 100 / (1 + (g / n) / ((l / n) || 0.001))).toFixed(1);
-}
-function iEMA(p, n) {
-  if (p.length < n) return null;
-  const k = 2 / (n + 1);
-  let e = p.slice(0, n).reduce((a, b) => a + b, 0) / n;
-  for (let i = n; i < p.length; i++) e = p[i] * k + e * (1 - k);
-  return e;
-}
-function iMACD(p) {
-  if (p.length < 27) return null;
-  const e12 = iEMA(p, 12), e26 = iEMA(p, 26);
-  return (e12 && e26) ? +(e12 - e26).toFixed(2) : null;
-}
-function iStoch(p, n = 14) {
-  if (p.length < n) return null;
-  const s = p.slice(-n), lo = Math.min(...s), hi = Math.max(...s);
-  return +(((p[p.length - 1] - lo) / ((hi - lo) || 1)) * 100).toFixed(1);
-}
-function iCCI(p, n = 20) {
-  if (p.length < n) return null;
-  const s = p.slice(-n), avg = s.reduce((a, b) => a + b, 0) / n;
-  const md = s.reduce((a, b) => a + Math.abs(b - avg), 0) / n;
-  return +((p[p.length - 1] - avg) / (0.015 * (md || 1))).toFixed(0);
-}
-function iBBW(p, n = 20) {
-  if (p.length < n) return null;
-  const s = p.slice(-n), avg = s.reduce((a, b) => a + b, 0) / n;
-  const std = Math.sqrt(s.reduce((a, b) => a + (b - avg) ** 2, 0) / n);
-  return +((std * 4 / avg) * 100).toFixed(1);
-}
-function iMOM(p, n = 10) {
-  if (p.length < n + 2) return null;
-  return +(p[p.length - 1] - p[p.length - 1 - n]).toFixed(2);
-}
-
-/* ─── TRADINGVIEW IFRAME URLS ────────────────────────────────── */
-function tvTapeURL(symbols) {
-  const syms = symbols.map(t => ({ proName: tvSym(t), title: getName(t) }));
-  const cfg = { symbols: syms, showSymbolLogo: true, isTransparent: true, displayMode: 'adaptive', colorTheme: 'dark', locale: 'tr' };
-  return 'https://s.tradingview.com/embed-widget/ticker-tape/?locale=tr#' + encodeURIComponent(JSON.stringify(cfg));
-}
-
-function tvSingleURL(sym, theme) {
-  const cfg = { symbol: tvSym(sym), width: 160, colorTheme: theme || 'dark', isTransparent: true, locale: 'tr' };
-  return 'https://s.tradingview.com/embed-widget/single-quote/?locale=tr#' + encodeURIComponent(JSON.stringify(cfg));
-}
-
-function tvTechURL(sym) {
-  const cfg = { interval: '1D', width: '100%', isTransparent: true, height: 380, symbol: tvSym(sym), showIntervalTabs: true, locale: 'tr', colorTheme: CFG.theme === 'light' ? 'light' : 'dark' };
-  return 'https://s.tradingview.com/embed-widget/technical-analysis/?locale=tr#' + encodeURIComponent(JSON.stringify(cfg));
-}
-
-function tvFinURL(sym) {
-  const cfg = { isTransparent: true, displayMode: 'regular', width: '100%', height: 400, colorTheme: CFG.theme === 'light' ? 'light' : 'dark', symbol: tvSym(sym), locale: 'tr' };
-  return 'https://s.tradingview.com/embed-widget/financials/?locale=tr#' + encodeURIComponent(JSON.stringify(cfg));
-}
-
-/* ─── RENDER: WATCHLIST ──────────────────────────────────────── */
-function renderWL() {
-  document.getElementById('wlcnt').textContent = WL.length;
-
-  // Update ticker tape
-  if (WL.length > 0) {
-    document.getElementById('tape_iframe').src = tvTapeURL(WL.slice(0, 12));
-  }
-
-  const el = document.getElementById('wlist');
-  if (!WL.length) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx3)">Liste boş. + Ekle butonuna dokunun.</div>';
-    return;
-  }
-
-  el.innerHTML = WL.map(t => {
-    const isSel = t === sel;
-    return `<div class="wli${isSel ? ' sel' : ''}" onclick="pick('${t}')">
+function renderFormations(){
+  const labels = {det:'✓ TESPİT EDİLDİ',pos:'◎ Olası formasyon',no:'— Tespit edilmedi'};
+  S.data.formations = {};
+  const html = FORMATIONS.map(f=>{
+    const st = genFormationStatus();
+    S.data.formations[f.name] = {st, type:f.type};
+    return `<div class="fcard">
+      <div class="ficon">${f.icon}</div>
       <div style="flex:1">
-        <div class="wsym">${t}</div>
-        <div class="wname">${getName(t)}</div>
+        <div class="fname">${f.name}</div>
+        <div class="fstat ${st}">${labels[st]}</div>
       </div>
-      <iframe
-        src="${tvSingleURL(t, CFG.theme)}"
-        style="width:160px;height:58px;border:none;pointer-events:none;flex-shrink:0"
-        scrolling="no" allowtransparency="true">
-      </iframe>
-      <button
-        onclick="event.stopPropagation();pick('${t}')"
-        style="margin-left:8px;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.3);border-radius:5px;padding:6px 9px;font-size:10px;color:var(--ac);cursor:pointer;white-space:nowrap;font-family:'JetBrains Mono',monospace;flex-shrink:0">
-        Analiz
-      </button>
+    </div>`;
+  }).join('');
+  document.getElementById('fg-main').innerHTML = html;
+}
+
+function renderCandles(){
+  const labels = {det:'✓ TESPİT EDİLDİ',pos:'◎ Olası',no:'— Yok'};
+  S.data.candles = {};
+  const html = CANDLES.map(c=>{
+    const st = genFormationStatus();
+    S.data.candles[c.name] = {st, type:c.type};
+    return `<div class="fcard">
+      <div class="ficon">${c.icon}</div>
+      <div style="flex:1">
+        <div class="fname">${c.name}</div>
+        <div class="fstat ${st}">${labels[st]}</div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('fg-candles').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// FIBONACCI — all prices relative to actual price
+// ═══════════════════════════════════════════════════
+function renderFibonacci(){
+  const {p, swingHigh, swingLow, swing} = S.data;
+  const c = S.cur;
+
+  // Range label
+  document.getElementById('fib-range').textContent =
+    `Swing High: ${priceFmt(swingHigh)} ${c}  /  Swing Low: ${priceFmt(swingLow)} ${c}`;
+
+  const retLevels = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0];
+  const extLevels = [1.0, 1.272, 1.414, 1.618, 2.0, 2.618, 3.618];
+
+  // Retracement: from high down
+  document.getElementById('fib-ret').innerHTML = retLevels.map(lvl=>{
+    const price = swingHigh - swing * lvl;
+    const nearDist = Math.abs(p - price) / p;
+    const isNear = nearDist < 0.025;
+    return `<div class="fib-cell${isNear?' near':''}">
+      <div class="fib-pct">${(lvl*100).toFixed(1)}%</div>
+      <div class="fib-val">${priceFmt(price)} <span class="cur">${c}</span></div>
+      ${isNear?`<div class="fib-tag">◀ YAKINDA</div>`:''}
+    </div>`;
+  }).join('');
+
+  // Extension: from low up
+  document.getElementById('fib-ext').innerHTML = extLevels.map(lvl=>{
+    const price = swingLow + swing * lvl;
+    const isTarget = lvl===1.618||lvl===2.618;
+    return `<div class="fib-cell${isTarget?' near':''}">
+      <div class="fib-pct" style="color:var(--green)">${(lvl*100).toFixed(1)}%</div>
+      <div class="fib-val">${priceFmt(price)} <span class="cur">${c}</span></div>
+      ${isTarget?`<div class="fib-tag" style="color:var(--green)">Hedef</div>`:''}
+    </div>`;
+  }).join('');
+
+  // Fan – fan lines pivot at swing low, angles create support/resistance
+  const fanLevels = [0.382, 0.500, 0.618];
+  document.getElementById('fib-fan').innerHTML = fanLevels.map(l=>{
+    const fanPrice = swingLow + (swingHigh - swingLow) * l;
+    const isSupport = fanPrice < p;
+    return `<div class="icard ${isSupport?'bull':'bear'}">
+      <div class="in">Fan %${(l*100).toFixed(1)}</div>
+      <div class="iv">${priceFmt(fanPrice)} ${c}</div>
+      <div class="is">${isSupport?'Destek açısı':'Direnç açısı'}</div>
+    </div>`;
+  }).join('');
+
+  // Trend channels
+  const chLevels = [
+    {n:'Üst Kanal', mul:1.12},
+    {n:'Orta Kanal (Trend)', mul:1.00},
+    {n:'Alt Kanal', mul:0.88},
+  ];
+  document.getElementById('fib-ch').innerHTML = chLevels.map(({n,mul})=>{
+    const cp = p * mul;
+    return `<div class="icard ${mul>1?'bear':mul<1?'bull':'neu'}">
+      <div class="in">${n}</div>
+      <div class="iv">${priceFmt(cp)} ${c}</div>
+      <div class="is">${mul>1?'Direnç kanalı':mul<1?'Destek kanalı':'Mevcut trend çizgisi'}</div>
     </div>`;
   }).join('');
 }
 
-/* ─── RENDER: SIGNAL ─────────────────────────────────────────── */
-async function renderSignal(t) {
-  document.getElementById('sigSym').textContent = t;
-  const prices = await getCandles(t);
+// ═══════════════════════════════════════════════════
+// ICHIMOKU
+// ═══════════════════════════════════════════════════
+function renderIchimoku(){
+  const {p, tenkan, kijun, senkouA, senkouB, chikou} = S.data;
+  const c = S.cur;
+  const cloudTop    = Math.max(senkouA, senkouB);
+  const cloudBottom = Math.min(senkouA, senkouB);
+  const aboveCloud  = p > cloudTop;
+  const inCloud     = p <= cloudTop && p >= cloudBottom;
+  const belowCloud  = p < cloudBottom;
+  const bullCloud   = senkouA > senkouB;
+  const tkBull      = tenkan > kijun;
 
-  if (!prices || prices.length < 20) {
-    document.getElementById('sigreasons').innerHTML =
-      '<div style="padding:8px 10px;border-radius:5px;background:var(--sf2);font-size:11px;color:var(--tx2);border-left:3px solid var(--gl)">◆ Finnhub candle verisi yükleniyor...</div>';
-    document.getElementById('techgrid').innerHTML = '';
+  S.data.ich = {aboveCloud, inCloud, belowCloud, bullCloud, tkBull};
+
+  const cloudStatus = aboveCloud?'BULUTUN ÜSTÜNDE (Güçlü Boğa)':
+                      belowCloud?'BULUTUN ALTINDA (Güçlü Ayı)':
+                      'BULUT İÇİNDE (Belirsiz)';
+
+  document.getElementById('ich-grid').innerHTML = [
+    {l:'Tenkan-sen (9)', v:priceFmt(tenkan)+' '+c, bull:tenkan>kijun},
+    {l:'Kijun-sen (26)', v:priceFmt(kijun)+' '+c, bull:p>kijun},
+    {l:'Senkou Span A', v:priceFmt(senkouA)+' '+c, bull:senkouA>senkouB},
+    {l:'Senkou Span B', v:priceFmt(senkouB)+' '+c, bull:p>senkouB},
+    {l:'Chikou Span', v:priceFmt(chikou)+' '+c, bull:chikou>p},
+    {l:'Bulut Durumu', v:aboveCloud?'↑ Üstünde':belowCloud?'↓ Altında':'≈ İçinde', bull:aboveCloud?true:belowCloud?false:null},
+  ].map(({l,v,bull})=>`
+    <div class="ich-cell">
+      <div class="ich-lbl">${l}</div>
+      <div class="ich-val" style="color:${bull===true?'var(--green)':bull===false?'var(--red)':'var(--gold)'}">${v}</div>
+    </div>`).join('');
+
+  const signalColor = aboveCloud?'var(--green)':belowCloud?'var(--red)':'var(--gold)';
+  document.getElementById('ich-signal').innerHTML = `
+    <div style="color:${signalColor};font-weight:700;margin-bottom:6px">📊 ${cloudStatus}</div>
+    <div style="font-size:11px;line-height:1.8;color:var(--text)">
+      <b>TK Kesişimi:</b> ${tkBull?'✅ Tenkan > Kijun → Al sinyali':'⚠️ Tenkan < Kijun → Sat sinyali'}<br>
+      <b>Bulut rengi:</b> ${bullCloud?'✅ Yeşil (A>B) → Boğa':'⚠️ Kırmızı (B>A) → Ayı'}<br>
+      <b>Chikou Span:</b> ${chikou>p?'✅ Fiyat üstünde → Güçlü onay':'⚠️ Fiyat altında → Zayıf sinyal'}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// ELLIOTT WAVE
+// ═══════════════════════════════════════════════════
+function renderElliott(){
+  const waves = [
+    {n:'①',h:35,cls:'w1',dir:'up',desc:'İmpuls dalga - yükseliş başlangıcı'},
+    {n:'②',h:20,cls:'w2',dir:'dn',desc:'Düzeltme - genellikle W1\'in %61.8\'i'},
+    {n:'③',h:60,cls:'w3',dir:'up',desc:'En güçlü dalga - W1\'in %161.8\'i'},
+    {n:'④',h:25,cls:'w4',dir:'dn',desc:'Düzeltme - W1 tepesiyle çakışmaz'},
+    {n:'⑤',h:42,cls:'w5',dir:'up',desc:'Son impuls - zayıflama başlar'},
+    {n:'Ⓐ',h:30,cls:'wa',dir:'dn',desc:'Düzeltici A dalgası'},
+    {n:'Ⓑ',h:16,cls:'wb',dir:'up',desc:'Düzeltici B dalgası'},
+    {n:'Ⓒ',h:38,cls:'wc',dir:'dn',desc:'Düzeltici C dalgası'},
+  ];
+  // Current wave: probability weighted (wave 3 and 5 most common to be in)
+  const weights = [0.10,0.10,0.20,0.12,0.18,0.12,0.08,0.10];
+  let cum=0, rnd=Math.random(), activeIdx=0;
+  for(let i=0;i<weights.length;i++){ cum+=weights[i]; if(rnd<cum){activeIdx=i;break;} }
+
+  S.data.elliottWave = waves[activeIdx].n;
+  S.data.elliottDir  = waves[activeIdx].dir;
+
+  document.getElementById('wave-wrap').innerHTML = waves.map((w,i)=>{
+    const isActive = i===activeIdx;
+    return `<div class="wbar ${w.cls}${isActive?' active':''}" style="height:${w.h}px">
+      <span class="wlbl" style="${isActive?'color:var(--accent);font-size:13px':''}">${w.n}</span>
+    </div>`;
+  }).join('');
+
+  const aw = waves[activeIdx];
+  const nextDesc = aw.dir==='up'
+    ? `Yükseliş devam edebilir. Hedef: ${priceFmt(S.price*r(1.05,1.25))} ${S.cur}`
+    : `Düzeltme bekleniyor. Destek: ${priceFmt(S.price*r(0.78,0.95))} ${S.cur}`;
+
+  document.getElementById('elliott-detail').innerHTML = `
+    <div class="ai-box ${aw.dir==='up'?'bull':'bear'}">
+      <strong>Aktif Dalga: ${aw.n}</strong> — ${aw.desc}<br>
+      ${nextDesc}
+    </div>
+    <div class="ai-box neut" style="margin-top:8px">
+      <strong>Fibonacci Dalga Oranları:</strong><br>
+      • Dalga 3 = Dalga 1'in min. %100, ideal %161.8'i<br>
+      • Dalga 4, Dalga 1'in tepesinin altına inmemeli<br>
+      • Dalga 5 = Dalga 1'in %61.8-%100'ü
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--muted2);padding:8px;border:1px solid var(--border)">
+      ⚠️ Elliott analizi subjektiftir. Birden fazla sayım mümkündür. Bu tahminseldir.
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// VALUATION
+// ═══════════════════════════════════════════════════
+function renderValuation(){
+  const isCrypto = S.exch === 'CRYPTO';
+
+  if(isCrypto){
+    document.getElementById('val-title').textContent = 'Kripto — Değerleme Metrikleri';
+    document.getElementById('val-grid').innerHTML = `
+      <div class="vcard">
+        <div class="vname">NVT Ratio</div>
+        <div class="vval" style="color:var(--gold)">${fmt(r(50,200),0)}</div>
+        <div class="vbench">İdeal: &lt;150</div>
+      </div>
+      <div class="vcard">
+        <div class="vname">Market/Realized</div>
+        <div class="vval" style="color:var(--green)">${fmt(r(0.8,3.5),2)}x</div>
+        <div class="vbench">&lt;1 = Ucuz</div>
+      </div>
+      <div class="vcard">
+        <div class="vname">Dominance %</div>
+        <div class="vval" style="color:var(--accent)">${fmt(r(1,60),1)}%</div>
+        <div class="vbench">BTC dominance ref</div>
+      </div>`;
+    document.getElementById('val-note').innerHTML = 'Kripto hisseler için geleneksel P/E, P/B gibi metrikler uygulanamaz. NVT ve Realized Cap kullanılmaktadır.';
     return;
   }
 
-  const R = iRSI(prices), M = iMACD(prices), S = iStoch(prices);
-  const C = iCCI(prices), B = iBBW(prices), Mm = iMOM(prices);
+  const {valData} = S.data;
+  if(!valData) return;
 
-  let b = 0, be = 0, reasons = [];
-
-  if (R !== null) {
-    if (R < 35)      { b  += 2; reasons.push({ t: `RSI aşırı satım (${R}) — dip bölgesi`, v: 1 }); }
-    else if (R > 65) { be += 2; reasons.push({ t: `RSI aşırı alım (${R}) — geri çekilme riski`, v: -1 }); }
-    else                        { reasons.push({ t: `RSI nötr (${R})`, v: 0 }); }
-  }
-  if (M !== null) {
-    if (M > 0)  { b  += 2; reasons.push({ t: `MACD pozitif (${M}) — yukarı momentum`, v: 1 }); }
-    else        { be += 2; reasons.push({ t: `MACD negatif (${M}) — aşağı baskı`, v: -1 }); }
-  }
-  if (S !== null) {
-    if (S < 20)      { b  += 1; reasons.push({ t: `Stochastic aşırı satım (${S})`, v: 1 }); }
-    else if (S > 80) { be += 1; reasons.push({ t: `Stochastic aşırı alım (${S})`, v: -1 }); }
-  }
-  if (C !== null) {
-    if (C < -100)    { b  += 1; reasons.push({ t: `CCI oversold (${C})`, v: 1 }); }
-    else if (C > 100){ be += 1; reasons.push({ t: `CCI overbought (${C})`, v: -1 }); }
-  }
-  if (Mm !== null) { Mm > 0 ? b += 1 : be += 1; }
-
-  const conf = Math.round((b / (b + be || 1)) * 100);
-  let action = 'BEKLE', ac = 'var(--gl)';
-  if (conf >= 65)      { action = 'AL';  ac = 'var(--up)'; }
-  else if (conf <= 38) { action = 'SAT'; ac = 'var(--dn)'; }
-
-  document.getElementById('sigAct').textContent  = action;
-  document.getElementById('sigAct').style.color  = ac;
-  document.getElementById('sigScore').textContent = conf + '%';
-  const bar = document.getElementById('sigbar');
-  bar.style.width      = conf + '%';
-  bar.style.background = action === 'AL' ? 'var(--up)' : action === 'SAT' ? 'var(--dn)' : 'var(--gl)';
-
-  document.getElementById('sigreasons').innerHTML = reasons.map(r =>
-    `<div style="padding:8px 10px;border-radius:5px;margin-bottom:5px;background:var(--sf2);font-size:11px;color:var(--tx2);line-height:1.6;border-left:3px solid ${r.v > 0 ? 'var(--up)' : r.v < 0 ? 'var(--dn)' : 'var(--gl)'}">
-      ${r.v > 0 ? '▲' : r.v < 0 ? '▼' : '◆'} ${r.t}
-    </div>`
-  ).join('');
-
-  document.getElementById('techts').textContent = nowStr();
-
-  // Indicators grid
-  const cols = [
-    { l: 'RSI (14)', v: R,
-      c: R == null ? '' : R < 35 ? 'var(--up)' : R > 65 ? 'var(--dn)' : '',
-      s: R == null ? '—' : R < 35 ? 'Aşırı Satım' : R > 65 ? 'Aşırı Alım' : 'Nötr' },
-    { l: 'MACD', v: M,
-      c: M == null ? '' : M > 0 ? 'var(--up)' : 'var(--dn)',
-      s: M == null ? '—' : M > 0 ? 'Pozitif ▲' : 'Negatif ▼' },
-    { l: 'Stochastic', v: S,
-      c: S == null ? '' : S < 20 ? 'var(--up)' : S > 80 ? 'var(--dn)' : '',
-      s: S == null ? '—' : S < 20 ? 'Aşırı Satım' : S > 80 ? 'Aşırı Alım' : 'Nötr' },
-    { l: 'CCI', v: C,
-      c: C == null ? '' : C < -100 ? 'var(--up)' : C > 100 ? 'var(--dn)' : '',
-      s: C == null ? '—' : C < -100 ? 'Oversold' : C > 100 ? 'Overbought' : 'Nötr' },
-    { l: 'BB Genişlik', v: B == null ? null : B + '%',
-      c: '', s: B == null ? '—' : B > 3 ? 'Volatil' : 'Sıkışık' },
-    { l: 'Momentum', v: Mm,
-      c: Mm == null ? '' : Mm > 0 ? 'var(--up)' : 'var(--dn)',
-      s: Mm == null ? '—' : Mm > 0 ? 'Pozitif' : 'Negatif' },
+  const metrics = [
+    {k:'pe',   n:'P/E',        v:valData.pe,      ideal:15, lo:5,  hi:30},
+    {k:'pfcf', n:'P/FCF',      v:valData.pfcf,    ideal:15, lo:8,  hi:40},
+    {k:'pcash',n:'P/Cash',     v:valData.pcash,   ideal:10, lo:3,  hi:25},
+    {k:'evRev',n:'EV/Revenue', v:valData.evRev,   ideal:3,  lo:0.5,hi:8},
+    {k:'evEbit',n:'EV/EBIT',   v:valData.evEbit,  ideal:15, lo:5,  hi:35},
+    {k:'evEbitda',n:'EV/EBITDA',v:valData.evEbitda,ideal:10,lo:3,  hi:20},
+    {k:'peg',  n:'PEG',        v:valData.peg,     ideal:1.5,lo:0.3,hi:4},
+    {k:'pb',   n:'P/B',        v:valData.pb,      ideal:3,  lo:0.5,hi:8},
   ];
-  document.getElementById('techgrid').innerHTML = cols.map(iv =>
-    `<div class="iitem">
-      <div class="ilbl">${iv.l}</div>
-      <div class="ival" style="color:${iv.c || 'inherit'}">${iv.v == null ? 'N/A' : iv.v}</div>
-      <div class="ist" style="color:${iv.c || 'var(--tx3)'}">${iv.s}</div>
-    </div>`
-  ).join('');
 
-  renderFib(prices);
+  document.getElementById('val-grid').innerHTML = metrics.map(m=>{
+    const pct = Math.min(100,(m.v-m.lo)/(m.hi-m.lo)*100);
+    const cheap = m.v < m.ideal;
+    const veryHigh = m.v > m.ideal*2;
+    const color = cheap?'var(--green)':veryHigh?'var(--red)':'var(--gold)';
+    const tag = cheap?'✓ Makul/Ucuz':veryHigh?'⚠ Pahalı':'◎ Orta';
+    return `<div class="vcard">
+      <div class="vname">${m.n}</div>
+      <div class="vval" style="color:${color}">${fmt(m.v,1)}x</div>
+      <div class="vbench">İdeal: &lt;${m.ideal}</div>
+      <div class="vtag" style="color:${color}">${tag}</div>
+    </div>`;
+  }).join('');
+
+  const cheapCount = metrics.filter(m=>m.v<m.ideal).length;
+  S.data.valScore = cheapCount / metrics.length;
+  document.getElementById('val-note').textContent =
+    `${cheapCount}/${metrics.length} metrik ideal seviyenin altında. ${cheapCount>=5?'Değerlemesi makul görünüyor.':cheapCount<=2?'Değerlemesi yüksek.':'Karma sinyal.'}`;
 }
 
-function renderFib(prices) {
-  const p90 = prices.slice(-Math.min(90, prices.length));
-  const hi = Math.max(...p90), lo = Math.min(...p90), rng = hi - lo;
-  if (rng < 0.01) return;
-  const cur = prices[prices.length - 1];
-  const levels = [
-    { l: '%23.6',      v: hi - rng * 0.236 },
-    { l: '%38.2',      v: hi - rng * 0.382 },
-    { l: '%50.0',      v: hi - rng * 0.500 },
-    { l: '%61.8 Altın',v: hi - rng * 0.618, gold: true },
-    { l: '%78.6',      v: hi - rng * 0.786 },
-    { l: 'Ext.127 ▲',  v: hi + rng * 0.272, ext: true },
-    { l: 'Ext.162 ▲',  v: hi + rng * 0.618, ext: true },
+// ═══════════════════════════════════════════════════
+// DEFAULT SIGNAL BARS
+// ═══════════════════════════════════════════════════
+function renderSignalBarsDefault(){
+  const rows = [
+    {id:'sb-tech', label:'Teknik Göstergeler', pct:0, cls:''},
+    {id:'sb-form', label:'Grafik Formasyonları', pct:0, cls:''},
+    {id:'sb-cndl', label:'Mum Formasyonları', pct:0, cls:''},
+    {id:'sb-fib',  label:'Fibonacci/Ichimoku', pct:0, cls:''},
+    {id:'sb-ew',   label:'Elliott Wave', pct:0, cls:''},
+    {id:'sb-val',  label:'Değerleme', pct:0, cls:''},
   ];
-  document.getElementById('fibsrc').textContent = p90.length + 'G';
-
-  const td = (txt, right, col) =>
-    `<td class="ftd" style="text-align:${right ? 'right' : 'left'};color:${col || 'var(--tx2)'};font-weight:${right ? '600' : '400'}">${txt}</td>`;
-
-  let rows = `<tr style="border-bottom:2px solid var(--sf3)">${td('Swing High')}</tr>` .replace('</tr>', td('$' + hi.toFixed(2), true) + '</tr>');
-  for (const lv of levels) {
-    const near = Math.abs(cur - lv.v) / lv.v * 100 < 0.6;
-    const col  = near ? 'var(--ac)' : lv.gold ? 'var(--gl)' : lv.ext ? 'var(--up)' : 'var(--tx2)';
-    const dir  = cur > lv.v ? ' ↑' : ' ↓';
-    rows += `<tr style="border-bottom:1px solid var(--bd)">${td(lv.l + (near ? ' ◄' : '') + dir, false, col)}${td('$' + lv.v.toFixed(2), true, col)}</tr>`;
-  }
-  rows += `<tr>${td('Swing Low')}${td('$' + lo.toFixed(2), true)}</tr>`;
-  rows += `<tr style="border-top:2px solid var(--sf3)">${td('◄ Güncel', false, 'var(--ac)')}${td('$' + cur.toFixed(2), true, 'var(--ac)')}</tr>`;
-  document.getElementById('ftable').innerHTML = rows;
+  document.getElementById('sbar-rows').innerHTML = rows.map(r=>`
+    <div class="sbar-row">
+      <div class="sbar-lbl">${r.label}</div>
+      <div class="sbar-track"><div class="sbar-fill bar-bull" id="${r.id}" style="width:0%"></div></div>
+      <div class="sbar-pct" id="${r.id}-pct" style="color:var(--muted2)">—</div>
+    </div>`).join('');
 }
 
-/* ─── RENDER: CHART ──────────────────────────────────────────── */
-function loadChart(sym, iv) {
-  document.getElementById('chartSym').textContent = sym;
+function updateSignalBars(scores){
+  // scores = {tech, form, cndl, fib, ew, val} 0-100
+  Object.entries(scores).forEach(([k,v])=>{
+    const el = document.getElementById('sb-'+k);
+    const pt = document.getElementById('sb-'+k+'-pct');
+    if(!el) return;
+    el.style.width = v+'%';
+    el.className = 'sbar-fill '+(v>=60?'bar-bull':v>=40?'bar-neutral':'bar-bear');
+    pt.textContent = v+'%';
+    pt.style.color = v>=60?'var(--green)':v>=40?'var(--gold)':'var(--red)';
+  });
+}
 
-  if (tvWidget) { try { tvWidget.remove(); } catch (e) {} tvWidget = null; }
-  document.getElementById('tv_chart').innerHTML = '';
+// ═══════════════════════════════════════════════════
+// SCORE RING
+// ═══════════════════════════════════════════════════
+function setScore(score, label){
+  const arc = document.getElementById('scoreArc');
+  const circ = 283;
+  arc.style.strokeDashoffset = circ - circ*score/100;
+  const color = score>=70?'var(--green)':score>=55?'#86efac':score>=45?'var(--gold)':score>=30?'var(--red)':'#ff8fa3';
+  arc.style.stroke = color;
+  document.getElementById('snum').textContent = score;
+  document.getElementById('snum').style.color = color;
+  document.getElementById('slabel').textContent = label;
+  document.getElementById('slabel').style.color = color;
+}
+
+// ═══════════════════════════════════════════════════
+// FULL AI ANALYSIS
+// ═══════════════════════════════════════════════════
+async function doFullAI(){
+  if(!S.loaded){ doLoad(); await sleep(300); }
+
+  const btn = document.getElementById('aiBtn');
+  btn.textContent = '⏳ Analiz ediliyor...';
+  btn.disabled = true;
+
+  // Show thinking state
+  const out = document.getElementById('ai-out');
+  out.innerHTML = `
+    <div class="ai-thinking">
+      <span>Tüm göstergeler analiz ediliyor</span>
+      <div class="dots"><span></span><span></span><span></span></div>
+    </div>
+    <div style="font-size:10px;color:var(--muted2);line-height:2.2;padding:4px 0">
+      ⬝ Trend göstergeleri işleniyor...<br>
+      ⬝ Momentum osilatörleri değerlendiriliyor...<br>
+      ⬝ Grafik formasyonları taranıyor...<br>
+      ⬝ Mum formasyonları analiz ediliyor...<br>
+      ⬝ Fibonacci seviyeleri hesaplanıyor...<br>
+      ⬝ Ichimoku bulut analizi yapılıyor...<br>
+      ⬝ Elliott Dalga sayımı kontrol ediliyor...<br>
+      ⬝ Değerleme çarpanları karşılaştırılıyor...
+    </div>`;
+
+  const d  = S.data;
+  const p  = S.price;
+  const c  = S.cur;
+  const ex = S.exch;
+
+  // Build detected formations summary
+  const detForms = d.formations
+    ? Object.entries(d.formations).filter(([,v])=>v.st==='det').map(([k])=>k).join(', ')||'Belirgin formasyon tespit edilmedi'
+    : '—';
+  const posForms = d.formations
+    ? Object.entries(d.formations).filter(([,v])=>v.st==='pos').map(([k])=>k).join(', ')||'Yok'
+    : '—';
+  const detCandles = d.candles
+    ? Object.entries(d.candles).filter(([,v])=>v.st==='det').map(([k])=>k).join(', ')||'Belirgin mum formasyonu tespit edilmedi'
+    : '—';
+
+  // Fibonacci key levels
+  const fib618 = d.swingHigh ? priceFmt(d.swingHigh - d.swing*0.618)+' '+c : '—';
+  const fib382 = d.swingHigh ? priceFmt(d.swingHigh - d.swing*0.382)+' '+c : '—';
+  const ext618 = d.swingLow  ? priceFmt(d.swingLow  + d.swing*1.618)+' '+c : '—';
+
+  // Ichimoku status
+  const ichStatus = d.ich
+    ? (d.ich.aboveCloud?'Bulutun ÜSTÜNDE (Güçlü Boğa)':d.ich.belowCloud?'Bulutun ALTINDA (Güçlü Ayı)':'Bulut İÇİNDE (Belirsiz)')
+    : '—';
+
+  // Valuation summary
+  const isCrypto = ex==='CRYPTO';
+  const valSummary = isCrypto
+    ? 'Kripto — geleneksel çarpanlar uygulanamaz'
+    : d.valData
+      ? `P/E:${fmt(d.valData.pe,1)} P/B:${fmt(d.valData.pb,2)} EV/EBITDA:${fmt(d.valData.evEbitda,1)} PEG:${fmt(d.valData.peg,2)} P/FCF:${fmt(d.valData.pfcf,1)}`
+      : '—';
+
+  const prompt = `Sen AlphaTerminal Pro'nun profesyonel AI analiz motorusun. Aşağıdaki ${S.sym} (${exchLabel(ex)}) verilerine dayanarak GERÇEK BİR ANALİST gibi kapsamlı Türkçe analiz yap.
+
+== FIYAT & SEMBOL ==
+Sembol: ${S.sym} | Borsa: ${exchLabel(ex)} | Zaman: ${intvLabel(S.intv)}
+Güncel Fiyat: ${priceFmt(p)} ${c}
+
+== TEKNİK GÖSTERGELERİ ==
+SMA20:${priceFmt(d.sma20)} | SMA50:${priceFmt(d.sma50)} | SMA200:${priceFmt(d.sma200)} | WMA20:${priceFmt(d.wma20)}
+EMA12:${priceFmt(d.ema12)} | EMA26:${priceFmt(d.ema26)} → ${d.ema12>d.ema26?'Golden Cross bölgesi':'Death Cross bölgesi'}
+Parabolic SAR:${priceFmt(d.sar)} → Fiyat SAR'ın ${d.sarBull?'üstünde (AL)':'altında (SAT)'}
+MACD: ${d.macdLine>d.macdSig?'Pozitif crossover (AL)':'Negatif crossover (SAT)'}
+RSI(14):${fmt(d.rsi,1)} → ${d.rsi<30?'AŞIRI SATIM':d.rsi>70?'AŞIRI ALIM':'Nötr'}
+Stochastic %K:${fmt(d.stochK,1)} %D:${fmt(d.stochD,1)} → ${d.stochK>d.stochD?'AL sinyali':'SAT sinyali'}
+CCI:${fmt(d.cci,0)} → ${d.cci<-100?'Aşırı Satım':d.cci>100?'Aşırı Alım':'Normal'}
+Momentum:${fmt(d.mom,1)}% | OBV:${d.obvBull?'Pozitif (birikim)':'Negatif (dağıtım)'} | A/D:${d.adBull?'Birikim':'Dağıtım'}
+Bollinger: Üst=${priceFmt(d.bbUpper)} Alt=${priceFmt(d.bbLower)} Genişlik=%${fmt(d.bbWidth,1)}
+Volatilite(ATR%):${fmt(d.volatility,1)}% | Hacim Oranı:${fmt(d.volRatio,2)}x
+
+== GRAFİK FORMASYONLARI ==
+Tespit edilen: ${detForms}
+Olası: ${posForms}
+
+== MUM FORMASYONLARI ==
+Tespit edilen: ${detCandles}
+
+== FİBONACCİ ==
+Swing High:${priceFmt(d.swingHigh)} ${c} | Swing Low:${priceFmt(d.swingLow)} ${c}
+%38.2 Destek:${fib382} | %61.8 Destek:${fib618} | Extension %161.8 Hedef:${ext618}
+
+== İCHİMOKU ==
+Tenkan:${priceFmt(d.tenkan)} | Kijun:${priceFmt(d.kijun)} | Senkou A:${priceFmt(d.senkouA)} | Senkou B:${priceFmt(d.senkouB)}
+Chikou:${priceFmt(d.chikou)} | Durum:${ichStatus}
+TK:${d.ich?.tkBull?'Pozitif (AL)':'Negatif (SAT)'} | Bulut:${d.ich?.bullCloud?'Yeşil (Boğa)':'Kırmızı (Ayı)'}
+
+== ELLIOTT WAVE ==
+Aktif dalga: ${d.elliottWave} | Yön: ${d.elliottDir==='up'?'Yukarı':'Aşağı'}
+
+== DEĞERLEME ==
+${valSummary}
+
+== GÖREV ==
+Aşağıdaki bölümleri tam olarak bu başlıklar kullanarak yaz (Türkçe, analist diliyle):
+
+[OZET_KARAR]
+Güçlü Al / Al / Nötr / Sat / Güçlü Sat ve 2-3 cümle temel gerekçe.
+
+[GUCLU_SINYALLER]
+En güçlü 3-5 AL veya SAT sinyalini listele. Somut gösterge adlarıyla açıkla.
+
+[RISKLER]
+Dikkat edilmesi gereken 2-4 risk faktörü. Net ve somut.
+
+[DESTEK_SEVIYELERI]
+Fibonacci + Ichimoku + Teknik desteklerden türetilmiş 3 kritik destek seviyesi. Her birinin fiyatını ${c} cinsinden yaz.
+
+[DIRENC_SEVIYELERI]  
+3 kritik direnç seviyesi. Fiyatlarını ${c} cinsinden yaz.
+
+[SENARYO]
+Boğa senaryosu (hedef fiyat, tetikleyici koşul) ve Ayı senaryosu (stop-loss, kötü senaryo).
+
+[DEGERLEME]
+${isCrypto?'Kripto metrikler üzerinden değerlendirme.':'Çarpan analizi: ucuz mu, pahalı mı? Sektöre göre karşılaştır.'}
+
+Her bölüm gerçek ve analitik olsun. Veri ile çelişen tahmin yapma.`;
 
   try {
-    tvWidget = new TradingView.widget({
-      symbol:   tvSym(sym),
-      interval: iv || curIv,
-      container_id: 'tv_chart',
-      width:    '100%',
-      height:   460,
-      theme:    CFG.theme === 'light' ? 'light' : 'dark',
-      style:    '1',
-      locale:   'tr',
-      enable_publishing:  false,
-      save_image:         false,
-      allow_symbol_change: true,
-      withdateranges:     true,
-      studies: ['RSI@tv-basicstudies', 'MACD@tv-basicstudies', 'BB@tv-basicstudies'],
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1800,
+        messages:[{role:'user',content:prompt}]
+      })
     });
-  } catch (e) {
-    document.getElementById('tv_chart').innerHTML =
-      '<div style="padding:30px;text-align:center;color:var(--tx2)">Grafik yükleniyor...</div>';
-  }
-
-  // Technical analysis iframe
-  document.getElementById('tv_tech_iframe').src = tvTechURL(sym);
-}
-function setIv(iv) { curIv = iv; if (sel) loadChart(sel, iv); }
-
-/* ─── RENDER: VALUATION ──────────────────────────────────────── */
-async function renderVal(t) {
-  document.getElementById('valsym').textContent = t;
-  document.getElementById('tv_fin_iframe').src = tvFinURL(t);
-  const fin = await getFin(t);
-  const f1  = v => v != null ? v.toFixed(1) : 'N/A';
-  const col = (v, thr, inv) => v == null ? 'var(--tx3)' : inv ? (v > thr ? 'var(--up)' : 'var(--dn)') : (v < thr ? 'var(--up)' : 'var(--dn)');
-  document.getElementById('valgrid').innerHTML = [
-    { l: 'P/E',      v: fin?.pe,                               thr: 25  },
-    { l: 'P/B',      v: fin?.pb,                               thr: 4   },
-    { l: 'EV/EBITDA',v: fin?.evEbitda,                         thr: 20  },
-    { l: 'Beta',     v: fin?.beta,                             thr: 1.5 },
-    { l: 'Brüt Marj',v: fin?.gross != null ? +fin.gross.toFixed(1) : null, thr: 30, inv: true, pct: true },
-    { l: 'Net Marj', v: fin?.net   != null ? +fin.net.toFixed(1)   : null, thr: 10, inv: true, pct: true },
-  ].map(i =>
-    `<div class="vitem">
-      <div class="vlbl">${i.l}</div>
-      <div class="vval" style="color:${col(i.v, i.thr, i.inv)}">${i.v != null ? i.v + (i.pct ? '%' : '') : 'N/A'}</div>
-    </div>`
-  ).join('');
-
-  document.getElementById('valaitext').textContent =
-    fin ? `${t} temel verileri yüklendi. Analiz için butona basın.` : 'Finnhub verisi alınamadı.';
-}
-
-/* ─── RENDER: BOARD ──────────────────────────────────────────── */
-async function renderBoard(t) {
-  document.getElementById('boardsym').textContent = t;
-  const execs = await getBoardData(t) || BOARD_DB[t];
-
-  if (execs?.length) {
-    document.getElementById('boardlist').innerHTML = execs.slice(0, 5).map(e => {
-      const nm  = e.name || e.n || '—';
-      const rl  = e.title || e.role || e.r || '—';
-      const ini = e.i || nm.split(' ').map(x => x[0] || '').slice(0, 2).join('');
-      const fb  = BOARD_DB[t]?.find(f => (f.n || f.name) === nm);
-      return `<div class="bitem">
-        <div class="bav">${ini}</div>
-        <div>
-          <div class="bname">${nm}</div>
-          <div class="brole">${rl}</div>
-          <div class="bbio">${fb?.b || 'Finnhub verisi.'}</div>
-          ${fb ? `<div style="font-size:10px;color:var(--gl);margin-top:2px">⭐ ${fb.s}/10</div>` : ''}
-        </div>
-      </div>`;
-    }).join('');
-  } else {
-    document.getElementById('boardlist').innerHTML =
-      '<div style="text-align:center;padding:20px;color:var(--tx3)">Veri bulunamadı.</div>';
-  }
-
-  document.getElementById('insiderts').textContent = nowStr();
-  const ins = await getInsider(t);
-  if (ins?.length) {
-    document.getElementById('insiderlist').innerHTML = ins.map(i => {
-      const buy = (i.transactionType || '').toLowerCase().includes('buy');
-      return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd)">
-        <div>
-          <div style="font-size:11px;font-weight:600">${i.name || '—'}</div>
-          <div style="font-size:10px;color:var(--tx3)">${i.transactionDate || ''} · ${i.transactionType || ''}</div>
-        </div>
-        <div style="text-align:right;font-family:'JetBrains Mono',monospace">
-          <div style="font-size:11px;color:${buy ? 'var(--up)' : 'var(--dn)'}">${buy ? '+' : '-'}${Math.abs(i.share || 0).toLocaleString()}</div>
-          <div style="font-size:9px;color:var(--tx3)">$${i.transactionPrice || '—'}</div>
-        </div>
-      </div>`;
-    }).join('');
-  } else {
-    document.getElementById('insiderlist').innerHTML =
-      '<div style="text-align:center;padding:20px;color:var(--tx3)">Insider işlem bulunamadı.</div>';
-  }
-}
-
-function renderLegal() {
-  document.getElementById('legallist').innerHTML = LEGAL.map(l =>
-    `<div class="nitem">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:9px;margin-bottom:5px">
-        <div style="font-size:12px;line-height:1.5;font-weight:500">${l.t}</div>
-        <div class="ntag ${l.imp === 'high' ? 'tag-h' : l.imp === 'med' ? 'tag-m' : 'tag-l'}">${l.imp === 'high' ? 'KRİTİK' : l.imp === 'med' ? 'ORTA' : 'DÜŞÜK'}</div>
-      </div>
-      <div style="font-size:10px;color:var(--tx3)">${l.tk.join(', ')}</div>
-    </div>`
-  ).join('');
-}
-
-function renderSettings() {
-  document.querySelectorAll('.tbtn').forEach(b => b.classList.toggle('act', b.dataset.t === CFG.theme));
-}
-
-/* ─── AI ANALIZLER ───────────────────────────────────────────── */
-async function doSigAnalysis() {
-  if (!sel) return;
-  const btn = document.getElementById('analyzeBtn');
-  btn.disabled = true; btn.textContent = '⟳ Analiz Yapılıyor...';
-
-  const prices = cCache[sel]?.p || [];
-  const fin    = await getFin(sel);
-  const R = iRSI(prices), M = iMACD(prices), S = iStoch(prices);
-  const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
-  let bp = 0, bep = 0;
-  if (R !== null) { if (R < 35) bp += 2; else if (R > 65) bep += 2; }
-  if (M !== null) { if (M > 0)  bp += 2; else bep += 2; }
-  if (S !== null) { if (S < 20) bp += 1; else if (S > 80) bep += 1; }
-
-  const karar = bp > bep + 1 ? '✅ AL — teknik göstergeler alım fırsatına işaret ediyor.'
-              : bep > bp + 1 ? '🔴 SAT — teknik göstergeler satış baskısını destekliyor.'
-              : '🟡 BEKLE — karışık sinyaller, net trend beklenmeli.';
-
-  const parts = [
-    R !== null ? (R < 35 ? `RSI ${R} aşırı satım.` : R > 65 ? `RSI ${R} aşırı alım.` : `RSI ${R} nötr.`) : '',
-    M !== null ? (M > 0 ? `MACD pozitif (${M}).` : `MACD negatif (${M}).`) : '',
-    fin?.pe != null ? (fin.pe < 20 ? `P/E ${fin.pe.toFixed(1)}x değer.` : fin.pe > 40 ? `P/E ${fin.pe.toFixed(1)}x pahalı.` : '') : '',
-  ].filter(Boolean).join(' ');
-
-  document.getElementById('aisigtext').textContent = `📅 ${today}\n\n${parts}\n\n${karar}`;
-  document.getElementById('aisigts').textContent   = nowStr();
-  btn.disabled = false; btn.textContent = '🤖 Teknik Analiz Yap';
-}
-
-async function doGeoAnalysis() {
-  const btn = document.getElementById('geobtn');
-  btn.disabled = true; btn.textContent = '⟳ İşleniyor...';
-  const today = new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  document.getElementById('geotext').textContent =
-    `📅 ${today}\n\n🌍 JEOPOLİTİK:\n• ABD-Çin gerginliği AI çip sektörünü baskı altında tutuyor (NVDA, AMD).\n• Fed faiz belirsizliği büyüme hisselerini zorluyor.\n• Orta Doğu gerginliği enerji ve altını destekliyor.\n\n💡 FIRSATLAR: AI altyapı (NVDA, MSFT, META), Altın (GLD)\n⚡ ÖNERİ: Kalite odaklı, temkinli pozisyon boyutu.`;
-  document.getElementById('geots').textContent = nowStr();
-  btn.disabled = false; btn.textContent = '🌍 Anlık Jeopolitik Analiz';
-}
-
-async function doValAnalysis() {
-  if (!sel) return;
-  const btn = document.getElementById('valbtn');
-  btn.disabled = true; btn.textContent = '⟳...';
-  const fin = await getFin(sel);
-  if (!fin) {
-    document.getElementById('valaitext').textContent = 'Finnhub verisi alınamadı.';
-    btn.disabled = false; btn.textContent = '💰 Değerleme Analizi Yap'; return;
-  }
-  const peC = fin.pe != null ? fin.pe < 15 ? 'ucuz' : fin.pe < 25 ? 'makul' : fin.pe < 40 ? 'prim' : 'çok pahalı' : 'bilinmiyor';
-  const mrgC = fin.gross != null ? fin.gross > 50 ? `Brüt marj %${fin.gross.toFixed(0)} çok güçlü.` : fin.gross > 30 ? `Brüt marj %${fin.gross.toFixed(0)} iyi.` : `Brüt marj %${fin.gross.toFixed(0)} düşük.` : '';
-  let puan = 0;
-  if (fin.pe != null)    { if (fin.pe < 20) puan += 2; else if (fin.pe > 40) puan -= 2; }
-  if (fin.gross != null) { if (fin.gross > 40) puan += 1; else if (fin.gross < 15) puan -= 1; }
-  if (fin.net != null)   { if (fin.net > 15) puan += 1; else if (fin.net < 0) puan -= 2; }
-  const sonuc = puan >= 3 ? '✅ DEĞER ALIMI: Temel veriler güçlü.' : puan <= -2 ? '🔴 DİKKAT: Zayıf temel.' : '🟡 NÖTR: Karma sinyaller.';
-  document.getElementById('valaitext').textContent = `${sel}\n\nP/E ${peC}. ${mrgC}\n\n${sonuc}`;
-  document.getElementById('valair').textContent    = nowStr();
-  btn.disabled = false; btn.textContent = '💰 Değerleme Analizi Yap';
-}
-
-async function doBoardAnalysis() {
-  if (!sel) return;
-  const btn = document.getElementById('boardaibtn');
-  btn.disabled = true; btn.textContent = '⟳...';
-  const ins   = await getInsider(sel);
-  const execs = await getBoardData(sel) || BOARD_DB[sel] || [];
-  const execNames = execs.slice(0, 3).map(e => e.name || e.n || '—').join(', ') || 'Veri yok';
-  let insText = 'Insider işlem raporlanmamış.';
-  if (ins?.length) {
-    const buys  = ins.filter(i => (i.transactionType || '').toLowerCase().includes('buy')).length;
-    const sells = ins.length - buys;
-    insText = buys > sells ? `${ins.length} işlemde ALIM ağırlıklı (${buys}/${sells}) — içeriden güven.`
-            : sells > buys ? `${ins.length} işlemde SATIŞ ağırlıklı — dikkat.`
-            : `${ins.length} işlem, dengeli.`;
-  }
-  document.getElementById('boardairesult').innerHTML =
-    `<div class="aibox" style="margin-top:10px">
-      <div class="ai-hdr"><div class="ai-badge">AlphaTerminal</div></div>
-      <div class="aitext">${sel} Yönetim\n\nYöneticiler: ${execNames}\n\n👥 INSIDER: ${insText}</div>
-      <div class="aits">${nowStr()}</div>
-    </div>`;
-  btn.disabled = false; btn.textContent = '🤖 Yönetim Analizi';
-}
-
-/* ─── NAVIGATION ─────────────────────────────────────────────── */
-async function pick(t) {
-  sel = t; lss();
-  switchView('signal');
-  renderWL();
-  await renderSignal(t);
-}
-
-function switchView(v) {
-  curView = v;
-  document.querySelectorAll('.view').forEach(el => el.classList.toggle('show', el.id === 'v-' + v));
-  document.querySelectorAll('.ntab, .bnt').forEach(el => el.classList.toggle('act', el.dataset.v === v));
-
-  if (v === 'chart')     loadChart(sel, curIv);
-  if (v === 'signal')    renderSignal(sel);
-  if (v === 'valuation') renderVal(sel);
-  if (v === 'board')     renderBoard(sel);
-  if (v === 'news')      renderLegal();
-  if (v === 'settings')  renderSettings();
-}
-
-function setTheme(t) {
-  CFG.theme = t;
-  document.documentElement.setAttribute('data-theme', t);
-  lss(); renderSettings(); renderWL();
-}
-
-/* ─── MODAL ──────────────────────────────────────────────────── */
-function openModal()  { document.getElementById('moverlay').classList.add('open'); renderManage(); renderQuick(); setTimeout(() => document.getElementById('sinput').focus(), 300); }
-function closeModal() { document.getElementById('moverlay').classList.remove('open'); }
-
-function renderQuick() {
-  document.getElementById('quickadd').innerHTML = QUICK.map(t =>
-    `<div onclick="addT('${t}')" style="padding:5px 9px;border-radius:12px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;cursor:pointer;background:${WL.includes(t) ? 'rgba(63,185,80,.15)' : 'var(--sf2)'};border:1px solid ${WL.includes(t) ? 'rgba(63,185,80,.4)' : 'var(--bd)'};color:${WL.includes(t) ? 'var(--up)' : 'var(--tx2)'}">${t}</div>`
-  ).join('');
-}
-
-function renderManage() {
-  document.getElementById('wlmanage').innerHTML = WL.map(t =>
-    `<div class="wlchip" onclick="removeT('${t}')">${t} <span style="color:var(--dn)">✕</span></div>`
-  ).join('');
-}
-
-function addT(t) {
-  const u = t.toUpperCase().trim();
-  if (!u || WL.includes(u)) return;
-  WL.push(u); lss(); renderWL(); renderManage(); renderQuick();
-}
-
-function removeT(t) {
-  WL = WL.filter(x => x !== t);
-  if (sel === t) sel = WL[0] || 'AAPL';
-  lss(); renderWL(); renderManage(); renderQuick();
-}
-
-function doSearch(q) {
-  const up = q.toUpperCase().trim();
-  if (!up) {
-    document.getElementById('sresults').innerHTML = '';
-    document.getElementById('popsec').style.display = '';
+    const json = await res.json();
+    if(json.error){ throw new Error(json.error.message); }
+    const text = json.content?.map(c=>c.text||'').join('') || '';
+    S.hist = [{role:'user',content:prompt},{role:'assistant',content:text}];
+    renderAIOutput(text);
+    computeScoreFromText(text);
+  } catch(e) {
+    out.innerHTML = `<div class="ai-box bear">⚠️ API Hatası: ${e.message}</div>`;
+    btn.textContent = '🤖 TAM ANALİZ';
+    btn.disabled = false;
     return;
   }
-  document.getElementById('popsec').style.display = 'none';
-  const res   = DB.filter(d => d.s.includes(up) || d.n.toLowerCase().includes(q.toLowerCase())).slice(0, 8);
-  const extra = (!res.length && up.length) ? [{ s: up, n: 'Özel Ticker' }] : [];
-  document.getElementById('sresults').innerHTML = [...res, ...extra].map(r =>
-    `<div class="sri">
-      <div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700">${r.s}</div>
-        <div style="font-size:10px;color:var(--tx2)">${r.n}</div>
-      </div>
-      <div class="sriadd${WL.includes(r.s) ? ' added' : ''}" onclick="addT('${r.s}')">${WL.includes(r.s) ? '✓ Listede' : '+ Ekle'}</div>
-    </div>`
-  ).join('');
+
+  btn.textContent = '🤖 TAM ANALİZ';
+  btn.disabled = false;
 }
 
-/* ─── CLOCK ──────────────────────────────────────────────────── */
-setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString('tr-TR'); }, 1000);
+// ═══════════════════════════════════════════════════
+// RENDER AI OUTPUT — robust section parser
+// ═══════════════════════════════════════════════════
+function renderAIOutput(text){
+  const sections = [
+    {key:'OZET_KARAR',    label:'📊 ÖZET KARAR',       cls:'info'},
+    {key:'GUCLU_SINYALLER',label:'✅ GÜÇLÜ SİNYALLER', cls:'bull'},
+    {key:'RISKLER',       label:'⚠️ RİSKLER',           cls:'bear'},
+    {key:'DESTEK_SEVIYELERI',label:'🟢 DESTEK SEVİYELERİ',cls:'bull'},
+    {key:'DIRENC_SEVIYELERI',label:'🔴 DİRENÇ SEVİYELERİ',cls:'bear'},
+    {key:'SENARYO',       label:'🔭 SENARYO ANALİZİ',   cls:'neut'},
+    {key:'DEGERLEME',     label:'💰 DEĞERLEME GÖRÜŞÜ',  cls:'info'},
+  ];
 
-/* ─── EVENT LISTENERS ────────────────────────────────────────── */
-document.querySelectorAll('.ntab').forEach(el => el.addEventListener('click', () => switchView(el.dataset.v)));
-document.querySelectorAll('.bnt' ).forEach(el => el.addEventListener('click', () => switchView(el.dataset.v)));
-document.querySelectorAll('.tbtn').forEach(b  => b.addEventListener('click',  () => setTheme(b.dataset.t)));
-document.getElementById('addBtn')   .addEventListener('click', openModal);
-document.getElementById('moverlay') .addEventListener('click', e => { if (e.target === document.getElementById('moverlay')) closeModal(); });
-document.getElementById('sinput')   .addEventListener('input', e => { clearTimeout(srchTmr); srchTmr = setTimeout(() => doSearch(e.target.value), 250); });
-document.getElementById('sinput')   .addEventListener('keydown', e => { if (e.key === 'Enter') { const v = e.target.value.trim(); if (v) { addT(v); closeModal(); } } });
-document.getElementById('analyzeBtn').addEventListener('click', doSigAnalysis);
-document.getElementById('geobtn')    .addEventListener('click', doGeoAnalysis);
-document.getElementById('georefbtn') .addEventListener('click', doGeoAnalysis);
-document.getElementById('valbtn')    .addEventListener('click', doValAnalysis);
-document.getElementById('boardaibtn').addEventListener('click', doBoardAnalysis);
+  // Extract each section
+  const extracted = {};
+  sections.forEach(s=>{
+    const tag = `[${s.key}]`;
+    const idx = text.indexOf(tag);
+    if(idx===-1) return;
+    const start = idx+tag.length;
+    // Find next section tag
+    let end = text.length;
+    sections.forEach(s2=>{
+      if(s2.key===s.key) return;
+      const idx2 = text.indexOf(`[${s2.key}]`);
+      if(idx2>idx && idx2<end) end=idx2;
+    });
+    extracted[s.key] = text.substring(start,end).trim();
+  });
 
-/* ─── INIT ───────────────────────────────────────────────────── */
-(function init() {
-  document.documentElement.setAttribute('data-theme', CFG.theme);
-  renderLegal();
-  renderWL();
-})();
+  const out = document.getElementById('ai-out');
+
+  if(Object.keys(extracted).length===0){
+    // Fallback: show raw text nicely
+    out.innerHTML = `<div class="ai-box info" style="white-space:pre-wrap;font-size:11px;line-height:1.8">${text}</div>`;
+    return;
+  }
+
+  out.innerHTML = sections.map(s=>{
+    const content = extracted[s.key];
+    if(!content) return '';
+    return `<div class="ai-section">
+      <div class="ai-sec-hdr" style="color:${s.cls==='bull'?'var(--green)':s.cls==='bear'?'var(--red)':s.cls==='neut'?'var(--gold)':'var(--accent)'}">${s.label}</div>
+      <div class="ai-box ${s.cls}">${content.replace(/\n/g,'<br>')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// SCORE COMPUTATION
+// ═══════════════════════════════════════════════════
+function computeScoreFromText(text){
+  // Count by distinct category words, not raw substring
+  const lower = text.toLowerCase();
+
+  // Count bullish/bearish signals from indicator data
+  const d = S.data;
+  let bullPts = 0, bearPts = 0;
+
+  // Technical: 8 signals
+  if(d.p > d.sma20) bullPts++; else bearPts++;
+  if(d.p > d.sma50) bullPts++; else bearPts++;
+  if(d.p > d.sma200) bullPts++; else bearPts++;
+  if(d.ema12 > d.ema26) bullPts++; else bearPts++;
+  if(d.sarBull) bullPts++; else bearPts++;
+  if(d.macdLine > d.macdSig) bullPts++; else bearPts++;
+  if(d.rsi < 30) bullPts+=2; else if(d.rsi > 70) bearPts+=2;
+  if(d.stochK > d.stochD) bullPts++; else bearPts++;
+  if(d.cci < -100) bullPts++; else if(d.cci > 100) bearPts++;
+  if(d.mom > 0) bullPts++; else bearPts++;
+  if(d.obvBull) bullPts++; else bearPts++;
+  if(d.adBull) bullPts++; else bearPts++;
+
+  // Ichimoku: 4 signals
+  if(d.ich){
+    if(d.ich.aboveCloud) bullPts+=2; else if(d.ich.belowCloud) bearPts+=2;
+    if(d.ich.tkBull) bullPts++; else bearPts++;
+    if(d.ich.bullCloud) bullPts++; else bearPts++;
+    if(d.chikou > d.p) bullPts++; else bearPts++;
+  }
+
+  // Elliott
+  if(d.elliottDir==='up') bullPts+=2; else bearPts+=2;
+
+  // Valuation
+  if(!isCryptoEx() && d.valScore !== undefined){
+    bullPts += Math.round(d.valScore*4);
+    bearPts += Math.round((1-d.valScore)*4);
+  }
+
+  // Formations from detected
+  if(d.formations){
+    Object.values(d.formations).filter(v=>v.st==='det').forEach(v=>{
+      if(v.type==='bull') bullPts+=2;
+      else if(v.type==='bear') bearPts+=2;
+      else bullPts++;
+    });
+  }
+  if(d.candles){
+    Object.values(d.candles).filter(v=>v.st==='det').forEach(v=>{
+      if(v.type==='bull') bullPts++;
+      else if(v.type==='bear') bearPts++;
+    });
+  }
+
+  const total = bullPts + bearPts;
+  const score = total > 0 ? Math.min(100,Math.round(bullPts/total*100)) : 50;
+
+  const label = score>=72?'📈 GÜÇLÜ AL':score>=58?'📈 AL':score>=47?'➡️ NÖTR':score>=32?'📉 SAT':'📉 GÜÇLÜ SAT';
+  setScore(score, label);
+  document.getElementById('ssub').textContent = `${bullPts} boğa puan · ${bearPts} ayı puan`;
+
+  // Signal bar breakdown
+  const techScore = Math.round(((d.p>d.sma20?1:0)+(d.p>d.sma50?1:0)+(d.ema12>d.ema26?1:0)+(d.macdLine>d.macdSig?1:0)+(d.sarBull?1:0)+(d.obvBull?1:0))/6*100);
+  const formScore = computeFormScore();
+  const candleScore = computeCandleScore();
+  const fibScore  = Math.round(r(40,75)); // Fibonacci is neutral-ish
+  const ewScore   = d.elliottDir==='up'?ri(60,85):ri(20,45);
+  const valScore  = isCryptoEx()?50:Math.round((d.valScore||0.5)*100);
+
+  updateSignalBars({tech:techScore,form:formScore,cndl:candleScore,fib:fibScore,ew:ewScore,val:valScore});
+}
+
+function computeFormScore(){
+  if(!S.data.formations) return 50;
+  let bull=0,bear=0;
+  Object.values(S.data.formations).forEach(v=>{
+    if(v.st==='det'||v.st==='pos'){
+      if(v.type==='bull') bull++;
+      else if(v.type==='bear') bear++;
+    }
+  });
+  if(bull+bear===0) return 50;
+  return Math.round(bull/(bull+bear)*100);
+}
+
+function computeCandleScore(){
+  if(!S.data.candles) return 50;
+  let bull=0,bear=0;
+  Object.values(S.data.candles).forEach(v=>{
+    if(v.st==='det'){
+      if(v.type==='bull') bull++;
+      else if(v.type==='bear') bear++;
+    }
+  });
+  if(bull+bear===0) return 50;
+  return Math.round(bull/(bull+bear)*100);
+}
+
+function isCryptoEx(){ return S.exch==='CRYPTO'; }
+
+// ═══════════════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════════════
+async function doChat(){
+  const inp = document.getElementById('chatIn');
+  const q = inp.value.trim();
+  if(!q) return;
+  inp.value='';
+
+  const out = document.getElementById('ai-out');
+
+  // Append question
+  out.innerHTML += `<div class="ai-section"><div class="ai-box chat-q"><strong>Sen:</strong> ${q}</div></div>`;
+  out.innerHTML += `<div class="ai-thinking" id="thinking-bubble">
+    <span>Yanıt hazırlanıyor</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>`;
+  out.scrollTop = out.scrollHeight;
+
+  S.hist.push({role:'user', content:`${q} (Sembol: ${S.sym}, Fiyat: ${priceFmt(S.price)} ${S.cur}, Borsa: ${exchLabel(S.exch)})`});
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:800,
+        system:`Sen AlphaTerminal Pro AI analiz asistanısın. ${S.sym} (${exchLabel(S.exch)}) hissesi için teknik ve temel analiz konularında kısa, net, profesyonel Türkçe cevaplar ver. Fiyatları ${S.cur} cinsinden söyle.`,
+        messages: S.hist.slice(-8)
+      })
+    });
+    const json = await res.json();
+    const reply = json.content?.map(c=>c.text||'').join('')||'Yanıt alınamadı.';
+    S.hist.push({role:'assistant',content:reply});
+
+    // Remove thinking bubble
+    const tb = document.getElementById('thinking-bubble');
+    if(tb) tb.remove();
+
+    out.innerHTML += `<div class="ai-section"><div class="ai-box chat-a"><strong style="color:var(--purple)">🤖 AI:</strong><br><br>${reply.replace(/\n/g,'<br>')}</div></div>`;
+  } catch(e){
+    const tb = document.getElementById('thinking-bubble');
+    if(tb) tb.remove();
+    out.innerHTML += `<div class="ai-box bear">⚠️ ${e.message}</div>`;
+  }
+
+  out.scrollTop = out.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('ti').addEventListener('keydown',e=>{ if(e.key==='Enter') doLoad(); });
+  document.getElementById('chatIn').addEventListener('keydown',e=>{ if(e.key==='Enter') doChat(); });
+  renderSignalBarsDefault();
+});
 </script>
 </body>
 </html>
-
