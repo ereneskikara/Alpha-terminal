@@ -2,1591 +2,570 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>AlphaTerminal Pro</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AlphaTerminal</title>
 <style>
-/* ═══════════════════════════════════════════
-   RESET — no overflow tricks anywhere
-═══════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#040912;--p1:#07111f;--p2:#0b1829;--b1:#152338;--b2:#1e3050;
+  --cy:#00ccff;--gr:#00dd88;--rd:#ff3355;--go:#f5a020;--vi:#9b8cf0;
+  --dm:#3a5470;--d2:#607590;--tx:#c8d8ec;--wh:#e0eeff;
+}
+html,body{background:var(--bg);color:var(--tx);font-family:monospace;font-size:13px;min-height:100vh}
 
-/* ═══════════════════════════════════════════
-   ROOT
-═══════════════════════════════════════════ */
-:root {
-  --bg:     #03080f;
-  --p1:     #060d1a;
-  --p2:     #0a1422;
-  --b1:     #132030;
-  --b2:     #1c2e44;
-  --cyan:   #00d4ff;
-  --green:  #00e090;
-  --red:    #ff3d5a;
-  --gold:   #f59e20;
-  --violet: #a78bfa;
-  --dim:    #3d5570;
-  --dim2:   #6080a0;
-  --text:   #ccd8ec;
-  --white:  #e8f2ff;
-  --topH:   0px; /* set by JS */
-}
+/* TOPBAR */
+#tb{background:var(--p1);border-bottom:2px solid var(--b1);padding:8px 10px}
+.tr1{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tr2{display:flex;align-items:center;gap:5px;flex-wrap:nowrap}
+.logo{font-weight:900;font-size:16px;color:var(--cy);letter-spacing:2px}
+.logo b{color:var(--rd)}
+.tg{flex:1}
+input.si{width:75px;background:var(--p2);border:1px solid var(--b2);color:var(--wh);padding:7px 6px;font-size:13px;font-weight:700;text-transform:uppercase;outline:none;border-radius:3px;font-family:inherit;flex-shrink:0}
+select.se{background:var(--p2);border:1px solid var(--b2);color:var(--tx);padding:7px 4px;font-size:11px;outline:none;border-radius:3px;font-family:inherit;flex-shrink:0}
+button.bt{background:transparent;border:1px solid var(--cy);color:var(--cy);padding:7px 11px;font-size:11px;cursor:pointer;border-radius:3px;font-family:inherit;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+button.bt:active{background:var(--cy);color:#000}
+button.bv{border-color:var(--vi);color:var(--vi);background:rgba(155,140,240,.1)}
+button.bv:active{background:var(--vi);color:#000}
+button.bv:disabled{opacity:.4;pointer-events:none}
 
-/* ═══════════════════════════════════════════
-   BASE — NO overflow:hidden on html/body
-═══════════════════════════════════════════ */
-html {
-  background: var(--bg);
-  -webkit-text-size-adjust: 100%;
-  scroll-behavior: auto;
-}
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
-  font-size: 12px;
-  line-height: 1.4;
-  min-height: 100vh;
-}
+/* STATUS */
+#sb{background:#040c1a;border-bottom:1px solid var(--b1);padding:4px 10px;font-size:10px;color:var(--d2);white-space:nowrap;overflow-x:auto;display:flex;gap:12px}
+#sb::-webkit-scrollbar{display:none}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--dm);margin-right:3px;vertical-align:middle}
+.dot.on{background:var(--gr);animation:bk 1.4s infinite}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ═══════════════════════════════════════════
-   TOPBAR — 2 rows on mobile, 1 row on desktop
-═══════════════════════════════════════════ */
-#topbar {
-  position: sticky;
-  top: 0;
-  z-index: 500;
-  background: var(--p1);
-  border-bottom: 1px solid var(--b1);
-  /* two flex rows on mobile */
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-}
+/* PRICE */
+#ph{padding:10px 12px;background:var(--p1);border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:flex-start}
+#pn{font-size:21px;font-weight:900;color:var(--cy)}
+#ps{font-size:10px;color:var(--d2);margin-top:3px}
+#pv{font-size:20px;font-weight:800;text-align:right}
+#pc{font-size:11px;text-align:right;margin-top:3px}
+.up{color:var(--gr)}.dn{color:var(--rd)}.nu{color:var(--d2)}
 
-.tb-row1 {
-  display: contents; /* logo + gap + ai-btn always visible */
-}
+/* CHART */
+#ch{height:220px;background:var(--p2);border-bottom:1px solid var(--b1);position:relative}
+#ch iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+#chp{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--d2);gap:6px}
 
-.logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 20px;
-  letter-spacing: 3px;
-  color: var(--cyan);
-  white-space: nowrap;
-  line-height: 1;
-}
-.logo em { color: var(--red); font-style: normal; }
+/* NAV TABS */
+#nav{display:flex;background:var(--p1);border-bottom:2px solid var(--b1);overflow-x:auto;-webkit-overflow-scrolling:touch}
+#nav::-webkit-scrollbar{display:none}
+#nav button{flex-shrink:0;background:none;border:none;border-bottom:3px solid transparent;padding:11px 13px;font-size:10px;color:var(--d2);cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:.8px;font-family:inherit;-webkit-tap-highlight-color:transparent}
+#nav button:active{background:var(--p2)}
+#nav button.on{color:var(--cy);border-bottom-color:var(--cy)}
+#nav button.ai{color:var(--vi)}
+#nav button.ai.on{color:var(--vi);border-bottom-color:var(--vi)}
 
-.tb-spacer { flex: 1; min-width: 8px; }
+/* PAGES — only one visible at a time */
+.pg{display:none;padding:12px}
+.pg.on{display:block}
 
-/* inputs row */
-.tb-inputs {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-wrap: nowrap;
-  width: 100%;
-  order: 10; /* push below logo row on mobile */
-}
+/* SECTION HEADER */
+.sh{font-size:10px;color:var(--d2);text-transform:uppercase;letter-spacing:2px;margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.sh:after{content:'';flex:1;height:1px;background:var(--b1)}
+.sh:first-child{margin-top:0}
 
-@media (min-width: 680px) {
-  .tb-inputs {
-    width: auto;
-    order: 0;
-    flex: 1;
-  }
-  .logo { order: -1; }
-}
+/* INDICATOR CELLS */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+@media(min-width:400px){.ig{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:600px){.ig{grid-template-columns:repeat(4,1fr)}}
+.ic{background:var(--p2);border:1px solid var(--b1);padding:8px;position:relative;overflow:hidden}
+.ic:before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.ic.g:before{background:var(--gr)}.ic.r:before{background:var(--rd)}.ic.n:before{background:var(--go)}
+.in{font-size:9px;color:var(--d2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.iv{font-size:13px;font-weight:700}
+.ic.g .iv{color:var(--gr)}.ic.r .iv{color:var(--rd)}.ic.n .iv{color:var(--go)}
+.is{font-size:9px;color:var(--d2);margin-top:2px}
 
-input.sym-in {
-  width: 76px;
-  flex-shrink: 0;
-  background: var(--p2);
-  border: 1px solid var(--b2);
-  color: var(--white);
-  padding: 5px 7px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  outline: none;
-  border-radius: 2px;
-  -webkit-appearance: none;
-}
-input.sym-in:focus { border-color: var(--cyan); }
+/* FORMATION GRID */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+@media(min-width:400px){.fg{grid-template-columns:repeat(3,1fr)}}
+.fc{background:var(--p2);border:1px solid var(--b1);padding:7px 8px;display:flex;align-items:center;gap:5px}
+.fi{font-size:13px;flex-shrink:0}
+.fn{font-size:10px;font-weight:700;color:var(--wh)}
+.fs{font-size:9px;margin-top:2px}
+.fd{color:var(--gr)}.fp{color:var(--go)}.fn2{color:var(--dm)}
 
-select.sel {
-  flex-shrink: 0;
-  background: var(--p2);
-  border: 1px solid var(--b2);
-  color: var(--text);
-  padding: 5px 5px;
-  font-family: inherit;
-  font-size: 11px;
-  outline: none;
-  border-radius: 2px;
-  -webkit-appearance: none;
-  cursor: pointer;
-}
+/* FIB TABLE */
+.ft{width:100%;border-collapse:collapse;font-size:11px}
+.ft th{font-size:9px;color:var(--d2);text-transform:uppercase;padding:5px 6px;border-bottom:1px solid var(--b1);text-align:right}
+.ft th:first-child{text-align:left}
+.ft td{padding:5px 6px;border-bottom:1px solid var(--b1);text-align:right}
+.ft td:first-child{text-align:left;font-weight:700;color:var(--vi)}
+.ft tr.nr td{background:rgba(0,204,255,.06)}
+.ft tr.nr td:first-child{color:var(--cy)}
+.nt{font-size:8px;background:rgba(0,204,255,.15);color:var(--cy);padding:1px 4px;margin-left:4px}
 
-.btn {
-  flex-shrink: 0;
-  background: transparent;
-  border: 1px solid var(--cyan);
-  color: var(--cyan);
-  padding: 5px 11px;
-  font-family: inherit;
-  font-size: 11px;
-  letter-spacing: 1px;
-  cursor: pointer;
-  white-space: nowrap;
-  border-radius: 2px;
-  -webkit-tap-highlight-color: transparent;
-  transition: background .12s, color .12s;
-}
-.btn:active, .btn:hover { background: var(--cyan); color: #000; }
+/* ICH */
+.ig3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.ichc{background:var(--p2);border:1px solid var(--b1);padding:8px;text-align:center}
+.ichl{font-size:8px;color:var(--d2);text-transform:uppercase}
+.ichv{font-size:12px;font-weight:700;margin-top:4px}
 
-.btn-ai {
-  border-color: var(--violet);
-  color: var(--violet);
-  background: rgba(167,139,250,.1);
-}
-.btn-ai:active, .btn-ai:hover { background: var(--violet); color: #000; }
-.btn-ai:disabled { opacity: .4; pointer-events: none; }
+/* ELLIOTT */
+.ww{padding-top:24px;margin-bottom:8px}
+.wc{display:flex;align-items:flex-end;gap:4px;height:80px}
+.wb{flex:1;position:relative;min-height:8px;border-radius:2px 2px 0 0}
+.wl{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:700;white-space:nowrap}
+.wi{background:linear-gradient(to top,var(--gr),rgba(0,221,136,.08))}
+.wc2{background:linear-gradient(to top,var(--rd),rgba(255,51,85,.08))}
+.wa{outline:2px solid var(--cy);outline-offset:1px}
 
-/* ═══════════════════════════════════════════
-   STATUS BAR
-═══════════════════════════════════════════ */
-#stbar {
-  background: #040a14;
-  border-bottom: 1px solid var(--b1);
-  padding: 3px 10px;
-  font-size: 10px;
-  color: var(--dim2);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  white-space: nowrap;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-#stbar::-webkit-scrollbar { display: none; }
-.sdot {
-  display: inline-block;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--dim);
-  margin-right: 4px;
-  vertical-align: middle;
-  flex-shrink: 0;
-}
-.sdot.live { background: var(--green); animation: blink 1.4s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-#stv { margin-left: auto; color: var(--violet); flex-shrink: 0; }
+/* VALUATION */
+.vg{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+@media(min-width:400px){.vg{grid-template-columns:repeat(4,1fr)}}
+.vc{background:var(--p2);border:1px solid var(--b1);padding:8px}
+.vn{font-size:9px;color:var(--d2);text-transform:uppercase}
+.vv{font-size:15px;font-weight:800;margin-top:4px}
+.vb{font-size:9px;color:var(--dm);margin-top:2px}
+.vt{font-size:9px;margin-top:2px}
 
-/* ═══════════════════════════════════════════
-   PRICE HEADER
-═══════════════════════════════════════════ */
-#price-hdr {
-  padding: 10px 12px 9px;
-  border-bottom: 1px solid var(--b1);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  background: var(--p1);
-}
-#sym-name { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--cyan); line-height: 1; }
-#sym-sub  { font-size: 10px; color: var(--dim2); margin-top: 3px; }
-#price-v  { font-size: 22px; font-weight: 800; text-align: right; line-height: 1; }
-#price-c  { font-size: 11px; text-align: right; margin-top: 4px; }
-.up { color: var(--green); }
-.dn { color: var(--red); }
-.nu { color: var(--dim2); }
-
-/* ═══════════════════════════════════════════
-   CHART
-═══════════════════════════════════════════ */
-#chart-box {
-  position: relative;
-  height: 240px;
-  background: var(--p1);
-  border-bottom: 1px solid var(--b1);
-}
-@media (min-width: 600px) { #chart-box { height: 320px; } }
-@media (min-width: 900px) { #chart-box { height: 380px; } }
-#chart-box iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
-}
-#chart-ph {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  color: var(--dim2); gap: 8px;
-}
-#chart-ph .ci { font-size: 30px; }
-
-/* ═══════════════════════════════════════════
-   MAIN LAYOUT
-   Mobile: single column (natural scroll)
-   Desktop 900px+: left + sticky right panel
-═══════════════════════════════════════════ */
-#main {
-  display: block;
-}
-@media (min-width: 900px) {
-  #main {
-    display: flex;
-    align-items: flex-start;
-  }
-  #left {
-    flex: 1;
-    min-width: 0;
-  }
-  #right {
-    width: 300px;
-    flex-shrink: 0;
-    position: sticky;
-    top: var(--topH, 100px);
-    max-height: calc(100vh - var(--topH, 100px));
-    display: flex;
-    flex-direction: column;
-    border-left: 1px solid var(--b1);
-    background: var(--p1);
-  }
-}
-
-/* ═══════════════════════════════════════════
-   TAB BAR — sticky, JS sets the top offset
-═══════════════════════════════════════════ */
-#tab-bar {
-  position: sticky;
-  top: var(--topH, 100px); /* updated by JS */
-  z-index: 100;
-  display: flex;
-  background: var(--p1);
-  border-bottom: 1px solid var(--b1);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-#tab-bar::-webkit-scrollbar { display: none; }
-.tab {
-  padding: 8px 11px;
-  font-size: 10px;
-  color: var(--dim2);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
-  transition: color .15s;
-  user-select: none;
-}
-.tab:hover { color: var(--text); }
-.tab.on { color: var(--cyan); border-bottom-color: var(--cyan); }
-
-/* ═══════════════════════════════════════════
-   PANES
-═══════════════════════════════════════════ */
-.pane { display: none; padding: 12px; }
-.pane.on { display: block; }
-
-/* ═══════════════════════════════════════════
-   SECTION HEADER
-═══════════════════════════════════════════ */
-.sh {
-  font-size: 10px;
-  color: var(--dim2);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin: 14px 0 8px;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.sh::after { content: ''; flex: 1; height: 1px; background: var(--b1); }
-.sh:first-child { margin-top: 0; }
-
-/* ═══════════════════════════════════════════
-   INDICATOR CARDS
-═══════════════════════════════════════════ */
-.ig {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
-}
-@media (min-width: 500px) { .ig { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 760px) { .ig { grid-template-columns: repeat(4, 1fr); } }
-
-.ic {
-  background: var(--p2);
-  border: 1px solid var(--b1);
-  padding: 8px 9px;
-  position: relative;
-  overflow: hidden; /* clip the left accent bar only */
-}
-.ic::before {
-  content: '';
-  position: absolute; top: 0; left: 0;
-  width: 3px; height: 100%;
-}
-.ic.bull::before { background: var(--green); }
-.ic.bear::before { background: var(--red); }
-.ic.neu::before  { background: var(--gold); }
-.in { font-size: 9px; color: var(--dim2); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 3px; }
-.iv { font-size: 13px; font-weight: 700; }
-.ic.bull .iv { color: var(--green); }
-.ic.bear .iv { color: var(--red); }
-.ic.neu  .iv { color: var(--gold); }
-.is { font-size: 9px; color: var(--dim2); margin-top: 2px; }
-
-/* ═══════════════════════════════════════════
-   FORMATION CARDS
-═══════════════════════════════════════════ */
-.fg {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
-}
-@media (min-width: 520px) { .fg { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 800px) { .fg { grid-template-columns: repeat(4, 1fr); } }
-.fc {
-  background: var(--p2);
-  border: 1px solid var(--b1);
-  padding: 7px 8px;
-  display: flex; align-items: center; gap: 6px;
-}
-.fi { font-size: 13px; flex-shrink: 0; width: 18px; text-align: center; }
-.fn { font-size: 10px; font-weight: 700; color: var(--white); }
-.fs { font-size: 9px; margin-top: 2px; }
-.det { color: var(--green); }
-.pos { color: var(--gold); }
-.no  { color: var(--dim); }
-
-/* ═══════════════════════════════════════════
-   FIBONACCI TABLE
-═══════════════════════════════════════════ */
-.ftbl { width: 100%; border-collapse: collapse; }
-.ftbl th {
-  font-size: 9px; color: var(--dim2);
-  text-transform: uppercase; letter-spacing: .8px;
-  padding: 5px 7px;
-  border-bottom: 1px solid var(--b1);
-  text-align: right;
-  white-space: nowrap;
-}
-.ftbl th:first-child { text-align: left; }
-.ftbl td {
-  padding: 5px 7px;
-  border-bottom: 1px solid var(--b1);
-  font-size: 11px;
-  text-align: right;
-}
-.ftbl td:first-child { text-align: left; font-weight: 700; color: var(--violet); }
-.ftbl tr.crow td { background: rgba(0,212,255,.05); }
-.ftbl tr.crow td:first-child { color: var(--cyan); }
-.ftbl tr:last-child td { border-bottom: none; }
-.ntag {
-  display: inline-block;
-  font-size: 8px; color: var(--cyan);
-  background: rgba(0,212,255,.12);
-  padding: 1px 4px; margin-left: 4px;
-}
-
-/* ═══════════════════════════════════════════
-   ICHIMOKU
-═══════════════════════════════════════════ */
-.ichg {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
-}
-@media (min-width: 420px) { .ichg { grid-template-columns: repeat(3, 1fr); } }
-.ichc { background: var(--p2); border: 1px solid var(--b1); padding: 8px; text-align: center; }
-.ichl { font-size: 8px; color: var(--dim2); text-transform: uppercase; letter-spacing: .7px; }
-.ichv { font-size: 12px; font-weight: 700; margin-top: 4px; }
-
-/* ═══════════════════════════════════════════
-   ELLIOTT WAVE
-   IMPORTANT: padding-top leaves room for labels
-═══════════════════════════════════════════ */
-.wave-wrap {
-  padding-top: 24px; /* room for wave labels above bars */
-  margin-bottom: 10px;
-}
-.wave-ch {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: 80px;
-}
-.wb {
-  flex: 1;
-  position: relative;
-  min-height: 8px;
-  border-radius: 2px 2px 0 0;
-}
-.wlbl {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-  user-select: none;
-}
-.wb.imp { background: linear-gradient(to top, var(--green) 0%, rgba(0,224,144,.08) 100%); }
-.wb.cor { background: linear-gradient(to top, var(--red) 0%, rgba(255,61,90,.08) 100%); }
-.wb.act { outline: 2px solid var(--cyan); outline-offset: 1px; }
-
-/* ═══════════════════════════════════════════
-   VALUATION
-═══════════════════════════════════════════ */
-.vg {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
-}
-@media (min-width: 480px) { .vg { grid-template-columns: repeat(4, 1fr); } }
-.vc { background: var(--p2); border: 1px solid var(--b1); padding: 8px 9px; }
-.vn { font-size: 9px; color: var(--dim2); text-transform: uppercase; letter-spacing: .7px; }
-.vv { font-size: 16px; font-weight: 800; margin-top: 4px; }
-.vb { font-size: 9px; color: var(--dim); margin-top: 2px; }
-.vt { font-size: 9px; margin-top: 3px; }
-
-/* ═══════════════════════════════════════════
-   AI PANEL (right on desktop, bottom on mobile)
-═══════════════════════════════════════════ */
-#right {
-  border-top: 2px solid var(--b1);
-  background: var(--p1);
-}
-@media (min-width: 900px) {
-  #right {
-    border-top: none;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: var(--b2) transparent;
-  }
-}
-
-/* Score */
-#score-box {
-  padding: 12px;
-  border-bottom: 1px solid var(--b1);
-  display: flex; align-items: center; gap: 12px;
-  background: var(--p2);
-  flex-shrink: 0;
-}
-#ring { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
-#ring svg { transform: rotate(-90deg); }
-#snum {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 26px; color: var(--violet);
-}
-#slabel { font-size: 14px; font-weight: 700; color: var(--violet); }
-#ssub   { font-size: 10px; color: var(--dim2); margin-top: 4px; line-height: 1.6; }
-
-/* Signal bars */
-#sig-box { padding: 10px 12px; border-bottom: 1px solid var(--b1); flex-shrink: 0; }
-#sig-ttl { font-size: 9px; color: var(--dim2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 7px; }
-.sr { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
-.sl { font-size: 9px; color: var(--dim2); width: 100px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.st { flex: 1; height: 4px; background: var(--b1); border-radius: 2px; overflow: hidden; }
-.sf { height: 100%; width: 0; border-radius: 2px; transition: width 1.1s ease; }
-.sp { font-size: 9px; font-weight: 700; width: 28px; text-align: right; }
-
-/* AI output */
-#ai-hdr {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--b1);
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(167,139,250,.04);
-  flex-shrink: 0;
-}
-#ai-hdr .t { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1px; color: var(--violet); }
-#ai-hdr .b {
-  font-size: 9px; color: var(--violet);
-  background: rgba(167,139,250,.12);
-  border: 1px solid rgba(167,139,250,.25);
-  padding: 2px 7px; letter-spacing: .8px;
-}
-#ai-out { padding: 12px; }
-@media (min-width: 900px) {
-  #ai-out { flex: 1; overflow-y: auto; }
-}
-
-/* AI boxes */
-.asec { margin-top: 12px; }
-.asec:first-child { margin-top: 0; }
-.ahdr {
-  font-size: 10px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 1.2px;
-  padding-bottom: 5px; margin-bottom: 5px;
-  border-bottom: 1px solid var(--b2);
-}
-.abox {
-  padding: 9px 11px;
-  font-size: 11px; line-height: 1.8;
-  border-left: 2px solid;
-  margin-bottom: 3px;
-}
-.abox.info { border-color: var(--cyan);   background: rgba(0,212,255,.04); }
-.abox.bull { border-color: var(--green);  background: rgba(0,224,144,.04); }
-.abox.bear { border-color: var(--red);    background: rgba(255,61,90,.04); }
-.abox.neu  { border-color: var(--gold);   background: rgba(245,158,32,.04); }
-.abox.cq   { border-color: var(--b2);     background: rgba(12,20,34,.6); color: var(--dim2); font-size: 10px; }
-.abox.ca   { border-color: var(--violet); background: rgba(167,139,250,.04); }
-
-.thinking { display: flex; align-items: center; gap: 8px; color: var(--violet); font-size: 11px; padding: 8px 0; }
-.dots span { display: inline-block; width: 5px; height: 5px; background: var(--violet); border-radius: 50%; animation: dp 1.2s ease infinite; margin: 0 2px; }
-.dots span:nth-child(2) { animation-delay: .2s; }
-.dots span:nth-child(3) { animation-delay: .4s; }
-@keyframes dp { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1.2)} }
-
-/* Chat */
-#ai-chat {
-  padding: 8px 12px;
-  border-top: 1px solid var(--b1);
-  display: flex; gap: 6px;
-  background: var(--p1);
-  flex-shrink: 0;
-}
-#chat-in {
-  flex: 1;
-  background: var(--p2); border: 1px solid var(--b2);
-  color: var(--text); padding: 7px 9px;
-  font-family: inherit; font-size: 11px;
-  outline: none; border-radius: 2px;
-  -webkit-appearance: none;
-}
-#chat-in:focus { border-color: var(--violet); }
-#chat-send {
-  background: rgba(167,139,250,.1);
-  border: 1px solid var(--violet); color: var(--violet);
-  padding: 7px 12px; font-family: inherit; font-size: 11px;
-  cursor: pointer; white-space: nowrap; border-radius: 2px;
-  -webkit-tap-highlight-color: transparent;
-}
-#chat-send:active, #chat-send:hover { background: var(--violet); color: #000; }
-
-/* Welcome */
-.wt  { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; color: var(--violet); margin-bottom: 10px; }
-.wli { font-size: 11px; line-height: 2.1; color: var(--dim2); }
-.wli .g { color: var(--green); }
-
-/* Note */
-.note {
-  margin-top: 8px; padding: 7px 9px;
-  font-size: 10px; color: var(--violet); line-height: 1.7;
-  background: rgba(167,139,250,.05);
-  border: 1px solid rgba(167,139,250,.18);
-}
-
-/* Scrollbars */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 2px; }
-::-webkit-scrollbar-track { background: transparent; }
+/* AI PAGE */
+#pg-ai{display:none;padding:0;flex-direction:column}
+#pg-ai.on{display:flex;min-height:calc(100vh - 320px)}
+#aih{padding:10px 12px;border-bottom:1px solid var(--b1);background:rgba(155,140,240,.04);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#aih .t{font-size:13px;font-weight:800;color:var(--vi)}
+#aih .b{font-size:9px;color:var(--vi);background:rgba(155,140,240,.12);border:1px solid rgba(155,140,240,.3);padding:2px 7px}
+#scb{padding:12px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:12px;background:var(--p2);flex-shrink:0}
+#rng{position:relative;width:80px;height:80px;flex-shrink:0}
+#rng svg{transform:rotate(-90deg)}
+#snum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--vi)}
+#slb{font-size:14px;font-weight:700;color:var(--vi)}
+#ssx{font-size:10px;color:var(--d2);margin-top:4px;line-height:1.6}
+#sgb{padding:10px 12px;border-bottom:1px solid var(--b1);flex-shrink:0}
+#sgt{font-size:9px;color:var(--d2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.sr{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.sl{font-size:9px;color:var(--d2);width:90px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb2{flex:1;height:4px;background:var(--b1);border-radius:2px;overflow:hidden}
+.sf{height:100%;width:0;border-radius:2px;transition:width 1s ease}
+.sv{font-size:9px;font-weight:700;width:28px;text-align:right}
+#ao{padding:12px;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.as{margin-top:10px}
+.as:first-child{margin-top:0}
+.ah{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding-bottom:4px;margin-bottom:4px;border-bottom:1px solid var(--b2)}
+.ab{padding:9px 10px;font-size:11px;line-height:1.8;border-left:2px solid}
+.ab.i{border-color:var(--cy);background:rgba(0,204,255,.04)}
+.ab.g{border-color:var(--gr);background:rgba(0,221,136,.04)}
+.ab.r{border-color:var(--rd);background:rgba(255,51,85,.04)}
+.ab.n{border-color:var(--go);background:rgba(245,160,32,.04)}
+.ab.q{border-color:var(--b2);background:rgba(5,12,25,.7);color:var(--d2);font-size:10px}
+.ab.a{border-color:var(--vi);background:rgba(155,140,240,.04)}
+.tk{display:flex;align-items:center;gap:8px;color:var(--vi);font-size:11px;padding:6px 0}
+.ds span{display:inline-block;width:5px;height:5px;background:var(--vi);border-radius:50%;animation:dp 1.2s infinite;margin:0 2px}
+.ds span:nth-child(2){animation-delay:.2s}.ds span:nth-child(3){animation-delay:.4s}
+@keyframes dp{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+#ach{padding:8px 12px;border-top:1px solid var(--b1);display:flex;gap:6px;background:var(--p1);flex-shrink:0}
+#ci{flex:1;background:var(--p2);border:1px solid var(--b2);color:var(--tx);padding:8px;font-family:inherit;font-size:11px;outline:none;border-radius:3px}
+#ci:focus{border-color:var(--vi)}
+#cs{background:rgba(155,140,240,.1);border:1px solid var(--vi);color:var(--vi);padding:8px 12px;font-family:inherit;font-size:11px;cursor:pointer;border-radius:3px;-webkit-tap-highlight-color:transparent}
+#cs:active{background:var(--vi);color:#000}
+.wt{font-size:15px;font-weight:800;color:var(--vi);margin-bottom:8px}
+.wli{font-size:11px;line-height:2.2;color:var(--d2)}
+.wli .g{color:var(--gr)}
+.note{margin-top:8px;padding:7px 9px;font-size:10px;color:var(--vi);line-height:1.7;background:rgba(155,140,240,.05);border:1px solid rgba(155,140,240,.2)}
 </style>
 </head>
 <body>
 
-<!-- ═══ TOPBAR ═══ -->
-<div id="topbar">
-  <div class="logo">ALPHA<em>TERM</em></div>
-  <div class="tb-spacer"></div>
-  <button class="btn btn-ai" id="ai-btn" onclick="runAI()">🤖 ANALİZ</button>
-  <!-- second row on mobile, same row on desktop -->
-  <div class="tb-inputs">
-    <input class="sym-in" id="sym" type="text" value="THYAO" maxlength="12"
-      placeholder="SEMBOL" autocomplete="off" autocorrect="off"
-      autocapitalize="characters" spellcheck="false">
-    <select class="sel" id="exch">
+<div id="tb">
+  <div class="tr1">
+    <div class="logo">ALPHA<b>TERM</b></div>
+    <div class="tg"></div>
+    <button class="bt bv" id="aib" onclick="runAI()">🤖 ANALİZ</button>
+  </div>
+  <div class="tr2">
+    <input class="si" id="sym" value="THYAO" maxlength="12" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="SEMBOL">
+    <select class="se" id="exch">
       <option value="BIST">BIST</option>
       <option value="NASDAQ">NASDAQ</option>
       <option value="NYSE">NYSE</option>
       <option value="XETR">Frankfurt</option>
       <option value="CRYPTO">Kripto</option>
     </select>
-    <select class="sel" id="intv">
+    <select class="se" id="intv">
       <option value="D">Günlük</option>
       <option value="W">Haftalık</option>
       <option value="240">4S</option>
       <option value="60">1S</option>
       <option value="15">15dk</option>
     </select>
-    <button class="btn" onclick="load()">▶ YÜKLE</button>
+    <button class="bt" onclick="doLoad()">▶ YÜKLE</button>
   </div>
 </div>
 
-<!-- ═══ STATUS BAR ═══ -->
-<div id="stbar">
-  <span><span class="sdot" id="sdot"></span><span id="s-sym">Sembol yükleyin</span></span>
-  <span id="s-price"></span>
-  <span id="s-vol"></span>
-  <span id="s-mcap"></span>
-  <span id="stv">AlphaTerminal Pro</span>
+<div id="sb">
+  <span><span class="dot" id="dot"></span><span id="s1">Sembol yükleyin</span></span>
+  <span id="s2"></span><span id="s3"></span><span id="s4"></span>
 </div>
 
-<!-- ═══ PRICE HEADER ═══ -->
-<div id="price-hdr">
-  <div>
-    <div id="sym-name">—</div>
-    <div id="sym-sub">Sembol seçin</div>
-  </div>
-  <div>
-    <div id="price-v" class="nu">—</div>
-    <div id="price-c" class="nu">—</div>
-  </div>
+<div id="ph">
+  <div><div id="pn">—</div><div id="ps">Sembol seçin</div></div>
+  <div><div id="pv" class="nu">—</div><div id="pc" class="nu">—</div></div>
 </div>
 
-<!-- ═══ CHART ═══ -->
-<div id="chart-box">
-  <div id="chart-ph">
-    <div class="ci">📊</div>
-    <div style="font-size:12px">▶ YÜKLE butonuna basın</div>
-    <div style="font-size:10px;color:var(--dim)">Sembol yazın ve yükleyin</div>
-  </div>
+<div id="ch"><div id="chp"><div style="font-size:28px">📊</div><div style="font-size:11px">▶ YÜKLE butonuna basın</div></div></div>
+
+<div id="nav">
+  <button onclick="tab(this,'pg-tek')" class="on">Teknik</button>
+  <button onclick="tab(this,'pg-for')">Formasyon</button>
+  <button onclick="tab(this,'pg-mum')">Mum</button>
+  <button onclick="tab(this,'pg-fib')">Fibonacci</button>
+  <button onclick="tab(this,'pg-ich')">Ichimoku</button>
+  <button onclick="tab(this,'pg-ew')">Elliott</button>
+  <button onclick="tab(this,'pg-val')">Değerleme</button>
+  <button onclick="tab(this,'pg-ai')" class="ai">🤖 AI</button>
 </div>
 
-<!-- ═══ MAIN: left tabs + right AI ═══ -->
-<div id="main">
+<div class="pg on" id="pg-tek">
+  <div class="sh">Trend &amp; Ortalamalar</div><div class="ig" id="ig1"></div>
+  <div class="sh">Momentum</div><div class="ig" id="ig2"></div>
+  <div class="sh">Hacim &amp; Volatilite</div><div class="ig" id="ig3"></div>
+</div>
+<div class="pg" id="pg-for"><div class="sh">Formasyonlar</div><div class="fg" id="ff1"></div></div>
+<div class="pg" id="pg-mum"><div class="sh">Mum Formasyonları</div><div class="fg" id="ff2"></div></div>
+<div class="pg" id="pg-fib"><div id="fibw"><p style="color:var(--d2);font-size:11px">Sembol yükleyin.</p></div></div>
+<div class="pg" id="pg-ich"><div class="sh">Ichimoku</div><div class="ig3" id="icg"></div><div id="icc" style="margin-top:10px"></div></div>
+<div class="pg" id="pg-ew"><div class="sh">Elliott Dalgaları</div><div class="ww"><div class="wc" id="ewc"></div></div><div id="ewd"></div></div>
+<div class="pg" id="pg-val"><div class="sh" id="vh">Değerleme</div><div class="vg" id="vg"></div><div class="note" id="vn" style="display:none"></div></div>
 
-  <!-- LEFT -->
-  <div id="left">
-
-    <!-- Tab bar — sticky offset set by JS -->
-    <div id="tab-bar">
-      <div class="tab on"  onclick="ST(this,'technical')">Teknik</div>
-      <div class="tab" onclick="ST(this,'formations')">Formasyon</div>
-      <div class="tab" onclick="ST(this,'candles')">Mum</div>
-      <div class="tab" onclick="ST(this,'fibonacci')">Fibonacci</div>
-      <div class="tab" onclick="ST(this,'ichimoku')">Ichimoku</div>
-      <div class="tab" onclick="ST(this,'elliott')">Elliott</div>
-      <div class="tab" onclick="ST(this,'valuation')">Değerleme</div>
+<div id="pg-ai">
+  <div id="aih"><span class="t">🤖 AI ANALİZ</span><span class="b">CLAUDE POWERED</span></div>
+  <div id="scb">
+    <div id="rng">
+      <svg width="80" height="80" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="32" fill="none" stroke="var(--b2)" stroke-width="7"/>
+        <circle id="arc" cx="40" cy="40" r="32" fill="none" stroke="var(--vi)" stroke-width="7"
+          stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round"
+          style="transition:stroke-dashoffset 1.2s ease,stroke .3s"/>
+      </svg>
+      <div id="snum">—</div>
     </div>
-
-    <!-- Teknik -->
-    <div class="pane on" id="pane-technical">
-      <div class="sh">Trend &amp; Hareketli Ortalamalar</div>
-      <div class="ig" id="ig-trend"></div>
-      <div class="sh">Momentum Osilatörleri</div>
-      <div class="ig" id="ig-mom"></div>
-      <div class="sh">Hacim &amp; Volatilite</div>
-      <div class="ig" id="ig-vol"></div>
+    <div><div id="slb">Analiz Bekleniyor</div><div id="ssx">ANALİZ butonuna basın</div></div>
+  </div>
+  <div id="sgb"><div id="sgt">SİNYAL DAĞILIMI</div><div id="sgr"></div></div>
+  <div id="ao">
+    <div class="wt">TAM ANALİZ MOTORU</div>
+    <div class="wli">
+      <span class="g">✓</span> SMA/WMA/EMA, SAR, MACD, RSI, Stoch, CCI, BB, OBV, A/D<br>
+      <span class="g">✓</span> OBO, İkili Tepe/Dip, Üçgenler, Takoz, Bayrak, Flama<br>
+      <span class="g">✓</span> Doji, Sabah/Akşam Yıldızı, Engulfing, Harami, 3 Asker<br>
+      <span class="g">✓</span> Fibonacci: Düzeltme, Extension, Fan, Kanal<br>
+      <span class="g">✓</span> Ichimoku: Tenkan, Kijun, Senkou A/B, Chikou<br>
+      <span class="g">✓</span> Elliott Wave 5+3, Değerleme: P/E, EV/EBITDA, PEG
     </div>
-
-    <!-- Formasyon -->
-    <div class="pane" id="pane-formations">
-      <div class="sh">Grafik Formasyonları</div>
-      <div class="fg" id="fg-main"></div>
-    </div>
-
-    <!-- Mum -->
-    <div class="pane" id="pane-candles">
-      <div class="sh">Mum Formasyonları</div>
-      <div class="fg" id="fg-candles"></div>
-    </div>
-
-    <!-- Fibonacci -->
-    <div class="pane" id="pane-fibonacci">
-      <div id="fib-wrap">
-        <p style="color:var(--dim2);font-size:11px;padding:8px 0">Sembol yükleyince Fibonacci seviyeleri görünür.</p>
-      </div>
-    </div>
-
-    <!-- Ichimoku -->
-    <div class="pane" id="pane-ichimoku">
-      <div class="sh">Ichimoku Kinko Hyo</div>
-      <div class="ichg" id="ich-cells"></div>
-      <div id="ich-comment" style="margin-top:10px"></div>
-    </div>
-
-    <!-- Elliott -->
-    <div class="pane" id="pane-elliott">
-      <div class="sh">Elliott Dalga Analizi</div>
-      <div class="wave-wrap">
-        <div class="wave-ch" id="wave-ch"></div>
-      </div>
-      <div id="ew-comment"></div>
-    </div>
-
-    <!-- Değerleme -->
-    <div class="pane" id="pane-valuation">
-      <div class="sh" id="val-hdr">Değerleme Çarpanları</div>
-      <div class="vg" id="val-grid"></div>
-      <div class="note" id="val-note" style="display:none"></div>
-    </div>
-
-  </div><!-- /left -->
-
-  <!-- RIGHT: AI Panel -->
-  <div id="right">
-
-    <div id="ai-hdr">
-      <span class="t">AI ANALİZ</span>
-      <span class="b">CLAUDE POWERED</span>
-    </div>
-
-    <div id="score-box">
-      <div id="ring">
-        <svg width="80" height="80" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="32" fill="none" stroke="var(--b2)" stroke-width="7"/>
-          <circle id="score-arc" cx="40" cy="40" r="32" fill="none"
-            stroke="var(--violet)" stroke-width="7"
-            stroke-dasharray="201" stroke-dashoffset="201"
-            stroke-linecap="round"
-            style="transition:stroke-dashoffset 1.2s ease,stroke .3s"/>
-        </svg>
-        <div id="snum">—</div>
-      </div>
-      <div>
-        <div id="slabel">Analiz Bekleniyor</div>
-        <div id="ssub">ANALİZ butonuna basın</div>
-      </div>
-    </div>
-
-    <div id="sig-box">
-      <div id="sig-ttl">SİNYAL DAĞILIMI</div>
-      <div id="sig-rows"></div>
-    </div>
-
-    <div id="ai-out">
-      <div class="wt">TAM ANALİZ MOTORU</div>
-      <div class="wli">
-        <span class="g">✓</span> Teknik: SMA/WMA/EMA, SAR, MACD, RSI, Stoch, CCI, BB, OBV, A/D<br>
-        <span class="g">✓</span> Formasyonlar: OBO, İkili Tepe/Dip, Üçgenler, Takozlar, Bayrak<br>
-        <span class="g">✓</span> Mum: Doji, Sabah/Akşam Yıldızı, Engulfing, Harami, 3 Asker<br>
-        <span class="g">✓</span> Fibonacci: Düzeltme + Extension + Fan + Kanal<br>
-        <span class="g">✓</span> Ichimoku: Tenkan, Kijun, Senkou A/B, Chikou<br>
-        <span class="g">✓</span> Elliott Wave: 5 impuls + 3 düzeltme dalgası<br>
-        <span class="g">✓</span> Temel: P/E, P/FCF, EV/EBITDA, PEG, P/B
-      </div>
-    </div>
-
-    <div id="ai-chat">
-      <input id="chat-in" placeholder="Soru: RSI? Destek nerede?">
-      <button id="chat-send" onclick="sendChat()">GÖNDER</button>
-    </div>
-
-  </div><!-- /right -->
-</div><!-- /main -->
+  </div>
+  <div id="ach">
+    <input id="ci" placeholder="Soru sor: RSI? Destek?">
+    <button id="cs" onclick="chat()">GÖNDER</button>
+  </div>
+</div>
 
 <script>
-"use strict";
+var G={sym:'',exch:'BIST',intv:'D',price:0,cur:'₺',d:{},hist:[],ready:false};
+var CUR={BIST:'₺',NASDAQ:'$',NYSE:'$',XETR:'€',CRYPTO:'$'};
+var PFX={BIST:'BIST:',NASDAQ:'NASDAQ:',NYSE:'NYSE:',XETR:'XETR:',CRYPTO:'BINANCE:'};
+var EL={BIST:'Borsa İstanbul',NASDAQ:'NASDAQ',NYSE:'NYSE',XETR:'Frankfurt',CRYPTO:'Kripto'};
+var IL={D:'Günlük',W:'Haftalık','240':'4 Saat','60':'1 Saat','15':'15dk'};
+var KP={THYAO:285,GARAN:95,AKBNK:52,SASA:48,EREGL:42,BIMAS:365,KCHOL:175,TUPRS:178,ASELS:58,ISCTR:12,TOASO:185,FROTO:1050,PETKM:19,SAHOL:54,ARCLK:120,KOZAL:145,TTKOM:24,AAPL:198,MSFT:415,NVDA:875,AMZN:202,GOOGL:172,META:510,TSLA:185,NFLX:670,AMD:165,INTC:22,SAP:192,AKB2:4.4,BMW:90,BTCUSDT:93500,ETHUSDT:3350,BNBUSDT:595,SOLUSDT:182,XRPUSDT:0.51,BTC:93500,ETH:3350,XRP:0.51};
 
-/* ════════════════════════════════════════════
-   STATE
-════════════════════════════════════════════ */
-const G = {
-  sym:'', exch:'BIST', intv:'D',
-  price:0, cur:'₺',
-  d:{}, hist:[], ready:false
-};
-
-/* ════════════════════════════════════════════
-   CONSTANTS
-════════════════════════════════════════════ */
-const CUR  = {BIST:'₺',NASDAQ:'$',NYSE:'$',XETR:'€',CRYPTO:'$'};
-const PFX  = {BIST:'BIST:',NASDAQ:'NASDAQ:',NYSE:'NYSE:',XETR:'XETR:',CRYPTO:'BINANCE:'};
-const ELAB = {BIST:'Borsa İstanbul',NASDAQ:'NASDAQ',NYSE:'NYSE',XETR:'Frankfurt',CRYPTO:'Kripto'};
-const ILAB = {D:'Günlük',W:'Haftalık','240':'4 Saat','60':'1 Saat','15':'15dk'};
-
-/* Known realistic prices */
-const KP = {
-  THYAO:285,GARAN:95,AKBNK:52,SASA:48,EREGL:42,BIMAS:365,KCHOL:175,
-  TUPRS:178,ASELS:58,ISCTR:12,TOASO:185,FROTO:1050,PETKM:19,SAHOL:54,
-  ARCLK:120,TAVHL:155,SISE:36,KOZAL:145,
-  AAPL:198,MSFT:415,NVDA:875,AMZN:202,GOOGL:172,META:510,TSLA:185,
-  NFLX:670,AMD:165,INTC:22,PLTR:24,PL:3.1,GME:22,AMC:4,F:11,
-  SAP:192,AKB2:4.4,BMW:90,SIEMENS:183,
-  BTCUSDT:93500,ETHUSDT:3350,BNBUSDT:595,SOLUSDT:182,
-  XRPUSDT:0.51,ADAUSDT:0.55,DOGEUSDT:0.17,AVAXUSDT:38,
-  BTC:93500,ETH:3350,BNB:595,SOL:182,XRP:0.51
-};
-
-/* ════════════════════════════════════════════
-   UTILS
-════════════════════════════════════════════ */
-const $ = id => document.getElementById(id);
+function $(i){return document.getElementById(i)}
 function rnd(a,b){return Math.random()*(b-a)+a}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-
+function cl(v,a,b){return Math.max(a,Math.min(b,v))}
 function fp(n){
-  if(n >= 100000) return n.toFixed(0);
-  if(n >= 10000)  return n.toFixed(0);
-  if(n >= 1000)   return n.toFixed(1);
-  if(n >= 100)    return n.toFixed(2);
-  if(n >= 10)     return n.toFixed(2);
-  if(n >= 1)      return n.toFixed(3);
-  if(n >= 0.1)    return n.toFixed(4);
-  return n.toFixed(6);
+  if(n>=10000)return n.toFixed(0);if(n>=1000)return n.toFixed(1);
+  if(n>=100)return n.toFixed(2);if(n>=10)return n.toFixed(2);
+  if(n>=1)return n.toFixed(3);if(n>=0.1)return n.toFixed(4);return n.toFixed(6);
+}
+function fB(n){if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';return(n/1e3).toFixed(0)+'K'}
+function gp(s,e){if(KP[s])return KP[s];var R={BIST:[8,1200],NASDAQ:[3,900],NYSE:[3,700],XETR:[2,500],CRYPTO:[.01,98000]};var r=R[e]||[5,500];return Math.exp(rnd(Math.log(r[0]),Math.log(r[1])))}
+
+// TAB SWITCH — simple, no tricks
+function tab(btn, id) {
+  // hide all pages
+  var all = document.querySelectorAll('.pg, #pg-ai');
+  for(var i=0;i<all.length;i++){
+    all[i].style.display='none';
+    all[i].classList.remove('on');
+  }
+  // deactivate all tab buttons
+  var btns = document.querySelectorAll('#nav button');
+  for(var i=0;i<btns.length;i++) btns[i].classList.remove('on');
+  // show target
+  var pg = $(id);
+  if(id==='pg-ai'){
+    pg.style.display='flex';
+  } else {
+    pg.style.display='block';
+  }
+  pg.classList.add('on');
+  btn.classList.add('on');
 }
 
-function fmtBig(n){
-  if(n>=1e12) return (n/1e12).toFixed(1)+'T';
-  if(n>=1e9)  return (n/1e9).toFixed(1)+'B';
-  if(n>=1e6)  return (n/1e6).toFixed(1)+'M';
-  if(n>=1e3)  return (n/1e3).toFixed(0)+'K';
-  return n.toFixed(0);
+function doLoad(){
+  var sym=$('sym').value.trim().toUpperCase();
+  var exch=$('exch').value, intv=$('intv').value;
+  if(!sym){alert('Sembol girin');return;}
+  G.sym=sym;G.exch=exch;G.intv=intv;G.cur=CUR[exch]||'$';
+  G.price=gp(sym,exch)*rnd(0.93,1.07);G.hist=[];
+  var chg=rnd(-6.5,6.5),ca=G.price*chg/100;
+  $('pn').textContent=sym;
+  $('ps').textContent=(EL[exch]||exch)+' · '+(IL[intv]||intv);
+  $('pv').textContent=fp(G.price)+' '+G.cur;$('pv').className=chg>=0?'up':'dn';
+  $('pc').textContent=(chg>=0?'+':'')+chg.toFixed(2)+'% ('+(chg>=0?'+':'')+fp(Math.abs(ca))+' '+G.cur+')';$('pc').className=chg>=0?'up':'dn';
+  $('dot').className='dot on';
+  $('s1').textContent=sym+' — '+(EL[exch]||exch);
+  $('s2').textContent=fp(G.price)+' '+G.cur;
+  $('s3').textContent='Vol:'+fB(rnd(1e5,4e8)*G.price)+G.cur;
+  $('s4').textContent='Mkt:'+fB(G.price*rnd(5e5,3e9))+G.cur;
+  loadChart();calc();G.ready=true;
 }
 
-function getBasePrice(sym,exch){
-  if(KP[sym]) return KP[sym];
-  const R={BIST:[8,1200],NASDAQ:[3,900],NYSE:[3,700],XETR:[2,500],CRYPTO:[0.01,98000]};
-  const[lo,hi]=R[exch]||[5,500];
-  return Math.exp(rnd(Math.log(lo),Math.log(hi)));
-}
-
-/* ════════════════════════════════════════════
-   STICKY TOPBAR HEIGHT — fix tab-bar offset
-════════════════════════════════════════════ */
-function updateTopH(){
-  const h = $('topbar').getBoundingClientRect().height;
-  document.documentElement.style.setProperty('--topH', h + 'px');
-}
-
-/* ════════════════════════════════════════════
-   TAB SWITCHING
-════════════════════════════════════════════ */
-function ST(el,name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
-  el.classList.add('on');
-  $('pane-'+name).classList.add('on');
-}
-
-/* ════════════════════════════════════════════
-   LOAD SYMBOL
-════════════════════════════════════════════ */
-function load(){
-  const sym  = $('sym').value.trim().toUpperCase();
-  const exch = $('exch').value;
-  const intv = $('intv').value;
-  if(!sym){ alert('Sembol girin'); return; }
-
-  G.sym   = sym;
-  G.exch  = exch;
-  G.intv  = intv;
-  G.cur   = CUR[exch] || '$';
-  G.price = getBasePrice(sym, exch) * rnd(0.93, 1.07);
-  G.hist  = [];
-
-  const chg = rnd(-6.5, 6.5);
-  const ca  = G.price * chg / 100;
-  const cl  = chg >= 0 ? 'up' : 'dn';
-
-  $('sym-name').textContent = sym;
-  $('sym-sub').textContent  = (ELAB[exch]||exch) + ' · ' + (ILAB[intv]||intv);
-  $('price-v').textContent  = fp(G.price) + ' ' + G.cur;
-  $('price-v').className    = cl;
-  $('price-c').textContent  = (chg>=0?'+':'') + chg.toFixed(2) + '%  (' + (chg>=0?'+':'') + fp(Math.abs(ca)) + ' ' + G.cur + ')';
-  $('price-c').className    = cl;
-
-  $('sdot').className       = 'sdot live';
-  $('s-sym').textContent    = sym + ' — ' + (ELAB[exch]||exch);
-  $('s-price').textContent  = fp(G.price) + ' ' + G.cur;
-  $('s-vol').textContent    = 'Hacim: ' + fmtBig(rnd(1e5,4e8) * G.price) + ' ' + G.cur;
-  $('s-mcap').textContent   = 'Mkt Cap: ' + fmtBig(G.price * rnd(5e5,3e9)) + ' ' + G.cur;
-
-  loadChart();
-  computeAll();
-  G.ready = true;
-}
-
-/* ════════════════════════════════════════════
-   TRADINGVIEW
-════════════════════════════════════════════ */
 function loadChart(){
-  const pfx     = PFX[G.exch] || '';
-  const symEnc  = encodeURIComponent(pfx + G.sym);
-  const studies = ['RSI@tv-basicstudies','MACD@tv-basicstudies','BB@tv-basicstudies','IchimokuCloud@tv-basicstudies']
-    .map(s => encodeURIComponent(s)).join('%1F');
-  const src = `https://s.tradingview.com/widgetembed/?symbol=${symEnc}&interval=${G.intv}&theme=dark&style=1&locale=tr&timezone=Europe%2FIstanbul&toolbar_bg=%23060d1a&hide_side_toolbar=0&allow_symbol_change=0&studies=${studies}&withdateranges=1&save_image=0`;
-  $('chart-box').innerHTML = `<iframe src="${src}" allowfullscreen scrolling="no"></iframe>`;
+  var s=encodeURIComponent((PFX[G.exch]||'')+G.sym);
+  var st=['RSI@tv-basicstudies','MACD@tv-basicstudies','BB@tv-basicstudies','IchimokuCloud@tv-basicstudies'].map(encodeURIComponent).join('%1F');
+  $('ch').innerHTML='<iframe src="https://s.tradingview.com/widgetembed/?symbol='+s+'&interval='+G.intv+'&theme=dark&style=1&locale=tr&timezone=Europe%2FIstanbul&toolbar_bg=%2307111f&hide_side_toolbar=0&allow_symbol_change=0&studies='+st+'&withdateranges=1&save_image=0" allowfullscreen scrolling="no"></iframe>';
 }
 
-/* ════════════════════════════════════════════
-   COMPUTE ALL INDICATORS
-════════════════════════════════════════════ */
-function computeAll(){
-  const p = G.price;
-
-  /* Moving averages */
-  const sma20  = p*rnd(.94,1.06), sma50 = p*rnd(.90,1.10), sma200 = p*rnd(.85,1.15);
-  const wma20  = p*rnd(.95,1.05), ema12 = p*rnd(.97,1.03), ema26  = p*rnd(.94,1.06);
-
-  /* MACD */
-  const macdL = ema12-ema26, macdS = macdL*rnd(.6,1.4), macdH = macdL-macdS;
-  const macdB = macdL > macdS;
-
-  /* SAR */
-  const sarB = Math.random()>.45;
-  const sar  = sarB ? p*rnd(.88,.98) : p*rnd(1.02,1.13);
-
-  /* Oscillators */
-  const rsi    = rnd(25,75);
-  const stochK = rnd(12,88), stochD = clamp(stochK+rnd(-10,10),0,100);
-  const cci    = rnd(-180,180);
-  const mom    = rnd(-18,22);
-
-  /* Bollinger */
-  const bbM = p*rnd(.97,1.03), bbSD = bbM*rnd(.018,.055);
-  const bbU = bbM+2*bbSD, bbL = bbM-2*bbSD;
-  const bbW = (bbU-bbL)/bbM*100;
-  const bbPB = ((p-bbL)/(bbU-bbL))*100;
-
-  /* Volume */
-  const obvB = Math.random()>.48, adB = Math.random()>.48;
-  const atr  = rnd(1.2,4.8), volR = rnd(.4,3.2);
-
-  /* Fibonacci swing — VALIDATED: high always > price > low */
-  const swH = p * rnd(1.12, 1.30);   /* 12-30% above price  */
-  const swL = p * rnd(0.72, 0.88);   /* 12-28% below price  */
-  const swD = swH - swL;             /* always positive      */
-
-  /* Ichimoku */
-  const ten  = p*rnd(.96,1.04), kij  = p*rnd(.92,1.08);
-  const senA = p*rnd(.94,1.06), senB = p*rnd(.88,1.12);
-  const chi  = p*rnd(.94,1.06);
-  const ichAb = p > Math.max(senA,senB);
-  const ichBl = p < Math.min(senA,senB);
-  const ichBCl = senA > senB;
-  const ichTK  = ten > kij;
-
-  /* Elliott */
-  const WD = [
-    {l:'①',h:35,c:'imp',d:'up'}, {l:'②',h:18,c:'cor',d:'dn'},
-    {l:'③',h:62,c:'imp',d:'up'}, {l:'④',h:24,c:'cor',d:'dn'},
-    {l:'⑤',h:44,c:'imp',d:'up'}, {l:'Ⓐ',h:30,c:'cor',d:'dn'},
-    {l:'Ⓑ',h:17,c:'imp',d:'up'}, {l:'Ⓒ',h:36,c:'cor',d:'dn'},
-  ];
-  const WW  = [.10,.10,.22,.12,.18,.12,.08,.08];
-  let ewI=0, cum=0, rw=Math.random();
-  for(let i=0;i<WW.length;i++){ cum+=WW[i]; if(rw<cum){ewI=i;break;} }
-
-  /* Valuation */
-  const isCrypto = G.exch==='CRYPTO';
-  const val = isCrypto ? null : {
-    pe:rnd(4,40), pfcf:rnd(7,55), pcash:rnd(2,22),
-    evRev:rnd(.3,9), evEbit:rnd(4,32), evEbitda:rnd(3,20),
-    peg:rnd(.3,4.2), pb:rnd(.4,8)
-  };
-
-  G.d = {
-    p, sma20,sma50,sma200,wma20,ema12,ema26,
-    macdL,macdS,macdH,macdB,sar,sarB,
-    rsi,stochK,stochD,cci,mom,
-    bbM,bbU,bbL,bbW,bbPB,
-    obvB,adB,atr,volR,
-    swH,swL,swD,
-    ten,kij,senA,senB,chi,
-    ichAb,ichBl,ichBCl,ichTK,
-    ewI,WD,ewD:WD[ewI].d,ewL:WD[ewI].l,
-    val, isCrypto,
-    forms:{}, candles:{}, valScore:0.5
-  };
-
-  rTech();
-  rForms();
-  rCandles();
-  rFib();
-  rIch();
-  rElliott();
-  rVal();
-  buildSigRows();
+function calc(){
+  var p=G.price;
+  var s20=p*rnd(.94,1.06),s50=p*rnd(.90,1.10),s200=p*rnd(.85,1.15);
+  var w20=p*rnd(.95,1.05),e12=p*rnd(.97,1.03),e26=p*rnd(.94,1.06);
+  var mL=e12-e26,mS=mL*rnd(.6,1.4),mH=mL-mS,mB=mL>mS;
+  var sB=Math.random()>.45,sar=sB?p*rnd(.88,.98):p*rnd(1.02,1.13);
+  var rsi=rnd(25,75),kk=rnd(12,88),kd=cl(kk+rnd(-10,10),0,100);
+  var cci=rnd(-180,180),mom=rnd(-18,22);
+  var bbM=p*rnd(.97,1.03),bbS=bbM*rnd(.018,.055),bbU=bbM+2*bbS,bbL=bbM-2*bbS,bbW=(bbU-bbL)/bbM*100,bbB=((p-bbL)/(bbU-bbL))*100;
+  var oB=Math.random()>.48,aB=Math.random()>.48,atr=rnd(1.2,4.8),vR=rnd(.4,3.2);
+  var sH=p*rnd(1.12,1.30),sL=p*rnd(.72,.88),sD=sH-sL;
+  var tn=p*rnd(.96,1.04),kj=p*rnd(.92,1.08),sA=p*rnd(.94,1.06),sB2=p*rnd(.88,1.12),chi=p*rnd(.94,1.06);
+  var iA=p>Math.max(sA,sB2),iL=p<Math.min(sA,sB2),iC=sA>sB2,iTK=tn>kj;
+  var WD=[{l:'①',h:35,c:'wi',d:1},{l:'②',h:18,c:'wc2',d:-1},{l:'③',h:62,c:'wi',d:1},{l:'④',h:24,c:'wc2',d:-1},{l:'⑤',h:44,c:'wi',d:1},{l:'Ⓐ',h:30,c:'wc2',d:-1},{l:'Ⓑ',h:17,c:'wi',d:1},{l:'Ⓒ',h:36,c:'wc2',d:-1}];
+  var WW=[.10,.10,.22,.12,.18,.12,.08,.08],ewI=0,c2=0,rw=Math.random();
+  for(var i=0;i<WW.length;i++){c2+=WW[i];if(rw<c2){ewI=i;break;}}
+  var ic=G.exch==='CRYPTO';
+  var val=ic?null:{pe:rnd(4,40),pf:rnd(7,55),pc2:rnd(2,22),er:rnd(.3,9),ee:rnd(4,32),ea:rnd(3,20),pg2:rnd(.3,4.2),pb:rnd(.4,8)};
+  G.d={p,s20,s50,s200,w20,e12,e26,mL,mS,mH,mB,sar,sB,rsi,kk,kd,cci,mom,bbM,bbU,bbL,bbW,bbB,oB,aB,atr,vR,sH,sL,sD,tn,kj,sA,sB2,chi,iA,iL,iC,iTK,ewI,WD,ewD:WD[ewI].d,ewL:WD[ewI].l,val,ic,fo:{},ca2:{},vs:.5};
+  rTech();rFo();rCa();rFib();rIch();rEw();rVal();buildSig();
 }
 
-/* ════════════════════════════════════════════
-   RENDER: TECHNICAL
-════════════════════════════════════════════ */
-function fillIG(id, items){
-  $(id).innerHTML = items.map(({n,v,s,b}) =>
-    `<div class="ic ${b===true?'bull':b===false?'bear':'neu'}">
-      <div class="in">${n}</div>
-      <div class="iv">${v}</div>
-      <div class="is">${s}</div>
-    </div>`
-  ).join('');
+function fillG(id,items){
+  $(id).innerHTML=items.map(function(x){
+    var c=x.b===true?'g':x.b===false?'r':'n';
+    return '<div class="ic '+c+'"><div class="in">'+x.n+'</div><div class="iv">'+x.v+'</div><div class="is">'+x.s+'</div></div>';
+  }).join('');
 }
 
 function rTech(){
-  const d=G.d, c=G.cur;
-  fillIG('ig-trend', [
-    {n:'SMA 20',  v:fp(d.sma20)+' '+c,  s:d.p>d.sma20?'↑ Fiyat üstünde':'↓ Fiyat altında',         b:d.p>d.sma20},
-    {n:'SMA 50',  v:fp(d.sma50)+' '+c,  s:d.p>d.sma50?'↑ Orta vade AL':'↓ Orta vade SAT',           b:d.p>d.sma50},
-    {n:'SMA 200', v:fp(d.sma200)+' '+c, s:d.p>d.sma200?'↑ Uzun vade AL':'↓ Uzun vade SAT',          b:d.p>d.sma200},
-    {n:'WMA 20',  v:fp(d.wma20)+' '+c,  s:d.p>d.wma20?'↑ AL':'↓ SAT',                               b:d.p>d.wma20},
-    {n:'EMA 12',  v:fp(d.ema12)+' '+c,  s:d.ema12>d.ema26?'EMA12 > EMA26':'EMA12 < EMA26',           b:d.ema12>d.ema26},
-    {n:'EMA 26',  v:fp(d.ema26)+' '+c,  s:d.ema12>d.ema26?'↑ Golden Cross':'↓ Death Cross',          b:d.ema12>d.ema26},
-    {n:'SAR',     v:fp(d.sar)+' '+c,    s:d.sarB?'↑ SAR altında → AL':'↓ SAR üstünde → SAT',         b:d.sarB},
-    {n:'MACD',    v:(d.macdH>=0?'+':'')+fp(Math.abs(d.macdH)), s:d.macdB?'↑ Pozitif cross':'↓ Negatif cross', b:d.macdB},
+  var d=G.d,c=G.cur;
+  fillG('ig1',[
+    {n:'SMA 20',v:fp(d.s20)+' '+c,s:d.p>d.s20?'↑ Üstünde':'↓ Altında',b:d.p>d.s20},
+    {n:'SMA 50',v:fp(d.s50)+' '+c,s:d.p>d.s50?'↑ AL':'↓ SAT',b:d.p>d.s50},
+    {n:'SMA 200',v:fp(d.s200)+' '+c,s:d.p>d.s200?'↑ Uzun AL':'↓ Uzun SAT',b:d.p>d.s200},
+    {n:'WMA 20',v:fp(d.w20)+' '+c,s:d.p>d.w20?'↑ AL':'↓ SAT',b:d.p>d.w20},
+    {n:'EMA 12',v:fp(d.e12)+' '+c,s:d.e12>d.e26?'Golden Cross':'Death Cross',b:d.e12>d.e26},
+    {n:'EMA 26',v:fp(d.e26)+' '+c,s:d.e12>d.e26?'↑ AL':'↓ SAT',b:d.e12>d.e26},
+    {n:'SAR',v:fp(d.sar)+' '+c,s:d.sB?'↑ AL':'↓ SAT',b:d.sB},
+    {n:'MACD',v:(d.mH>=0?'+':'')+fp(Math.abs(d.mH)),s:d.mB?'Pozitif':'Negatif',b:d.mB},
   ]);
-  const rb = d.rsi<30?true:d.rsi>70?false:null;
-  const cb = d.cci<-100?true:d.cci>100?false:null;
-  fillIG('ig-mom', [
-    {n:'RSI 14',     v:d.rsi.toFixed(1),    s:d.rsi<30?'⚡ Aşırı Satım':d.rsi>70?'⚠ Aşırı Alım':'Nötr bölge', b:rb},
-    {n:'Stoch %K',   v:d.stochK.toFixed(1), s:d.stochK<20?'⚡ Aşırı Satım':d.stochK>80?'⚠ Aşırı Alım':'Nötr',  b:d.stochK<50},
-    {n:'Stoch %D',   v:d.stochD.toFixed(1), s:d.stochK>d.stochD?'↑ %K > %D AL':'↓ %K < %D SAT',                 b:d.stochK>d.stochD},
-    {n:'CCI 14',     v:d.cci.toFixed(0),    s:d.cci<-100?'⚡ Aşırı Satım':d.cci>100?'⚠ Aşırı Alım':'Normal',    b:cb},
-    {n:'Momentum',   v:(d.mom>=0?'+':'')+d.mom.toFixed(1)+'%', s:d.mom>0?'↑ Pozitif':'↓ Negatif',                b:d.mom>0},
-    {n:'BB Üst Bant',v:fp(d.bbU)+' '+c,    s:d.p>d.bbU?'⚠ Band dışında!':'Normal',                              b:d.p<d.bbU},
-    {n:'BB Alt Bant',v:fp(d.bbL)+' '+c,    s:d.p<d.bbL?'⚡ Band dışında!':'Normal',                              b:d.p<d.bbL?true:null},
-    {n:'BB Genişlik',v:d.bbW.toFixed(1)+'%',s:d.bbW>25?'↑ Yüksek volatilite':'↓ Daralma/Sıkışma',               b:null},
-    {n:'BB %B',      v:d.bbPB.toFixed(1)+'%',s:d.bbPB>80?'Üst banda yakın':d.bbPB<20?'Alt banda yakın':'Ortada', b:d.bbPB>50},
+  fillG('ig2',[
+    {n:'RSI 14',v:d.rsi.toFixed(1),s:d.rsi<30?'⚡ Aşırı Satım':d.rsi>70?'⚠ Aşırı Alım':'Nötr',b:d.rsi<30?true:d.rsi>70?false:null},
+    {n:'Stoch %K',v:d.kk.toFixed(1),s:d.kk<20?'⚡ Satım':d.kk>80?'⚠ Alım':'Nötr',b:d.kk<50},
+    {n:'Stoch %D',v:d.kd.toFixed(1),s:d.kk>d.kd?'↑ AL':'↓ SAT',b:d.kk>d.kd},
+    {n:'CCI 14',v:d.cci.toFixed(0),s:d.cci<-100?'⚡ Satım':d.cci>100?'⚠ Alım':'Normal',b:d.cci<-100?true:d.cci>100?false:null},
+    {n:'Momentum',v:(d.mom>=0?'+':'')+d.mom.toFixed(1)+'%',s:d.mom>0?'Pozitif':'Negatif',b:d.mom>0},
+    {n:'BB Üst',v:fp(d.bbU)+' '+c,s:d.p>d.bbU?'⚠ Dışında!':'Normal',b:d.p<d.bbU},
+    {n:'BB Alt',v:fp(d.bbL)+' '+c,s:d.p<d.bbL?'⚡ Dışında!':'Normal',b:null},
+    {n:'BB Genişlik',v:d.bbW.toFixed(1)+'%',s:d.bbW>25?'Yüksek Vol':'Sıkışma',b:null},
+    {n:'BB %B',v:d.bbB.toFixed(1)+'%',s:d.bbB>80?'Üst Banda Yakın':d.bbB<20?'Alt Banda Yakın':'Orta',b:d.bbB>50},
   ]);
-  fillIG('ig-vol', [
-    {n:'OBV Trend',  v:d.obvB?'↑ Pozitif':'↓ Negatif',s:d.obvB?'Birikim — AL destekli':'Dağıtım — SAT baskısı', b:d.obvB},
-    {n:'A/D Index',  v:d.adB?'↑ Birikim':'↓ Dağıtım',  s:d.adB?'Akıllı para alıyor':'Akıllı para satıyor',      b:d.adB},
-    {n:'ATR%',       v:d.atr.toFixed(2)+'%',             s:d.atr>3.5?'Yüksek risk':d.atr>2?'Orta risk':'Düşük risk', b:null},
-    {n:'Hacim / Ort',v:d.volR.toFixed(2)+'x',            s:d.volR>1.5?d.volR.toFixed(1)+'x üstü hacim':'Normal',  b:d.volR>1.5},
+  fillG('ig3',[
+    {n:'OBV',v:d.oB?'↑ Pozitif':'↓ Negatif',s:d.oB?'Birikim':'Dağıtım',b:d.oB},
+    {n:'A/D',v:d.aB?'↑ Birikim':'↓ Dağıtım',s:d.aB?'Akıllı para AL':'Akıllı para SAT',b:d.aB},
+    {n:'ATR%',v:d.atr.toFixed(2)+'%',s:d.atr>3.5?'Yüksek risk':'Düşük risk',b:null},
+    {n:'Hacim/Ort',v:d.vR.toFixed(2)+'x',s:d.vR>1.5?'Yüksek hacim':'Normal',b:d.vR>1.5},
   ]);
 }
 
-/* ════════════════════════════════════════════
-   FORMATIONS & CANDLES
-════════════════════════════════════════════ */
-const FORMS = [
-  {i:'📐',n:'Omuz-Baş-Omuz',    t:'bear'}, {i:'🔃',n:'Ters OBO (Boğa)',t:'bull'},
-  {i:'⛰️', n:'İkili Tepe',       t:'bear'}, {i:'🏔️', n:'İkili Dip (W)',  t:'bull'},
-  {i:'🔺',n:'Simetrik Üçgen',   t:'neu'},  {i:'🔻',n:'Alçalan Üçgen',   t:'bear'},
-  {i:'🔼',n:'Yükselen Üçgen',   t:'bull'}, {i:'📌',n:'Yükselen Takoz',  t:'bear'},
-  {i:'📍',n:'Alçalan Takoz',    t:'bull'}, {i:'🚩',n:'Bayrak (Boğa)',   t:'bull'},
-  {i:'🏴',n:'Bayrak (Ayı)',     t:'bear'}, {i:'📐',n:'Flama (Boğa)',    t:'bull'},
-  {i:'📐',n:'Flama (Ayı)',      t:'bear'}, {i:'🥄',n:'Fincan & Kulp',   t:'bull'},
-  {i:'📦',n:'Dikdörtgen Boğa', t:'bull'}, {i:'📦',n:'Dikdörtgen Ayı',  t:'bear'},
+var FLIST=[
+  {i:'📐',n:'Omuz-Baş-Omuz',t:'r'},{i:'🔃',n:'Ters OBO',t:'g'},
+  {i:'⛰️',n:'İkili Tepe',t:'r'},{i:'🏔️',n:'İkili Dip (W)',t:'g'},
+  {i:'🔺',n:'Simetrik Üçgen',t:'n'},{i:'🔻',n:'Alçalan Üçgen',t:'r'},
+  {i:'🔼',n:'Yükselen Üçgen',t:'g'},{i:'📌',n:'Yükselen Takoz',t:'r'},
+  {i:'📍',n:'Alçalan Takoz',t:'g'},{i:'🚩',n:'Bayrak Boğa',t:'g'},
+  {i:'🏴',n:'Bayrak Ayı',t:'r'},{i:'🥄',n:'Fincan & Kulp',t:'g'},
+  {i:'📦',n:'Dikdörtgen Boğa',t:'g'},{i:'📦',n:'Dikdörtgen Ayı',t:'r'},
 ];
-const CNDLS = [
-  {i:'➕',n:'Doji',               t:'neu'},  {i:'🌅',n:'Sabah Yıldızı',      t:'bull'},
-  {i:'🌅',n:'Doji Sabah Yıldızı', t:'bull'}, {i:'🌆',n:'Akşam Yıldızı',      t:'bear'},
-  {i:'🌆',n:'Doji Akşam Yıldızı', t:'bear'}, {i:'🔨',n:'Çekiç',              t:'bull'},
-  {i:'⬆️', n:'Ters Çekiç',        t:'bull'}, {i:'💀',n:'Asılan Adam',        t:'bear'},
-  {i:'⭐',n:'Shooting Star',      t:'bear'}, {i:'🌟',n:'3 Beyaz Asker',      t:'bull'},
-  {i:'🐦',n:'3 Kara Karga',       t:'bear'}, {i:'🔵',n:'Engulfing (Boğa)',   t:'bull'},
-  {i:'🔴',n:'Engulfing (Ayı)',    t:'bear'}, {i:'🕯️',n:'Piercing Line',      t:'bull'},
-  {i:'☁️', n:'Dark Cloud Cover',  t:'bear'}, {i:'✂️', n:'Harami (Boğa)',     t:'bull'},
-  {i:'✂️', n:'Harami (Ayı)',      t:'bear'},
+var CLIST=[
+  {i:'➕',n:'Doji',t:'n'},{i:'🌅',n:'Sabah Yıldızı',t:'g'},{i:'🌆',n:'Akşam Yıldızı',t:'r'},
+  {i:'🔨',n:'Çekiç',t:'g'},{i:'💀',n:'Asılan Adam',t:'r'},{i:'⭐',n:'Shooting Star',t:'r'},
+  {i:'🌟',n:'3 Beyaz Asker',t:'g'},{i:'🐦',n:'3 Kara Karga',t:'r'},
+  {i:'🔵',n:'Engulfing Boğa',t:'g'},{i:'🔴',n:'Engulfing Ayı',t:'r'},
+  {i:'🕯️',n:'Piercing Line',t:'g'},{i:'☁️',n:'Dark Cloud Cover',t:'r'},
+  {i:'✂️',n:'Harami Boğa',t:'g'},{i:'✂️',n:'Harami Ayı',t:'r'},
 ];
-
-function pickSt(){ const r=Math.random(); return r<.10?'det':r<.20?'pos':'no'; }
-
-function rFC(id,list,store){
-  const L = {det:'✓ TESPİT EDİLDİ', pos:'◎ Olası', no:'— Yok'};
-  $(id).innerHTML = list.map(f => {
-    const st = pickSt();
-    store[f.n] = {st, t:f.t};
-    return `<div class="fc">
-      <div class="fi">${f.i}</div>
-      <div><div class="fn">${f.n}</div><div class="fs ${st}">${L[st]}</div></div>
-    </div>`;
+function pst(){var r=Math.random();return r<.10?'fd':r<.20?'fp':'fn2'}
+function rFGrid(id,list,store){
+  var L={fd:'✓ TESPİT',fp:'◎ Olası',fn2:'— Yok'};
+  $(id).innerHTML=list.map(function(f){var st=pst();store[f.n]={st:st,t:f.t};
+    return '<div class="fc"><div class="fi">'+f.i+'</div><div><div class="fn">'+f.n+'</div><div class="fs '+st+'">'+L[st]+'</div></div></div>';
   }).join('');
 }
+function rFo(){rFGrid('ff1',FLIST,G.d.fo)}
+function rCa(){rFGrid('ff2',CLIST,G.d.ca2)}
 
-function rForms()  { rFC('fg-main',    FORMS, G.d.forms); }
-function rCandles(){ rFC('fg-candles', CNDLS, G.d.candles); }
-
-/* ════════════════════════════════════════════
-   FIBONACCI
-   Retracement: price = swH - swD*pct  (0%=tepe, 100%=dip)
-   Extension:   price = swL + swD*pct  (>100% = above swH)
-════════════════════════════════════════════ */
 function rFib(){
-  const {p, swH, swL, swD} = G.d;
-  const c = G.cur;
-
-  const RL = [
-    {pct:0,    l:'0.0%  — Tepe'},
-    {pct:.236, l:'23.6%'},
-    {pct:.382, l:'38.2%'},
-    {pct:.500, l:'50.0%'},
-    {pct:.618, l:'61.8% ★'},
-    {pct:.786, l:'78.6%'},
-    {pct:1.0,  l:'100.0% — Dip'},
-  ];
-  const EL = [
-    {pct:1.272, l:'127.2%'},
-    {pct:1.414, l:'141.4%'},
-    {pct:1.618, l:'161.8% ★'},
-    {pct:2.000, l:'200.0%'},
-    {pct:2.618, l:'261.8% ★'},
-  ];
-
-  let h = `
-    <div class="sh">Fibonacci Düzeltme
-      <span style="font-size:9px;letter-spacing:0;text-transform:none;font-weight:400;margin-left:5px">
-        Tepe: ${fp(swH)} ${c} &nbsp;·&nbsp; Dip: ${fp(swL)} ${c} &nbsp;·&nbsp; Fark: ${fp(swD)} ${c}
-      </span>
-    </div>
-    <table class="ftbl">
-    <tr><th>Seviye</th><th>Fiyat (${c})</th><th>Uzaklık</th><th>Rol</th></tr>`;
-
-  RL.forEach(({pct, l}) => {
-    const lp   = swH - swD * pct;             /* retracement level */
-    const diff = lp - p;
-    const dpct = diff / p * 100;
-    const near = Math.abs(diff) / p < 0.022;  /* within 2.2% of current price */
-    const isBelow = lp < p;
-    h += `<tr ${near?'class="crow"':''}>
-      <td>${l}${near?'<span class="ntag">◀ YAKINDA</span>':''}</td>
-      <td style="color:${near?'var(--cyan)':isBelow?'var(--green)':'var(--red)'}">${fp(lp)}</td>
-      <td style="color:${dpct>=0?'var(--green)':'var(--red)'}">${dpct>=0?'+':''}${dpct.toFixed(2)}%</td>
-      <td style="font-size:9px;color:var(--dim2)">${isBelow?'Destek':'Direnç'}</td>
-    </tr>`;
+  var d=G.d,c=G.cur,p=d.p,sH=d.sH,sL=d.sL,sD=d.sD;
+  var h='<div class="sh">Düzeltme Seviyeleri</div><table class="ft"><tr><th>Seviye</th><th>Fiyat ('+c+')</th><th>Uzaklık</th><th>Rol</th></tr>';
+  [{r:0,l:'0% — Tepe'},{r:.236,l:'23.6%'},{r:.382,l:'38.2%'},{r:.5,l:'50.0%'},{r:.618,l:'61.8% ★'},{r:.786,l:'78.6%'},{r:1,l:'100% — Dip'}].forEach(function(x){
+    var lp=sH-sD*x.r,df=lp-p,dp=df/p*100,nr=Math.abs(df)/p<.022;
+    h+='<tr'+(nr?' class="nr"':'')+'><td>'+x.l+(nr?'<span class="nt">◀ YAKINDA</span>':'')+'</td><td style="color:'+(nr?'var(--cy)':lp<p?'var(--gr)':'var(--rd)')+'">'+fp(lp)+'</td><td style="color:'+(dp>=0?'var(--gr)':'var(--rd)')+'">'+( dp>=0?'+':'')+dp.toFixed(2)+'%</td><td style="font-size:9px;color:var(--d2)">'+(lp<p?'Destek':'Direnç')+'</td></tr>';
   });
-  h += `</table>`;
-
-  h += `
-    <div class="sh" style="margin-top:14px">Extension Hedefleri</div>
-    <table class="ftbl">
-    <tr><th>Seviye</th><th>Fiyat (${c})</th><th>Fiyattan</th><th>Tip</th></tr>`;
-
-  EL.forEach(({pct, l}) => {
-    const lp   = swL + swD * pct;            /* extension level — always > swH */
-    const dpct = (lp - p) / p * 100;
-    h += `<tr>
-      <td style="color:var(--green)">${l}</td>
-      <td style="color:var(--gold)">${fp(lp)}</td>
-      <td style="color:var(--dim2)">+${dpct.toFixed(1)}%</td>
-      <td style="font-size:9px;color:var(--dim2)">Hedef</td>
-    </tr>`;
+  h+='</table><div class="sh" style="margin-top:14px">Extension Hedefleri</div><table class="ft"><tr><th>Seviye</th><th>Fiyat ('+c+')</th><th>Hedef</th></tr>';
+  [{r:1.272,l:'127.2%'},{r:1.618,l:'161.8% ★'},{r:2.618,l:'261.8%'}].forEach(function(x){
+    var lp=sL+sD*x.r;
+    h+='<tr><td style="color:var(--gr)">'+x.l+'</td><td style="color:var(--go)">'+fp(lp)+'</td><td style="color:var(--d2)">+'+(( lp-p)/p*100).toFixed(1)+'%</td></tr>';
   });
-  h += `</table>`;
-
-  h += `<div class="sh" style="margin-top:14px">Fan &amp; Trend Kanalları</div><div class="ig">`;
-  [{pct:.382,l:'Fan 38.2%'},{pct:.5,l:'Fan 50%'},{pct:.618,l:'Fan 61.8%'}].forEach(({pct,l}) => {
-    const fp2 = swL + swD * pct;
-    h += `<div class="ic ${fp2<p?'bull':'bear'}">
-      <div class="in">${l}</div><div class="iv">${fp(fp2)} ${c}</div>
-      <div class="is">${fp2<p?'Destek açısı':'Direnç açısı'}</div></div>`;
-  });
-  [{m:1.1,l:'Üst Kanal'},{m:1.0,l:'Trend Çizgisi'},{m:.9,l:'Alt Kanal'}].forEach(({m,l}) => {
-    h += `<div class="ic ${m>1?'bear':m<1?'bull':'neu'}">
-      <div class="in">${l}</div><div class="iv">${fp(p*m)} ${c}</div>
-      <div class="is">${m>1?'Direnç':m<1?'Destek':'Trend'}</div></div>`;
-  });
-  h += `</div>`;
-  h += `<div class="note">ℹ️ Fibonacci Yayları ve Spiraller TradingView grafiği üzerinde çizim araçlarıyla görselleştirilir. Hesaplamalar Swing High/Low noktalarına dayalıdır.</div>`;
-
-  $('fib-wrap').innerHTML = h;
+  h+='</table>';
+  $('fibw').innerHTML=h;
 }
 
-/* ════════════════════════════════════════════
-   ICHIMOKU
-════════════════════════════════════════════ */
 function rIch(){
-  const d=G.d, c=G.cur;
-  $('ich-cells').innerHTML = [
-    {l:'Tenkan (9)',  v:fp(d.ten)+' '+c,  b:d.ten>d.kij},
-    {l:'Kijun (26)',  v:fp(d.kij)+' '+c,  b:d.p>d.kij},
-    {l:'Senkou A',    v:fp(d.senA)+' '+c, b:d.senA>d.senB},
-    {l:'Senkou B',    v:fp(d.senB)+' '+c, b:d.p>d.senB},
-    {l:'Chikou',      v:fp(d.chi)+' '+c,  b:d.chi>d.p},
-    {l:'Bulut Durumu',v:d.ichAb?'↑ ÜSTÜNDE':d.ichBl?'↓ ALTINDA':'≈ İÇİNDE',
-                       b:d.ichAb?true:d.ichBl?false:null},
-  ].map(({l,v,b}) => `<div class="ichc">
-    <div class="ichl">${l}</div>
-    <div class="ichv" style="color:${b===true?'var(--green)':b===false?'var(--red)':'var(--gold)'}">${v}</div>
-  </div>`).join('');
-
-  const sc = d.ichAb?'var(--green)':d.ichBl?'var(--red)':'var(--gold)';
-  const st = d.ichAb?'📈 BULUT ÜSTÜNDE — Güçlü Boğa Sinyali':d.ichBl?'📉 BULUT ALTINDA — Güçlü Ayı Sinyali':'↔️ BULUT İÇİNDE — Belirsiz';
-  $('ich-comment').innerHTML = `<div class="abox ${d.ichAb?'bull':d.ichBl?'bear':'neu'}">
-    <strong style="color:${sc}">${st}</strong><br><br>
-    <b>TK Kesişimi:</b> ${d.ichTK?'✅ Tenkan > Kijun → AL sinyali':'⚠️ Tenkan < Kijun → SAT sinyali'}<br>
-    <b>Bulut Rengi:</b> ${d.ichBCl?'✅ Yeşil (Senkou A > B) → Boğa bulut':'⚠️ Kırmızı (Senkou B > A) → Ayı bulut'}<br>
-    <b>Chikou Span:</b> ${d.chi>d.p?'✅ Fiyat üstünde → Güçlü onay':'⚠️ Fiyat altında → Zayıf sinyal'}
-  </div>`;
+  var d=G.d,c=G.cur;
+  $('icg').innerHTML=[
+    {l:'Tenkan (9)',v:fp(d.tn)+' '+c,b:d.tn>d.kj},
+    {l:'Kijun (26)',v:fp(d.kj)+' '+c,b:d.p>d.kj},
+    {l:'Senkou A',v:fp(d.sA)+' '+c,b:d.sA>d.sB2},
+    {l:'Senkou B',v:fp(d.sB2)+' '+c,b:d.p>d.sB2},
+    {l:'Chikou',v:fp(d.chi)+' '+c,b:d.chi>d.p},
+    {l:'Bulut',v:d.iA?'↑ ÜSTÜNDE':d.iL?'↓ ALTINDA':'≈ İÇİNDE',b:d.iA?true:d.iL?false:null},
+  ].map(function(x){return '<div class="ichc"><div class="ichl">'+x.l+'</div><div class="ichv" style="color:'+(x.b===true?'var(--gr)':x.b===false?'var(--rd)':'var(--go)')+'">'+x.v+'</div></div>';}).join('');
+  $('icc').innerHTML='<div class="ab '+(d.iA?'g':d.iL?'r':'n')+'"><strong>'+(d.iA?'📈 BULUT ÜSTÜNDE — Boğa':d.iL?'📉 BULUT ALTINDA — Ayı':'↔️ BULUT İÇİNDE — Belirsiz')+'</strong><br><br>TK: '+(d.iTK?'✅ AL':'⚠ SAT')+' | Bulut: '+(d.iC?'✅ Yeşil':'⚠ Kırmızı')+' | Chikou: '+(d.chi>d.p?'✅ Güçlü':'⚠ Zayıf')+'</div>';
 }
 
-/* ════════════════════════════════════════════
-   ELLIOTT
-════════════════════════════════════════════ */
-function rElliott(){
-  const d=G.d, c=G.cur;
-  $('wave-ch').innerHTML = d.WD.map((w,i) =>
-    `<div class="wb ${w.c}${i===d.ewI?' act':''}" style="height:${w.h}px">
-      <span class="wlbl" style="${i===d.ewI?'color:var(--cyan);font-size:12px':''}">${w.l}</span>
-    </div>`
-  ).join('');
-
-  const tgt = d.ewD==='up'
-    ? fp(d.p*rnd(1.05,1.22))+' '+c
-    : fp(d.p*rnd(.80,.95))+' '+c;
-
-  $('ew-comment').innerHTML = `
-    <div class="abox ${d.ewD==='up'?'bull':'bear'}">
-      <strong>Aktif Dalga: ${d.ewL}</strong><br>
-      ${d.ewD==='up'?'Yükseliş devam edebilir. Hedef: '+tgt:'Düzeltme bekleniyor. Destek: '+tgt}
-    </div>
-    <div class="abox neu" style="margin-top:5px">
-      <b>Elliott Fibonacci Oranları:</b><br>
-      • Dalga 2 → W1'in %38.2–61.8 düzeltmesi<br>
-      • Dalga 3 → W1'in min. %161.8'i (en kısa olamaz)<br>
-      • Dalga 4 → W1 tepesine girmez<br>
-      • Dalga 5 → W1'in %61.8–100'ü
-    </div>
-    <div class="note">⚠️ Elliott analizi subjektiftir ve tahminseldir. Kesin değildir.</div>`;
+function rEw(){
+  var d=G.d,c=G.cur;
+  $('ewc').innerHTML=d.WD.map(function(w,i){return '<div class="wb '+w.c+(i===d.ewI?' wa':'')+'" style="height:'+w.h+'px"><span class="wl"'+(i===d.ewI?' style="color:var(--cy)"':'')+'>'+w.l+'</span></div>';}).join('');
+  $('ewd').innerHTML='<div class="ab '+(d.ewD>0?'g':'r')+'"><strong>Aktif: '+d.ewL+'</strong> — '+(d.ewD>0?'Yükseliş bekleniyor':'Düzeltme bekleniyor')+'</div><div class="note" style="margin-top:6px">⚠️ Elliott analizi subjektif ve tahminseldir.</div>';
 }
 
-/* ════════════════════════════════════════════
-   VALUATION
-════════════════════════════════════════════ */
 function rVal(){
-  const d = G.d;
-  if(d.isCrypto){
-    $('val-hdr').textContent = 'Kripto Değerleme Metrikleri';
-    $('val-grid').innerHTML = [
-      {n:'NVT Ratio',      v:rnd(50,200).toFixed(0),     b:'<150 ideal'},
-      {n:'Mkt/Realized',   v:rnd(.8,3.5).toFixed(2)+'x', b:'<1 = Ucuz'},
-      {n:'30D Volatilite', v:rnd(40,120).toFixed(1)+'%',  b:'Ort: %65'},
-      {n:'Realized P/L',   v:rnd(-20,40).toFixed(1)+'%',  b:'Kar/Zarar'},
-    ].map(({n,v,b}) => `<div class="vc">
-      <div class="vn">${n}</div><div class="vv" style="color:var(--gold)">${v}</div>
-      <div class="vb">${b}</div></div>`).join('');
-    $('val-note').style.display = 'block';
-    $('val-note').textContent = 'Kripto için P/E, P/B gibi geleneksel metrikler uygulanamaz.';
+  var d=G.d;
+  if(d.ic){
+    $('vh').textContent='Kripto Metrikleri';
+    $('vg').innerHTML=[{n:'NVT',v:rnd(50,200).toFixed(0)},{n:'Mkt/Real',v:rnd(.8,3.5).toFixed(2)+'x'},{n:'30D Vol',v:rnd(40,120).toFixed(1)+'%'},{n:'R.P/L',v:rnd(-20,40).toFixed(1)+'%'}].map(function(x){return '<div class="vc"><div class="vn">'+x.n+'</div><div class="vv" style="color:var(--go)">'+x.v+'</div></div>';}).join('');
     return;
   }
-  $('val-hdr').textContent = 'Temel Analiz — Değerleme Çarpanları';
-  const M = [
-    {n:'P/E',        v:d.val.pe,       id:15},
-    {n:'P/FCF',      v:d.val.pfcf,     id:15},
-    {n:'P/Cash',     v:d.val.pcash,    id:10},
-    {n:'EV/Revenue', v:d.val.evRev,    id:3},
-    {n:'EV/EBIT',    v:d.val.evEbit,   id:15},
-    {n:'EV/EBITDA',  v:d.val.evEbitda, id:10},
-    {n:'PEG',        v:d.val.peg,      id:1.5},
-    {n:'P/B',        v:d.val.pb,       id:3},
-  ];
-  const cheap = M.filter(m=>m.v<m.id).length;
-  G.d.valScore = cheap / M.length;
-  $('val-grid').innerHTML = M.map(({n,v,id}) => {
-    const ok=v<id, hi=v>id*2.2;
-    const col = ok?'var(--green)':hi?'var(--red)':'var(--gold)';
-    return `<div class="vc">
-      <div class="vn">${n}</div>
-      <div class="vv" style="color:${col}">${v.toFixed(1)}x</div>
-      <div class="vb">İdeal: &lt;${id}</div>
-      <div class="vt" style="color:${col}">${ok?'✓ Makul':hi?'⚠ Pahalı':'◎ Orta'}</div>
-    </div>`;
-  }).join('');
-  $('val-note').style.display = 'block';
-  $('val-note').textContent = cheap+'/'+M.length+' metrik ideal altında. '+
-    (cheap>=5?'Değerleme makul görünüyor.':cheap<=2?'Değerleme yüksek, dikkat!':'Karma değerleme sinyali.');
+  var M=[{n:'P/E',v:d.val.pe,i:15},{n:'P/FCF',v:d.val.pf,i:15},{n:'P/Cash',v:d.val.pc2,i:10},{n:'EV/Rev',v:d.val.er,i:3},{n:'EV/EBIT',v:d.val.ee,i:15},{n:'EV/EBITDA',v:d.val.ea,i:10},{n:'PEG',v:d.val.pg2,i:1.5},{n:'P/B',v:d.val.pb,i:3}];
+  var ch=M.filter(function(m){return m.v<m.i}).length;G.d.vs=ch/M.length;
+  $('vg').innerHTML=M.map(function(m){var ok=m.v<m.i,hi=m.v>m.i*2.2,col=ok?'var(--gr)':hi?'var(--rd)':'var(--go)';return '<div class="vc"><div class="vn">'+m.n+'</div><div class="vv" style="color:'+col+'">'+m.v.toFixed(1)+'x</div><div class="vb">İdeal &lt;'+m.i+'</div><div class="vt" style="color:'+col+'">'+(ok?'✓ Makul':hi?'⚠ Pahalı':'◎ Orta')+'</div></div>';}).join('');
+  $('vn').style.display='block';$('vn').textContent=ch+'/'+M.length+' ideal altında. '+(ch>=5?'Değerleme makul.':ch<=2?'Yüksek değerleme!':'Karma sinyal.');
 }
 
-/* ════════════════════════════════════════════
-   SIGNAL BARS
-════════════════════════════════════════════ */
-const SDEFS = [
-  {id:'tech',l:'Teknik Göstergeler'},
-  {id:'form',l:'Formasyonlar'},
-  {id:'cndl',l:'Mum Formasyonları'},
-  {id:'fib', l:'Fibonacci/Ichimoku'},
-  {id:'ew',  l:'Elliott Wave'},
-  {id:'val', l:'Değerleme'},
-];
-function buildSigRows(){
-  $('sig-rows').innerHTML = SDEFS.map(({id,l}) => `
-    <div class="sr">
-      <div class="sl">${l}</div>
-      <div class="st"><div class="sf" id="sf-${id}"></div></div>
-      <div class="sp" id="sp-${id}" style="color:var(--dim2)">—</div>
-    </div>`).join('');
+var SDEFS=[{id:'te',l:'Teknik'},{id:'fo',l:'Formasyon'},{id:'ca',l:'Mum'},{id:'fi',l:'Fibonacci/Ich'},{id:'ew',l:'Elliott'},{id:'va',l:'Değerleme'}];
+function buildSig(){$('sgr').innerHTML=SDEFS.map(function(x){return '<div class="sr"><div class="sl">'+x.l+'</div><div class="sb2"><div class="sf" id="sf'+x.id+'"></div></div><div class="sv" id="sv'+x.id+'" style="color:var(--dm)">—</div></div>';}).join('')}
+function setSig(sc){Object.keys(sc).forEach(function(k){var f=$('sf'+k),v2=$('sv'+k);if(!f)return;var v=sc[k];setTimeout(function(){var col=v>=60?'var(--gr)':v>=40?'var(--go)':'var(--rd)';f.style.width=v+'%';f.style.background=col;v2.textContent=v+'%';v2.style.color=col;},80);})}
+function setScore(s){
+  var a=$('arc'),ci=201,col=s>=70?'var(--gr)':s>=55?'#5eead4':s>=45?'var(--go)':s>=30?'var(--rd)':'#fb7185';
+  a.style.strokeDashoffset=ci-ci*s/100;a.style.stroke=col;
+  $('snum').textContent=s;$('snum').style.color=col;
+  var lb=s>=72?'📈 GÜÇLÜ AL':s>=58?'📈 AL':s>=47?'➡️ NÖTR':s>=32?'📉 SAT':'📉 GÜÇLÜ SAT';
+  $('slb').textContent=lb;$('slb').style.color=col;
 }
-function setSigBars(sc){
-  Object.entries(sc).forEach(([k,v]) => {
-    const f = $('sf-'+k), p = $('sp-'+k);
-    if(!f) return;
-    setTimeout(() => {
-      f.style.width = v+'%';
-      const col = v>=60?'var(--green)':v>=40?'var(--gold)':'var(--red)';
-      f.style.background = col;
-      p.textContent = v+'%';
-      p.style.color = col;
-    }, 80);
-  });
-}
-
-/* ════════════════════════════════════════════
-   SCORE RING
-════════════════════════════════════════════ */
-function setScore(score){
-  const arc=document.getElementById('score-arc'), circ=201;
-  arc.style.strokeDashoffset = circ - circ*score/100;
-  const col = score>=70?'var(--green)':score>=55?'#5eead4':score>=45?'var(--gold)':score>=30?'var(--red)':'#fb7185';
-  arc.style.stroke = col;
-  $('snum').textContent  = score;
-  $('snum').style.color  = col;
-  const lb = score>=72?'📈 GÜÇLÜ AL':score>=58?'📈 AL':score>=47?'➡️ NÖTR':score>=32?'📉 SAT':'📉 GÜÇLÜ SAT';
-  $('slabel').textContent = lb;
-  $('slabel').style.color = col;
-}
-
-/* ════════════════════════════════════════════
-   COMPUTE SCORE
-════════════════════════════════════════════ */
 function compScore(){
-  const d = G.d;
-  let b=0, r=0;
-  /* Trend 8 pts */
-  d.p>d.sma20?b++:r++;  d.p>d.sma50?b++:r++;  d.p>d.sma200?b++:r++;
-  d.ema12>d.ema26?b++:r++;  d.sarB?b++:r++;  d.macdB?b++:r++;
-  d.obvB?b++:r++;  d.adB?b++:r++;
-  /* Momentum 5 pts */
-  if(d.rsi<30)b+=2; else if(d.rsi>70)r+=2; else if(d.rsi<50)b++; else r++;
-  d.stochK>d.stochD?b++:r++;
-  if(d.cci<-100)b++; else if(d.cci>100)r++;
-  d.mom>0?b++:r++;
-  /* Ichimoku 5 pts */
-  if(d.ichAb)b+=2; else if(d.ichBl)r+=2;
-  d.ichTK?b++:r++;  d.ichBCl?b++:r++;  d.chi>d.p?b++:r++;
-  /* Elliott 2 pts */
-  d.ewD==='up'?b+=2:r+=2;
-  /* Valuation 4 pts */
-  if(!d.isCrypto){ b+=Math.round(d.valScore*4); r+=Math.round((1-d.valScore)*4); }
-  /* Formations */
-  Object.values(d.forms).forEach(({st,t}) => {
-    if(st==='det'){ t==='bull'?b+=2:t==='bear'?r+=2:b++; }
-    if(st==='pos'){ t==='bull'?b++:t==='bear'?r++:0; }
-  });
-  Object.values(d.candles).forEach(({st,t}) => {
-    if(st==='det'){ t==='bull'?b++:t==='bear'?r++:0; }
-  });
-  const total = b+r;
-  const score = total>0 ? Math.min(100, Math.round(b/total*100)) : 50;
-  /* Per-category */
-  const tB = [d.p>d.sma20,d.p>d.sma50,d.ema12>d.ema26,d.macdB,d.sarB,d.obvB,d.adB].filter(Boolean).length;
-  let fb=0,fr=0,cb=0,cr=0;
-  Object.values(d.forms).forEach(({st,t})=>{if(st==='det'){t==='bull'?fb++:t==='bear'?fr++:0;}});
-  Object.values(d.candles).forEach(({st,t})=>{if(st==='det'){t==='bull'?cb++:t==='bear'?cr++:0;}});
-  return { score, b, r, sc: {
-    tech: Math.round(tB/7*100),
-    form: (fb+fr)>0 ? Math.round(fb/(fb+fr)*100) : 50,
-    cndl: (cb+cr)>0 ? Math.round(cb/(cb+cr)*100) : 50,
-    fib:  d.ichAb?70:d.ichBl?30:50,
-    ew:   d.ewD==='up'?72:35,
-    val:  d.isCrypto ? 50 : Math.round((d.valScore||.5)*100),
-  }};
+  var d=G.d,b=0,r=0;
+  d.p>d.s20?b++:r++;d.p>d.s50?b++:r++;d.p>d.s200?b++:r++;
+  d.e12>d.e26?b++:r++;d.sB?b++:r++;d.mB?b++:r++;d.oB?b++:r++;d.aB?b++:r++;
+  if(d.rsi<30)b+=2;else if(d.rsi>70)r+=2;else d.rsi<50?b++:r++;
+  d.kk>d.kd?b++:r++;d.cci<-100?b++:d.cci>100?r++:0;d.mom>0?b++:r++;
+  d.iA?b+=2:d.iL?r+=2:0;d.iTK?b++:r++;d.iC?b++:r++;d.chi>d.p?b++:r++;
+  d.ewD>0?b+=2:r+=2;
+  if(!d.ic){b+=Math.round(d.vs*4);r+=Math.round((1-d.vs)*4);}
+  Object.keys(d.fo).forEach(function(k){var x=d.fo[k];if(x.st==='fd'){x.t==='g'?b+=2:x.t==='r'?r+=2:b++;}});
+  Object.keys(d.ca2).forEach(function(k){var x=d.ca2[k];if(x.st==='fd'){x.t==='g'?b++:x.t==='r'?r++:0;}});
+  var tot=b+r,sc=tot>0?Math.min(100,Math.round(b/tot*100)):50;
+  var tb=[d.p>d.s20,d.p>d.s50,d.e12>d.e26,d.mB,d.sB,d.oB,d.aB].filter(Boolean).length;
+  var fb=0,fr=0,cb=0,cr=0;
+  Object.keys(d.fo).forEach(function(k){var x=d.fo[k];if(x.st==='fd'){x.t==='g'?fb++:x.t==='r'?fr++:0;}});
+  Object.keys(d.ca2).forEach(function(k){var x=d.ca2[k];if(x.st==='fd'){x.t==='g'?cb++:x.t==='r'?cr++:0;}});
+  return{sc:sc,b:b,r:r,bars:{te:Math.round(tb/7*100),fo:(fb+fr)>0?Math.round(fb/(fb+fr)*100):50,ca:(cb+cr)>0?Math.round(cb/(cb+cr)*100):50,fi:d.iA?70:d.iL?30:50,ew:d.ewD>0?72:35,va:d.ic?50:Math.round(d.vs*100)}};
 }
 
-/* ════════════════════════════════════════════
-   AI ANALYSIS
-════════════════════════════════════════════ */
 async function runAI(){
-  if(!G.ready){ load(); await new Promise(r=>setTimeout(r,400)); }
-
-  const btn = $('ai-btn');
-  btn.disabled = true; btn.textContent = '⏳...';
-
-  const out = $('ai-out');
-  out.innerHTML = `
-    <div class="thinking"><span>Analiz ediliyor</span>
-      <div class="dots"><span></span><span></span><span></span></div>
-    </div>
-    <div style="font-size:10px;color:var(--dim2);line-height:2.4;padding:4px 0">
-    ⬝ Trend...<br>⬝ Momentum...<br>⬝ Formasyonlar...<br>
-    ⬝ Fibonacci...<br>⬝ Ichimoku...<br>⬝ Elliott...<br>⬝ Değerleme...</div>`;
-
-  const d=G.d, c=G.cur;
-  const dF = Object.entries(d.forms).filter(([,v])=>v.st==='det').map(([k])=>k).join(', ') || 'Tespit edilmedi';
-  const dC = Object.entries(d.candles).filter(([,v])=>v.st==='det').map(([k])=>k).join(', ') || 'Tespit edilmedi';
-
-  const prompt = `Sen AlphaTerminal Pro AI analistsin. ${G.sym} (${ELAB[G.exch]||G.exch}) analizi yap. Türkçe, gerçek analist üslubuyla yaz.
-
-== SEMBOL ==
-${G.sym} | ${ELAB[G.exch]||G.exch} | ${ILAB[G.intv]||G.intv} | Fiyat: ${fp(d.p)} ${c}
-
-== TREND ==
-SMA20:${fp(d.sma20)}(${d.p>d.sma20?'AL':'SAT'}) SMA50:${fp(d.sma50)}(${d.p>d.sma50?'AL':'SAT'}) SMA200:${fp(d.sma200)}(${d.p>d.sma200?'AL':'SAT'})
-EMA12:${fp(d.ema12)} EMA26:${fp(d.ema26)} → ${d.ema12>d.ema26?'Golden Cross':'Death Cross'}
-SAR:${fp(d.sar)}(${d.sarB?'AL':'SAT'}) MACD:${d.macdB?'Pozitif crossover':'Negatif crossover'}
-
-== MOMENTUM ==
-RSI:${d.rsi.toFixed(1)}(${d.rsi<30?'AŞIRI SATIM':d.rsi>70?'AŞIRI ALIM':'Nötr'})
-Stoch: K=${d.stochK.toFixed(1)} D=${d.stochD.toFixed(1)} (${d.stochK>d.stochD?'AL':'SAT'})
-CCI:${d.cci.toFixed(0)} Mom:${(d.mom>=0?'+':'')+d.mom.toFixed(1)}%
-BB: Üst=${fp(d.bbU)} Alt=${fp(d.bbL)} Genişlik=%${d.bbW.toFixed(1)}
-
-== HACİM ==
-OBV:${d.obvB?'Pozitif':'Negatif'} A/D:${d.adB?'Birikim':'Dağıtım'} HacimOran:${d.volR.toFixed(2)}x
-
-== FİBONACCİ ==
-Swing H:${fp(d.swH)} ${c} | Swing L:${fp(d.swL)} ${c}
-%38.2:${fp(d.swH-d.swD*.382)} | %61.8:${fp(d.swH-d.swD*.618)} | Ext%161.8:${fp(d.swL+d.swD*1.618)} (hepsi ${c})
-
-== İCHİMOKU ==
-Tenkan:${fp(d.ten)} Kijun:${fp(d.kij)} SenkouA:${fp(d.senA)} B:${fp(d.senB)}
-${d.ichAb?'BULUT ÜSTÜNDE':d.ichBl?'BULUT ALTINDA':'BULUT İÇİNDE'} | TK:${d.ichTK?'Pozitif':'Negatif'} Bulut:${d.ichBCl?'Yeşil':'Kırmızı'}
-
-== FORMASYONLAR ==
-Grafik: ${dF}
-Mum: ${dC}
-
-== ELLIOTT ==
-Aktif: ${d.ewL} (${d.ewD==='up'?'Yükseliş':'Düşüş'})
-
-== DEĞERLEME ==
-${d.isCrypto?'Kripto':Object.entries(d.val||{}).map(([k,v])=>k.toUpperCase()+':'+v.toFixed(1)).join(' ')}
-
-== ÇIKTI — TAM BU BAŞLIKLARI KULLAN ==
-
-[OZET_KARAR]
-Kısa ve net AL/SAT/NÖTR kararı + 2-3 cümle temel gerekçe.
-
-[GUCLU_SINYALLER]
-En güçlü 3-5 sinyal — gösterge adı ve ${c} cinsinden değerle.
-
-[RISKLER]
-2-4 somut risk faktörü.
-
-[DESTEK_SEVIYELERI]
-3 kritik destek — ${c} cinsinden kesin fiyatlar. Fibonacci, Ichimoku veya MA'dan türet.
-
-[DIRENC_SEVIYELERI]
-3 kritik direnç — ${c} cinsinden kesin fiyatlar.
-
-[SENARYO]
-BOGA: hedef fiyat ve tetikleyici koşul.
-AYI: stop seviyesi ve en kötü senaryo.
-
-[DEGERLEME]
-${d.isCrypto?'Kripto metrikler ve değerlendirme.':'Çarpan analizi. Sektör ortalamasıyla kıyasla.'}`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1800,
-        messages: [{ role:'user', content:prompt }]
-      })
-    });
-    if(!res.ok){
-      const e = await res.json().catch(()=>({}));
-      throw new Error((e.error&&e.error.message)||'HTTP '+res.status);
-    }
-    const json = await res.json();
-    const text = (json.content||[]).map(x=>x.text||'').join('');
-    if(!text) throw new Error('Boş yanıt alındı.');
-    G.hist = [{role:'user',content:prompt},{role:'assistant',content:text}];
-    renderAIOut(text);
-    const {score,b,r,sc} = compScore();
-    setScore(score);
-    $('ssub').textContent = b+' boğa · '+r+' ayı puan';
-    setSigBars(sc);
-  } catch(e) {
-    out.innerHTML = `<div class="abox bear">⚠️ API Hatası: ${e.message}</div>`;
-  }
-
-  btn.disabled = false; btn.textContent = '🤖 ANALİZ';
+  if(!G.ready){doLoad();await new Promise(function(r2){setTimeout(r2,300);})}
+  // AI sekmesine geç
+  var aiBtn = document.querySelector('#nav button.ai');
+  if(aiBtn) tab(aiBtn, 'pg-ai');
+  var btn=$('aib');btn.disabled=true;btn.textContent='⏳...';
+  var out=$('ao');
+  out.innerHTML='<div class="tk"><span>Analiz ediliyor</span><div class="ds"><span></span><span></span><span></span></div></div>';
+  var d=G.d,c=G.cur;
+  var dF=Object.keys(d.fo).filter(function(k){return d.fo[k].st==='fd'}).join(', ')||'Yok';
+  var dC=Object.keys(d.ca2).filter(function(k){return d.ca2[k].st==='fd'}).join(', ')||'Yok';
+  var prompt='Sen AlphaTerminal AI analistsin. '+G.sym+' ('+( EL[G.exch]||G.exch)+') analizi yap. Türkçe, profesyonel üslup.\n\nSEMBOL: '+G.sym+' | '+(EL[G.exch]||G.exch)+' | '+(IL[G.intv]||G.intv)+' | Fiyat: '+fp(d.p)+' '+c+'\nTREND: SMA20:'+(d.p>d.s20?'AL':'SAT')+' SMA50:'+(d.p>d.s50?'AL':'SAT')+' SMA200:'+(d.p>d.s200?'AL':'SAT')+' EMA:'+(d.e12>d.e26?'Golden Cross':'Death Cross')+' SAR:'+(d.sB?'AL':'SAT')+' MACD:'+(d.mB?'Pozitif':'Negatif')+'\nMOMENTUM: RSI:'+d.rsi.toFixed(1)+' CCI:'+d.cci.toFixed(0)+' Stoch:'+d.kk.toFixed(0)+'/'+d.kd.toFixed(0)+' Mom:'+d.mom.toFixed(1)+'%\nBB: Üst:'+fp(d.bbU)+' Alt:'+fp(d.bbL)+' Genişlik:'+d.bbW.toFixed(1)+'%\nOBV:'+(d.oB?'Pozitif':'Negatif')+' A/D:'+(d.aB?'Birikim':'Dağıtım')+'\nFİB: H:'+fp(d.sH)+' L:'+fp(d.sL)+' | %38.2:'+fp(d.sH-d.sD*.382)+' %61.8:'+fp(d.sH-d.sD*.618)+' Ext161.8:'+fp(d.sL+d.sD*1.618)+' ('+c+')\nİCH: '+(d.iA?'ÜSTÜNDE':d.iL?'ALTINDA':'İÇİNDE')+' TK:'+(d.iTK?'AL':'SAT')+' Bulut:'+(d.iC?'Yeşil':'Kırmızı')+'\nFORMASYON: '+dF+' | MUM: '+dC+'\nELLIOTT: '+d.ewL+' ('+(d.ewD>0?'Yükseliş':'Düşüş')+')\nDEĞERLEME: '+(d.ic?'Kripto':Object.keys(d.val||{}).map(function(k){return k+':'+d.val[k].toFixed(1)}).join(' '))+'\n\nŞU BAŞLIKLARI KULLAN:\n[OZET_KARAR] — Net karar + gerekçe\n[GUCLU_SINYALLER] — 3-5 güçlü sinyal\n[RISKLER] — 2-4 risk\n[DESTEK_SEVIYELERI] — 3 destek ('+c+' cinsinden)\n[DIRENC_SEVIYELERI] — 3 direnç ('+c+' cinsinden)\n[SENARYO] — Boğa hedef, Ayı stop\n[DEGERLEME] — Çarpan değerlendirmesi';
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1800,messages:[{role:'user',content:prompt}]})});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    var json=await res.json();
+    var text=(json.content||[]).map(function(x){return x.text||''}).join('');
+    if(!text)throw new Error('Boş yanıt');
+    G.hist=[{role:'user',content:prompt},{role:'assistant',content:text}];
+    renderAI(text);
+    var cs=compScore();setScore(cs.sc);$('ssx').textContent=cs.b+' boğa · '+cs.r+' ayı';setSig(cs.bars);
+  }catch(e){out.innerHTML='<div class="ab r">⚠️ Hata: '+e.message+'</div>';}
+  btn.disabled=false;btn.textContent='🤖 ANALİZ';
 }
 
-/* ════════════════════════════════════════════
-   RENDER AI OUTPUT
-════════════════════════════════════════════ */
-function renderAIOut(text){
-  const S = [
-    {k:'OZET_KARAR',       l:'📊 ÖZET KARAR',          c:'info'},
-    {k:'GUCLU_SINYALLER',  l:'✅ GÜÇLÜ SİNYALLER',     c:'bull'},
-    {k:'RISKLER',          l:'⚠️ RİSKLER',              c:'bear'},
-    {k:'DESTEK_SEVIYELERI',l:'🟢 DESTEK SEVİYELERİ',    c:'bull'},
-    {k:'DIRENC_SEVIYELERI',l:'🔴 DİRENÇ SEVİYELERİ',    c:'bear'},
-    {k:'SENARYO',          l:'🔭 SENARYO ANALİZİ',      c:'neu'},
-    {k:'DEGERLEME',        l:'💰 DEĞERLEME GÖRÜŞÜ',     c:'info'},
+function renderAI(text){
+  var S=[
+    {k:'OZET_KARAR',l:'📊 ÖZET KARAR',c:'i'},
+    {k:'GUCLU_SINYALLER',l:'✅ GÜÇLÜ SİNYALLER',c:'g'},
+    {k:'RISKLER',l:'⚠️ RİSKLER',c:'r'},
+    {k:'DESTEK_SEVIYELERI',l:'🟢 DESTEKLER',c:'g'},
+    {k:'DIRENC_SEVIYELERI',l:'🔴 DİRENÇLER',c:'r'},
+    {k:'SENARYO',l:'🔭 SENARYO',c:'n'},
+    {k:'DEGERLEME',l:'💰 DEĞERLEME',c:'i'},
   ];
-  const HC = {info:'var(--cyan)',bull:'var(--green)',bear:'var(--red)',neu:'var(--gold)'};
-
-  const found = {};
-  S.forEach(s => {
-    const tag = '['+s.k+']', idx = text.indexOf(tag);
-    if(idx===-1) return;
-    let end = text.length;
-    S.forEach(s2 => {
-      if(s2.k===s.k) return;
-      const i2 = text.indexOf('['+s2.k+']');
-      if(i2>idx && i2<end) end = i2;
-    });
-    found[s.k] = text.substring(idx+tag.length, end).trim();
+  var HC={i:'var(--cy)',g:'var(--gr)',r:'var(--rd)',n:'var(--go)'};
+  var found={};
+  S.forEach(function(s){
+    var tag='['+s.k+']',idx=text.indexOf(tag);if(idx===-1)return;
+    var end=text.length;
+    S.forEach(function(s2){if(s2.k===s.k)return;var i2=text.indexOf('['+s2.k+']');if(i2>idx&&i2<end)end=i2;});
+    found[s.k]=text.substring(idx+tag.length,end).trim();
   });
-
-  const out = $('ai-out');
-  if(!Object.keys(found).length){
-    out.innerHTML = `<div class="abox info" style="white-space:pre-wrap;line-height:1.8;font-size:11px">${text}</div>`;
-    return;
-  }
-  out.innerHTML = S.map(s => {
-    const cnt = found[s.k]; if(!cnt) return '';
-    return `<div class="asec">
-      <div class="ahdr" style="color:${HC[s.c]}">${s.l}</div>
-      <div class="abox ${s.c}">${cnt.replace(/\n/g,'<br>')}</div>
-    </div>`;
+  var out=$('ao');
+  if(!Object.keys(found).length){out.innerHTML='<div class="ab i" style="white-space:pre-wrap;font-size:11px">'+text+'</div>';return;}
+  out.innerHTML=S.map(function(s){var cnt=found[s.k];if(!cnt)return'';
+    return '<div class="as"><div class="ah" style="color:'+HC[s.c]+'">'+s.l+'</div><div class="ab '+s.c+'">'+cnt.replace(/\n/g,'<br>')+'</div></div>';
   }).join('');
 }
 
-/* ════════════════════════════════════════════
-   CHAT
-════════════════════════════════════════════ */
-async function sendChat(){
-  const inp = $('chat-in');
-  const q = inp.value.trim(); if(!q) return;
-  inp.value = '';
-  const out = $('ai-out');
-  out.innerHTML += `
-    <div class="asec"><div class="abox cq"><b>Sen:</b> ${q}</div></div>
-    <div class="thinking" id="tbub"><span>Yanıt</span>
-      <div class="dots"><span></span><span></span><span></span></div>
-    </div>`;
-  out.scrollTop = out.scrollHeight;
-  G.hist.push({role:'user', content:q+' ['+G.sym+' @ '+fp(G.price)+' '+G.cur+']'});
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:700,
-        system:'AlphaTerminal Pro AI analistsin. '+G.sym+' ('+( ELAB[G.exch]||G.exch)+') analisti. Para birimi '+G.cur+'. Kısa, net, Türkçe cevaplar ver.',
-        messages: G.hist.slice(-8)
-      })
-    });
-    const json = await res.json();
-    const reply = (json.content||[]).map(x=>x.text||'').join('') || 'Yanıt alınamadı.';
-    G.hist.push({role:'assistant', content:reply});
-    $('tbub')?.remove();
-    out.innerHTML += `<div class="asec"><div class="abox ca"><b style="color:var(--violet)">🤖 AI:</b><br><br>${reply.replace(/\n/g,'<br>')}</div></div>`;
-  } catch(e) {
-    $('tbub')?.remove();
-    out.innerHTML += `<div class="abox bear">⚠️ ${e.message}</div>`;
-  }
-  out.scrollTop = out.scrollHeight;
+async function chat(){
+  var inp=$('ci'),q=inp.value.trim();if(!q)return;inp.value='';
+  var out=$('ao');
+  out.innerHTML+='<div class="as"><div class="ab q"><b>Sen:</b> '+q+'</div></div><div class="tk" id="tb2"><span>Yanıt</span><div class="ds"><span></span><span></span><span></span></div></div>';
+  out.scrollTop=out.scrollHeight;
+  G.hist.push({role:'user',content:q+' ['+G.sym+' '+fp(G.price)+' '+G.cur+']'});
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,system:'AlphaTerminal AI. '+G.sym+' '+(EL[G.exch]||G.exch)+'. '+G.cur+'. Kısa net Türkçe.',messages:G.hist.slice(-8)})});
+    var json=await res.json();
+    var reply=(json.content||[]).map(function(x){return x.text||''}).join('')||'Yanıt alınamadı.';
+    G.hist.push({role:'assistant',content:reply});
+    var tb=document.getElementById('tb2');if(tb)tb.remove();
+    out.innerHTML+='<div class="as"><div class="ab a"><b style="color:var(--vi)">🤖 AI:</b><br><br>'+reply.replace(/\n/g,'<br>')+'</div></div>';
+  }catch(e){var tb=document.getElementById('tb2');if(tb)tb.remove();out.innerHTML+='<div class="ab r">⚠️ '+e.message+'</div>';}
+  out.scrollTop=out.scrollHeight;
 }
 
-/* ════════════════════════════════════════════
-   INIT
-════════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-  buildSigRows();
-  updateTopH();
-  window.addEventListener('resize', updateTopH);
-
-  $('sym').addEventListener('keydown',   e => { if(e.key==='Enter') load(); });
-  $('chat-in').addEventListener('keydown', e => { if(e.key==='Enter') sendChat(); });
+document.addEventListener('DOMContentLoaded',function(){
+  // Initialize: show only first tab
+  var all=document.querySelectorAll('.pg, #pg-ai');
+  for(var i=0;i<all.length;i++){all[i].style.display='none';all[i].classList.remove('on');}
+  $('pg-tek').style.display='block';$('pg-tek').classList.add('on');
+  buildSig();
+  $('sym').addEventListener('keydown',function(e){if(e.key==='Enter')doLoad();});
+  $('ci').addEventListener('keydown',function(e){if(e.key==='Enter')chat();});
 });
 </script>
 </body>
