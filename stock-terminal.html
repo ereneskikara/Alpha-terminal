@@ -169,6 +169,19 @@ button.bv:disabled{opacity:.4;pointer-events:none}
 .wli{font-size:11px;line-height:2.2;color:var(--d2)}
 .wli .g{color:var(--gr)}
 .note{margin-top:8px;padding:7px 9px;font-size:10px;color:var(--vi);line-height:1.7;background:rgba(155,140,240,.05);border:1px solid rgba(155,140,240,.2)}
+
+/* FAVORİLER */
+#favbar{background:var(--p1);border-bottom:1px solid var(--b1);padding:6px 10px;display:flex;align-items:center;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#favbar::-webkit-scrollbar{display:none}
+.fav{background:var(--p2);border:1px solid var(--b2);color:var(--cy);padding:5px 9px;font-size:10px;font-weight:700;cursor:pointer;border-radius:3px;white-space:nowrap;-webkit-tap-highlight-color:transparent;font-family:monospace}
+.fav:active{background:var(--cy);color:#000}
+.fav.cr{color:var(--rd);border-color:var(--rd)}
+.fav.cr:active{background:var(--rd);color:#000}
+.fav.go{color:var(--go);border-color:var(--go)}
+.fav.go:active{background:var(--go);color:#000}
+.fav-add{background:transparent;border:1px dashed var(--dm);color:var(--dm);padding:5px 9px;font-size:10px;cursor:pointer;border-radius:3px;white-space:nowrap;font-family:monospace;-webkit-tap-highlight-color:transparent}
+.fav-add:active{border-color:var(--cy);color:var(--cy)}
+.fav-lbl{font-size:9px;color:var(--dm);white-space:nowrap;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -180,7 +193,7 @@ button.bv:disabled{opacity:.4;pointer-events:none}
     <button class="bt bv" id="aib" onclick="runAI()">🤖 ANALİZ</button>
   </div>
   <div class="tr2">
-    <input class="si" id="sym" value="THYAO" maxlength="12" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="SEMBOL">
+    <input class="si" id="sym" value="" maxlength="12" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="SEMBOL" onfocus="this.select()">
     <select class="se" id="exch">
       <option value="BIST">BIST</option>
       <option value="NASDAQ">NASDAQ</option>
@@ -207,6 +220,21 @@ button.bv:disabled{opacity:.4;pointer-events:none}
 <div id="ph">
   <div><div id="pn">—</div><div id="ps">Sembol seçin</div></div>
   <div><div id="pv" class="nu">—</div><div id="pc" class="nu">—</div></div>
+</div>
+
+<div id="favbar">
+  <span class="fav-lbl">⭐</span>
+  <button class="fav" onclick="quickLoad('THYAO','BIST')">THYAO</button>
+  <button class="fav" onclick="quickLoad('GARAN','BIST')">GARAN</button>
+  <button class="fav" onclick="quickLoad('AKBNK','BIST')">AKBNK</button>
+  <button class="fav" onclick="quickLoad('ASELS','BIST')">ASELS</button>
+  <button class="fav" onclick="quickLoad('FROTO','BIST')">FROTO</button>
+  <button class="fav cr" onclick="quickLoad('AAPL','NASDAQ')">AAPL</button>
+  <button class="fav cr" onclick="quickLoad('NVDA','NASDAQ')">NVDA</button>
+  <button class="fav cr" onclick="quickLoad('TSLA','NASDAQ')">TSLA</button>
+  <button class="fav go" onclick="quickLoad('BTCUSDT','CRYPTO')">BTC</button>
+  <button class="fav go" onclick="quickLoad('ETHUSDT','CRYPTO')">ETH</button>
+  <button class="fav-add" onclick="addFav()">+ Ekle</button>
 </div>
 
 <div id="ch"><div id="chp"><div style="font-size:28px">📊</div><div style="font-size:11px">▶ YÜKLE butonuna basın</div></div></div>
@@ -308,7 +336,6 @@ function tab(btn, id) {
 }
 
 function doLoad(){
-  console.log("doLoad called, sym=", $('sym').value);
   var sym=$('sym').value.trim().toUpperCase();
   var exch=$('exch').value, intv=$('intv').value;
   if(!sym){alert('Sembol girin');return;}
@@ -564,7 +591,52 @@ async function chat(){
   out.scrollTop=out.scrollHeight;
 }
 
+
+function quickLoad(sym, exch) {
+  $('sym').value = sym;
+  $('exch').value = exch;
+  doLoad();
+}
+
+function addFav() {
+  var sym = $('sym').value.trim().toUpperCase();
+  var exch = $('exch').value;
+  if(!sym){ alert('Önce sembol girin'); return; }
+  var bar = document.getElementById('favbar');
+  var cls = exch==='CRYPTO'?'go':exch==='BIST'?'':'cr';
+  var btn = document.createElement('button');
+  btn.className = 'fav ' + cls;
+  btn.textContent = sym;
+  btn.onclick = function(){ quickLoad(sym, exch); };
+  // insert before + button
+  var addBtn = bar.querySelector('.fav-add');
+  bar.insertBefore(btn, addBtn);
+  // save to localStorage
+  try {
+    var favs = JSON.parse(localStorage.getItem('at_favs')||'[]');
+    favs.push({sym:sym,exch:exch});
+    localStorage.setItem('at_favs', JSON.stringify(favs));
+  } catch(e){}
+}
+
+function loadFavs() {
+  try {
+    var favs = JSON.parse(localStorage.getItem('at_favs')||'[]');
+    var bar = document.getElementById('favbar');
+    var addBtn = bar.querySelector('.fav-add');
+    favs.forEach(function(f){
+      var cls = f.exch==='CRYPTO'?'go':f.exch==='BIST'?'':'cr';
+      var btn = document.createElement('button');
+      btn.className = 'fav ' + cls;
+      btn.textContent = f.sym;
+      btn.onclick = function(){ quickLoad(f.sym, f.exch); };
+      bar.insertBefore(btn, addBtn);
+    });
+  } catch(e){}
+}
+
 document.addEventListener('DOMContentLoaded',function(){
+  loadFavs();
   // Initialize: show only first tab
   var all=document.querySelectorAll('.pg, #pg-ai');
   for(var i=0;i<all.length;i++){all[i].style.display='none';all[i].classList.remove('on');}
