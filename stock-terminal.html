@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AlphaTerminal">
+<meta name="theme-color" content="#040912">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23040912'/><text y='.9em' font-size='80'>📈</text></svg>">
 <title>AlphaTerminal</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -303,6 +308,7 @@ function tab(btn, id) {
 }
 
 function doLoad(){
+  console.log("doLoad called, sym=", $('sym').value);
   var sym=$('sym').value.trim().toUpperCase();
   var exch=$('exch').value, intv=$('intv').value;
   if(!sym){alert('Sembol girin');return;}
