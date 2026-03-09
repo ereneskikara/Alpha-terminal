@@ -4,7 +4,6 @@ export default async function handler(req, res) {
   const { sym, exch } = req.query;
   if (!sym) return res.status(400).json({ error: 'sym required' });
 
-  // Yahoo sembol formatı
   let ys = sym;
   if (exch === 'BIST') ys = sym + '.IS';
   else if (exch === 'XETR') ys = sym + '.DE';
