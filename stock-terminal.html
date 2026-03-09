@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AlphaTerminal">
+<meta name="theme-color" content="#040912">
+<title>AlphaTerminal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#040912;--p1:#07111f;--p2:#0b1829;--b1:#152338;--b2:#1e3050;--cy:#00ccff;--gr:#00dd88;--rd:#ff3355;--go:#f5a020;--vi:#9b8cf0;--dm:#3a5470;--d2:#607590;--tx:#c8d8ec;--wh:#e0eeff}
+html,body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,monospace;font-size:13px;height:100%;overflow:hidden}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+#tb{background:var(--p1);border-bottom:2px solid var(--b1);padding:8px 12px;flex-shrink:0}
+.logo{font-weight:900;font-size:16px;color:var(--cy);letter-spacing:3px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.logo b{color:var(--rd)}
+.logo-right{font-size:10px;color:var(--d2);letter-spacing:0;font-weight:400}
+#sr{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+#sym{flex:1;background:var(--p2);border:2px solid var(--cy);color:var(--wh);padding:10px 12px;font-size:17px;font-weight:700;text-transform:uppercase;outline:none;border-radius:6px;font-family:inherit;min-height:46px}
+#sym::placeholder{color:var(--dm);font-size:13px;font-weight:400;text-transform:none}
+#lbtn{background:var(--cy);border:none;color:#000;padding:10px 16px;font-size:14px;font-weight:900;cursor:pointer;border-radius:6px;min-height:46px;white-space:nowrap;font-family:inherit;flex-shrink:0}
+#lbtn:active{opacity:.7}
+#lbtn:disabled{opacity:.5}
+#or{display:flex;gap:6px}
+#exch,#intv{flex:1;background:var(--p2);border:1px solid var(--b2);color:var(--tx);padding:8px 6px;font-size:12px;outline:none;border-radius:6px;font-family:inherit;min-height:38px}
+#abtn{background:rgba(155,140,240,.15);border:1px solid var(--vi);color:var(--vi);padding:8px 12px;font-size:12px;cursor:pointer;border-radius:6px;font-family:inherit;white-space:nowrap;min-height:38px;flex-shrink:0;font-weight:700}
+#abtn:active{background:var(--vi);color:#000}
+#abtn:disabled{opacity:.4;pointer-events:none}
+#favbar{background:var(--p1);border-bottom:1px solid var(--b1);padding:6px 12px;display:flex;align-items:center;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0}
+#favbar::-webkit-scrollbar{display:none}
+.fv{background:var(--p2);border:1px solid var(--b2);color:var(--cy);padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;border-radius:20px;white-space:nowrap;font-family:monospace;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.fv:active{background:var(--cy);color:#000}
+.fv.us{color:var(--rd);border-color:rgba(255,51,85,.3)}
+.fv.cr{color:var(--go);border-color:rgba(245,160,32,.3)}
+.fv.tr{color:var(--cy)}
+#chart-wrap{flex:1;position:relative;min-height:0}
+#ch{position:absolute;inset:0;width:100%;height:100%}
+#ch iframe{width:100%;height:100%;border:none;display:block}
+#placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--d2);gap:12px;font-size:13px;text-align:center;padding:20px}
+#placeholder .logo-big{font-size:36px;font-weight:900;color:var(--cy);letter-spacing:4px}
+#placeholder .logo-big b{color:var(--rd)}
+#placeholder p{color:var(--dm);font-size:12px;line-height:1.8}
+#ai-panel{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s ease}
+#ai-panel.open{transform:translateY(0)}
+#ai-header{background:var(--p1);border-bottom:2px solid var(--b1);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#ai-title{color:var(--vi);font-weight:900;font-size:15px;letter-spacing:1px}
+#ai-close{background:transparent;border:1px solid var(--b2);color:var(--tx);padding:6px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13px}
+#ai-close:active{background:var(--b2)}
+#ai-sym{font-size:11px;color:var(--d2);margin-top:2px}
+#ao{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch;min-height:0}
+#ai-input{border-top:1px solid var(--b1);padding:10px 12px;display:flex;gap:8px;flex-shrink:0;background:var(--p1)}
+#ci{flex:1;background:var(--p2);border:1px solid var(--b2);color:var(--wh);padding:10px 12px;font-size:14px;outline:none;border-radius:6px;font-family:inherit}
+#ci::placeholder{color:var(--dm)}
+#csend{background:var(--vi);border:none;color:#000;padding:10px 16px;font-weight:900;cursor:pointer;border-radius:6px;font-family:inherit;font-size:16px}
+#csend:active{opacity:.7}
+.as{margin-bottom:14px}
+.ah{font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:6px;text-transform:uppercase}
+.ab{background:var(--p2);border-radius:8px;padding:12px;font-size:12px;line-height:1.7;border-left:3px solid var(--b2)}
+.ab.i{border-left-color:var(--cy)}.ab.g{border-left-color:var(--gr)}.ab.r{border-left-color:var(--rd)}.ab.n{border-left-color:var(--go)}.ab.q{border-left-color:var(--dm);color:var(--d2)}.ab.a{border-left-color:var(--vi)}
+.tk{display:flex;align-items:center;gap:10px;color:var(--d2);font-size:12px;padding:8px 0}
+.ds{display:flex;gap:4px}.ds span{width:6px;height:6px;border-radius:50%;background:var(--vi);animation:pu 1.2s infinite}.ds span:nth-child(2){animation-delay:.2s}.ds span:nth-child(3){animation-delay:.4s}
+@keyframes pu{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.welcome{text-align:center;padding:30px 20px;color:var(--d2)}.welcome .wi{font-size:40px;margin-bottom:12px}.welcome h3{color:var(--vi);margin-bottom:8px;font-size:15px}.welcome p{font-size:12px;line-height:1.7}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="tb">
+    <div class="logo">
+      <span>ALPHA<b>TERM</b></span>
+      <span class="logo-right" id="sym-label">Hisse seçin</span>
+    </div>
+    <div id="sr">
+      <input id="sym" type="text" placeholder="Sembol: THYAO, PLTR, BTC..." autocomplete="off" autocorrect="off" spellcheck="false">
+      <button id="lbtn" onclick="doLoad()">▶ YÜKLE</button>
+    </div>
+    <div id="or">
+      <select id="exch">
+        <option value="BIST">🇹🇷 BIST</option>
+        <option value="NASDAQ" selected>🇺🇸 NASDAQ</option>
+        <option value="NYSE">🇺🇸 NYSE</option>
+        <option value="XETR">🇩🇪 XETR</option>
+        <option value="CRYPTO">₿ CRYPTO</option>
+      </select>
+      <select id="intv">
+        <option value="1">1dk</option>
+        <option value="5">5dk</option>
+        <option value="15">15dk</option>
+        <option value="60">1sa</option>
+        <option value="D" selected>Günlük</option>
+        <option value="W">Haftalık</option>
+      </select>
+      <button id="abtn" onclick="openAI()" disabled>🤖 ANALİZ</button>
+    </div>
+  </div>
+  <div id="favbar">
+    <button class="fv tr" onclick="quickLoad('THYAO','BIST')">THYAO</button>
+    <button class="fv tr" onclick="quickLoad('GARAN','BIST')">GARAN</button>
+    <button class="fv tr" onclick="quickLoad('AKBNK','BIST')">AKBNK</button>
+    <button class="fv tr" onclick="quickLoad('ASELS','BIST')">ASELS</button>
+    <button class="fv tr" onclick="quickLoad('FROTO','BIST')">FROTO</button>
+    <button class="fv us" onclick="quickLoad('PLTR','NASDAQ')">PLTR</button>
+    <button class="fv us" onclick="quickLoad('AAPL','NASDAQ')">AAPL</button>
+    <button class="fv us" onclick="quickLoad('NVDA','NASDAQ')">NVDA</button>
+    <button class="fv us" onclick="quickLoad('TSLA','NASDAQ')">TSLA</button>
+    <button class="fv cr" onclick="quickLoad('BTC','CRYPTO')">BTC</button>
+    <button class="fv cr" onclick="quickLoad('ETH','CRYPTO')">ETH</button>
+  </div>
+  <div id="chart-wrap">
+    <div id="ch">
+      <div id="placeholder">
+        <div class="logo-big">ALPHA<b>TERM</b></div>
+        <p>Yukarıdan bir hisse seçin<br>veya sembol yazıp YÜKLE'ye basın</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="ai-panel">
+  <div id="ai-header">
+    <div>
+      <div id="ai-title">🤖 AI ANALİZ</div>
+      <div id="ai-sym">—</div>
+    </div>
+    <button id="ai-close" onclick="closeAI()">✕ Kapat</button>
+  </div>
+  <div id="ao">
+    <div class="welcome">
+      <div class="wi">🤖</div>
+      <h3>AlphaTerminal AI</h3>
+      <p>Bir hisse yükleyin,<br>ardından ANALİZ butonuna basın.</p>
+    </div>
+  </div>
+  <div id="ai-input">
+    <input id="ci" type="text" placeholder="AI'ya soru sor..." autocomplete="off">
+    <button id="csend" onclick="chatSend()">↑</button>
+  </div>
+</div>
+
+<script>
+var G={sym:'',exch:'NASDAQ',intv:'D',ready:false,hist:[]};
+var PFX={BIST:'BIST:',NASDAQ:'NASDAQ:',NYSE:'NYSE:',XETR:'XETR:',CRYPTO:''};
+var EL={BIST:'Borsa İstanbul',NASDAQ:'NASDAQ',NYSE:'NYSE',XETR:'Frankfurt',CRYPTO:'Kripto'};
+var IL={'1':'1dk','5':'5dk','15':'15dk','60':'1sa','D':'Günlük','W':'Haftalık'};
+var CRYPTO_MAP={BTC:'BINANCE:BTCUSDT',ETH:'BINANCE:ETHUSDT',BNB:'BINANCE:BNBUSDT',SOL:'BINANCE:SOLUSDT',XRP:'BINANCE:XRPUSDT',DOGE:'BINANCE:DOGEUSDT',ADA:'BINANCE:ADAUSDT',AVAX:'BINANCE:AVAXUSDT'};
+
+function $(id){return document.getElementById(id)}
+
+function tvSymbol(sym,exch){
+  if(exch==='CRYPTO') return CRYPTO_MAP[sym]||('BINANCE:'+sym+'USDT');
+  return (PFX[exch]||'')+sym;
+}
+
+function loadChart(){
+  var tvSym=tvSymbol(G.sym,G.exch);
+  var studies=['RSI@tv-basicstudies','MACD@tv-basicstudies','BB@tv-basicstudies'];
+  var st=studies.map(encodeURIComponent).join('%1F');
+  var src='https://s.tradingview.com/widgetembed/?symbol='+encodeURIComponent(tvSym)+'&interval='+G.intv+'&theme=dark&style=1&locale=tr&timezone=Europe%2FIstanbul&toolbar_bg=%2307111f&hide_side_toolbar=0&allow_symbol_change=1&studies='+st+'&withdateranges=1&save_image=0';
+  $('ch').innerHTML='<iframe src="'+src+'" allowfullscreen scrolling="no"></iframe>';
+}
+
+function doLoad(){
+  var sym=$('sym').value.trim().toUpperCase();
+  var exch=$('exch').value;
+  var intv=$('intv').value;
+  if(!sym){$('sym').focus();return;}
+  G.sym=sym;G.exch=exch;G.intv=intv;G.ready=true;G.hist=[];
+  $('sym-label').textContent=sym+' · '+(EL[exch]||exch);
+  $('abtn').disabled=false;
+  $('lbtn').textContent='⏳';$('lbtn').disabled=true;
+  loadChart();
+  setTimeout(function(){$('lbtn').textContent='▶ YÜKLE';$('lbtn').disabled=false;},1500);
+  $('ai-sym').textContent=sym+' / '+(EL[exch]||exch)+' / '+(IL[intv]||intv);
+}
+
+function quickLoad(sym,exch){
+  $('sym').value=sym;
+  $('exch').value=exch;
+  doLoad();
+}
+
+function openAI(){
+  if(!G.ready){alert('Önce bir hisse yükleyin');return;}
+  $('ai-panel').classList.add('open');
+  if(G.hist.length===0) runAI();
+}
+
+function closeAI(){
+  $('ai-panel').classList.remove('open');
+}
+
+function runAI(){
+  var btn=$('abtn');btn.disabled=true;
+  $('ao').innerHTML='<div class="tk"><span>AI analiz yapıyor...</span><div class="ds"><span></span><span></span><span></span></div></div>';
+  var prompt='AlphaTerminal AI asistanısın. '+G.sym+' ('+(EL[G.exch]||G.exch)+') hissesini analiz et. Zaman dilimi: '+(IL[G.intv]||G.intv)+'. Türkçe, profesyonel ve net.\n\n[OZET] Genel durum özeti\n[TEKNIK] RSI, MACD, trend analizi\n[DESTEK_DIRENC] Önemli destek ve direnç seviyeleri\n[SENARYO] Boğa ve ayı senaryosu\n[KARAR] Net al/sat/bekle kararı';
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+  }).then(function(r){return r.json()}).then(function(json){
+    var text=(json.content||[]).map(function(x){return x.text||''}).join('');
+    if(!text)throw new Error('Boş yanıt');
+    G.hist=[{role:'user',content:prompt},{role:'assistant',content:text}];
+    renderAI(text);
+  }).catch(function(e){
+    $('ao').innerHTML='<div class="ab r">⚠️ Hata: '+e.message+'</div>';
+  }).finally(function(){btn.disabled=false;});
+}
+
+function renderAI(text){
+  var S=[{k:'OZET',l:'📊 ÖZET',c:'i'},{k:'TEKNIK',l:'📈 TEKNİK',c:'n'},{k:'DESTEK_DIRENC',l:'🎯 DESTEK & DİRENÇ',c:'g'},{k:'SENARYO',l:'🔭 SENARYO',c:'n'},{k:'KARAR',l:'⚡ KARAR',c:'r'}];
+  var HC={i:'var(--cy)',g:'var(--gr)',r:'var(--rd)',n:'var(--go)'};
+  var found={};
+  S.forEach(function(s){var tag='['+s.k+']',idx=text.indexOf(tag);if(idx===-1)return;var end=text.length;S.forEach(function(s2){if(s2.k===s.k)return;var i2=text.indexOf('['+s2.k+']');if(i2>idx&&i2<end)end=i2});found[s.k]=text.substring(idx+tag.length,end).trim()});
+  var out=$('ao');
+  if(!Object.keys(found).length){out.innerHTML='<div class="ab i" style="white-space:pre-wrap;font-size:12px">'+text+'</div>';return;}
+  out.innerHTML=S.map(function(s){var cnt=found[s.k];if(!cnt)return'';return'<div class="as"><div class="ah" style="color:'+HC[s.c]+'">'+s.l+'</div><div class="ab '+s.c+'">'+cnt.replace(/\n/g,'<br>')+'</div></div>'}).join('');
+}
+
+function chatSend(){
+  var inp=$('ci'),q=inp.value.trim();if(!q)return;inp.value='';
+  var out=$('ao');
+  out.innerHTML+='<div class="as"><div class="ab q"><b>Sen:</b> '+q+'</div></div><div class="tk" id="tb2"><span>Yanıt geliyor</span><div class="ds"><span></span><span></span><span></span></div></div>';
+  out.scrollTop=out.scrollHeight;
+  G.hist.push({role:'user',content:q});
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:'AlphaTerminal AI. '+G.sym+' '+(EL[G.exch]||G.exch)+' analisti. Kısa, net, Türkçe.',messages:G.hist.slice(-8)})
+  }).then(function(r){return r.json()}).then(function(json){
+    var reply=(json.content||[]).map(function(x){return x.text||''}).join('')||'Yanıt alınamadı.';
+    G.hist.push({role:'assistant',content:reply});
+    var tb=document.getElementById('tb2');if(tb)tb.remove();
+    out.innerHTML+='<div class="as"><div class="ab a"><b style="color:var(--vi)">🤖 AI:</b><br><br>'+reply.replace(/\n/g,'<br>')+'</div></div>';
+    out.scrollTop=out.scrollHeight;
+  }).catch(function(e){
+    var tb=document.getElementById('tb2');if(tb)tb.remove();
+    out.innerHTML+='<div class="ab r">⚠️ '+e.message+'</div>';
+  });
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  $('sym').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doLoad()}});
+  $('ci').addEventListener('keydown',function(e){if(e.key==='Enter')chatSend()});
+});
+</script>
+
+</body>
+</html>
