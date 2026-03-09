@@ -4,26 +4,21 @@ export default async function handler(req, res) {
   const { sym, exch } = req.query;
   if (!sym) return res.status(400).json({ error: 'sym required' });
 
-  let ys = sym;
-  if (exch === 'BIST') ys = sym + '.IS';
-  else if (exch === 'XETR') ys = sym + '.DE';
-  else if (exch === 'CRYPTO') ys = sym.replace('/USD','').replace('USDT','').replace('BUSD','') + '-USD';
+  const FINNHUB_KEY = 'd6ctgkpr01qgk7mjnqu0d6ctgkpr01qgk7mjnqug';
+
+  let fsym = sym;
+  if (exch === 'XETR') fsym = sym + '.DE';
+  else if (exch === 'BIST') fsym = sym + '.IS';
 
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${encodeURIComponent(ys)}&crumb=`;
-    const r = await fetch(url, { 
-      headers: { 
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json'
-      } 
-    });
+    const url = `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(fsym)}&token=${FINNHUB_KEY}`;
+    const r = await fetch(url);
     const data = await r.json();
-    const q = data?.quoteResponse?.result?.[0];
-    if (!q) return res.status(404).json({ error: 'not found', raw: data });
+    if (!data.c || data.c === 0) return res.status(404).json({ error: 'not found', raw: data });
     res.json({
-      price: q.regularMarketPrice,
-      chgPct: q.regularMarketChangePercent,
-      currency: q.currency
+      price: data.c,
+      chgPct: ((data.c - data.pc) / data.pc * 100).toFixed(2),
+      currency: exch === 'XETR' ? 'EUR' : exch === 'BIST' ? 'TRY' : 'USD'
     });
   } catch(e) {
     res.status(500).json({ error: e.message });
