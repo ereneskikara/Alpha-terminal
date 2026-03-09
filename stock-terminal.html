@@ -262,10 +262,17 @@ function yahooSym(sym,exch){
 
 function parseYahooData(text, exch){
   var data=JSON.parse(text);
-  var res=data.chart.result[0];
+  var res=data.chart&&data.chart.result&&data.chart.result[0];
+  if(!res) return null;
   var meta=res.meta;
-  var price=meta.regularMarketPrice||meta.previousClose;
-  var prev=meta.previousClose||price;
+  // En güncel fiyatı bul - öncelik sırası
+  var price=meta.regularMarketPrice
+    ||meta.postMarketPrice
+    ||meta.preMarketPrice
+    ||meta.chartPreviousClose
+    ||meta.previousClose;
+  // Önceki kapanış
+  var prev=meta.chartPreviousClose||meta.previousClose||price;
   if(!price||price<=0) return null;
   var chgPct=prev>0?((price-prev)/prev*100):0;
   var cur=exch==='BIST'?'₺':exch==='XETR'?'€':'$';
@@ -274,13 +281,15 @@ function parseYahooData(text, exch){
 
 function fetchPrice(sym,exch,callback){
   var ys=yahooSym(sym,exch);
-  var yahooUrl='https://query1.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(ys)+'?interval=1m&range=1d';
+  // v8/chart endpoint - regularMarketPrice içeriyor
+  var yahooUrl='https://query1.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(ys)+'?interval=1d&range=5d&includePrePost=false';
+  // v7/quote endpoint - daha stabil fiyat
+  var yahooUrl2='https://query2.finance.yahoo.com/v7/finance/quote?symbols='+encodeURIComponent(ys);
 
-  // 3 farklı proxy sırayla dene
   var proxies=[
     'https://corsproxy.io/?'+encodeURIComponent(yahooUrl),
     'https://api.allorigins.win/get?url='+encodeURIComponent(yahooUrl),
-    'https://thingproxy.freeboard.io/fetch/'+yahooUrl
+    'https://corsproxy.io/?'+encodeURIComponent(yahooUrl2),
   ];
 
   function tryProxy(i){
@@ -293,12 +302,24 @@ function fetchPrice(sym,exch,callback){
       if(xhr.status!==200){tryProxy(i+1);return;}
       try{
         var text=xhr.responseText;
-        // allorigins wrapper kontrolü
         if(text.indexOf('"contents"')!==-1){
           var outer=JSON.parse(text);
           text=outer.contents;
         }
-        var result=parseYahooData(text,exch);
+        var result=null;
+        // v7 quote formatı
+        if(text.indexOf('"quoteResponse"')!==-1){
+          var d=JSON.parse(text);
+          var q=d.quoteResponse&&d.quoteResponse.result&&d.quoteResponse.result[0];
+          if(q&&q.regularMarketPrice){
+            var cur=exch==='BIST'?'₺':exch==='XETR'?'€':'$';
+            var chgPct=q.regularMarketChangePercent||0;
+            result={price:q.regularMarketPrice,chgPct:chgPct,cur:cur,found:true};
+          }
+        } else {
+          // v8 chart formatı
+          result=parseYahooData(text,exch);
+        }
         if(result) callback(result);
         else tryProxy(i+1);
       }catch(e){
